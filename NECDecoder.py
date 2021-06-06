@@ -1,5 +1,9 @@
 #
-#    IR Circular buffer decoder
+#   IR Receiver
+#   NEC Protocol
+#   Designed for Raspberry Pi
+#   Tested on Raspberry Pi Zero
+#   2021 Kamil Skoczylas
 #
 
 import RPi.GPIO as GPIO
