@@ -479,12 +479,16 @@ class IRdecoder:
             commandDecoded = finalSignalString  
             return commandDecoded
     
-    def __init__(self, GPIO_Mode, GPIO_PIN):
+    def __init__(self, GPIO_Mode = None, GPIO_PIN = None):
         
         self.IRTimeQueue = Queue(self.MAX_QUEUE_SIZE)
         self.Commands = Queue(self.MAX_COMMANDS)
-        self.GPIO_Mode = GPIO_Mode
-        self.GPIO_PIN = GPIO_PIN
+        
+        if not GPIO_Mode is None:
+            self.GPIO_Mode = GPIO_Mode
+            
+        if not GPIO_PIN is None:    
+            self.GPIO_PIN = GPIO_PIN
         
         worker = Thread(target=self.QueueConsumer)
         worker.daemon = True
@@ -527,7 +531,7 @@ class IRdecoder:
     
 # Program start
 # Example
-IReader = IRdecoder(GPIO.BCM, 16)
+IReader = IRdecoder()
 
 while True:
     sleep(0.1)
