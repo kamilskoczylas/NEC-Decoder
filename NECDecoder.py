@@ -156,11 +156,17 @@ class IRdecoder:
             i = 0
             score = 0
             for character in string1:
-                if character == string2[i:1]:
-                    score += 1
+                if len(string2) >= i and string2[i:1] != '_':
+                    if character == string2[i:1]:
+                        score += 1
+                    else:
+                        score -= 1
                     
-                if character != string3[i:1]:
-                    score += 1
+                if len(string3) >= i and string3[i:1] != '_':
+                    if character != string3[i:1]:
+                        score += 1
+                    else:
+                        score -= 1
                     
             return score
                 
