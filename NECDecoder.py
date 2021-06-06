@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO
 from time import sleep
 from timeit import default_timer
 from Queue import Queue
+from Queue import Empty
 from threading import Thread
 
 
@@ -14,31 +15,44 @@ class IRdecoder:
     startIRTimeQueue = 0
     MAX_QUEUE_SIZE = 512
     MAX_COMMANDS = 10
+    DEBUG = False
+    
+    GPIO_Mode = GPIO.BCM
+    GPIO_PIN = 16
     
     class NECDecoder:
         AddressLengthSeconds = 0.027
         CommandLengthSeconds = 0.027
-        PulseErrorRange = 0.0008
+        PulseErrorRange = 0.001
         
         PULSE_POSITIVE_LENGTH = 0.00225
         PULSE_NEGATIVE_LENGTH = 0.001125
         
-        REPEAT_BURST_SHORT_LENGTH = 0.04
+        REPEAT_BURST_SHORT_LENGTH = 0.045
         REPEAT_BURST_LONG_LENGTH = 0.097
         REPEAT_BURST_ERROR_RANGE = 0.01
         
-        AddressString = ''
-        AddressInvertedString = ''
-        CommandString = ''
-        CommandInvertedString = ''
         breakTime = 0
         ir_pulseStart = 0
         timeFromNextPhase = 0
-        accurracyArray = []
         
-        def __init__(self, timeQueue):
+        REMOTE_CONTROLLER_COMMANDS = {
+            "00001100": "ON",
+            "00011010": "OK",
+            "01011010": "RIGHT"
+            }
+        
+        REMOTE_CONTROLLERS = {
+            "10110100": "DVD",
+            "00000000": "Custom"
+            }
+        
+        DEBUG = False
+        
+        def __init__(self, timeQueue, DebugMode = False):
             
             self.IRTimeQueue = timeQueue
+            self.DEBUG = DebugMode
             
         def getBurst(self, pulseCount, burstStartTime, maxTime):
             resultArray = []
@@ -46,33 +60,66 @@ class IRdecoder:
             previousPulseStart = burstStartTime
             i = 0
             
-            while i < 16 and edgeTimeDetected <= maxTime:
+            while i < pulseCount and edgeTimeDetected <= maxTime:
                 i += 1
+
+                try:
+                    edgeTimeDetected = self.IRTimeQueue.get_nowait()
+                    self.IRTimeQueue.task_done()
+                    signalTime = edgeTimeDetected - previousPulseStart
+                        #min(maxTime - previousPulseStart, edgeTimeDetected - previousPulseStart)
                 
-                if self.IRTimeQueue.empty():
-                    edgeTimeDetected = maxTime
-                    signalTime = maxTime - previousPulseStart
-                else:
+                except Empty:
+                    #if default_timer() >= maxTime:
+                    #edgeTimeDetected = maxTime
+                    #signalTime = maxTime - previousPulseStart
+                    
+                    #if self.DEBUG:
+                    print("Empty: {0}".format(len(resultArray)))
+                    
+                    if (maxTime - previousPulseStart < self.REPEAT_BURST_ERROR_RANGE):
+                        break
+                    
+                    print (resultArray)
+                    print("Left: {0}".format(maxTime - previousPulseStart))
                     edgeTimeDetected = self.IRTimeQueue.get()
                     self.IRTimeQueue.task_done()
                     signalTime = edgeTimeDetected - previousPulseStart
                     
                 resultArray.append(signalTime)
                 previousPulseStart = edgeTimeDetected
-                print ("{0} {1}".format(i, signalTime))
+                if self.DEBUG:
+                    print ("{0} {1}".format(i, signalTime))
             
             self.timeFromNextPhase = edgeTimeDetected - maxTime
+            #print ("{0} {1}".format(i, self.timeFromNextPhase))
+            #resultArray.append(self.timeFromNextPhase)
             
             # To future calculation of breakTime
             self.ir_pulseStart = edgeTimeDetected
             return resultArray
+        
+        def getFirst16bitsOr27ms(self, arrayOfPulses):
+            first16or27ms = []
+            i = 0
+            totalTime = 0
+            
+            while i < 16 and totalTime <= self.AddressLengthSeconds and len(arrayOfPulses) > 0:
+                i += 1
+                signalTime = arrayOfPulses.pop(0)
+                first16or27ms.append(signalTime)
+                totalTime += signalTime
+            
+            return first16or27ms
             
         def getCommand(self):
             
             signalTime = self.waitForSignal()
-            print("Break: {0}".format(self.breakTime))
             repeatCode = False
             self.timeFromNextPhase = 0
+            
+            if self.DEBUG:
+                print("Break: {0}".format(self.breakTime))
             
             if self.breakTime > self.REPEAT_BURST_SHORT_LENGTH - self.REPEAT_BURST_ERROR_RANGE and self.breakTime < self.REPEAT_BURST_SHORT_LENGTH + self.REPEAT_BURST_ERROR_RANGE:
                 repeatCode = True
@@ -80,38 +127,80 @@ class IRdecoder:
                 repeatCode = True
             
             if repeatCode:
-                #print ("Repeat")
-                #edgeTimeDetected = self.IRTimeQueue.get()
-                #self.IRTimeQueue.task_done()
-                #signalTime = edgeTimeDetected - self.ir_pulseStart
-                
-                print ("Break: {0} Repeat time: {1}".format(self.breakTime, signalTime))
                 return 'REPEAT'
             
-            ir_addressStart = self.ir_pulseStart
-            edgeTimeDetected = ir_addressStart
+            new_signalStart = self.ir_pulseStart + self.AddressLengthSeconds + self.PulseErrorRange
+            pulseArray = self.getBurst(32, self.ir_pulseStart, self.ir_pulseStart + self.AddressLengthSeconds + self.CommandLengthSeconds)    
             
-            addressArray = self.getBurst(16, edgeTimeDetected, self.ir_pulseStart + self.AddressLengthSeconds + self.PulseErrorRange)    
+            addressArray = self.getFirst16bitsOr27ms(pulseArray)
             address = self.fillInKnownValues(addressArray)
-            print("Address: {0}".format(address))
             
-            ir_commandStart = self.ir_pulseStart
-            commandArray = self.getBurst(16, self.ir_pulseStart, ir_commandStart - self.timeFromNextPhase + self.CommandLengthSeconds + self.PulseErrorRange)    
+            commandArray = pulseArray
             command = self.fillInKnownValues(commandArray)
-            print("Command: {0}".format(command))
             
-            if not address or not command:
+            if self.DEBUG:
+                print("Address: {0}".format(address))
+                print("Command: {0}".format(command))
+            
+            if type(address) != str or type(command) != str:
                 return False
             
-            return self.ConvertString16ToHex(address[:8] + command[:8])
+            return { "hex": self.ConvertString16ToHex(address[:8] + command[:8]),
+                     "address": address,
+                     "command": command,
+                     "bestCommand": self.bestCommand(command),
+                     "bestAddress": self.bestAddress(address)
+                     }
+        
+        def calculateSimilarity(self, string1, string2, string3):
+            i = 0
+            score = 0
+            for character in string1:
+                if character == string2[i:1]:
+                    score += 1
+                    
+                if character != string3[i:1]:
+                    score += 1
+                    
+            return score
+                
+            
+        
+        def bestMatch(self, command, arrayOfMatches):
+            bestValue = ''
+            bestScore = 0
+            i = 0
+            
+            for key in arrayOfMatches:
+                score = self.calculateSimilarity(key, command[:8], command[8:16])
+                if bestScore < score:
+                    bestScore = score
+                    bestValue = arrayOfMatches[key]
+            
+            return {
+                "score": bestScore,
+                "value": bestValue
+                }
+        
+        def bestAddress(self, command):
+            return self.bestMatch(command, self.REMOTE_CONTROLLERS)
+        
+        def bestCommand(self, command):
+            return self.bestMatch(command, self.REMOTE_CONTROLLER_COMMANDS)
         
         def ConvertString16ToHex(self, binaryStringValue):
             result = 0
             i = 0
+            if len(binaryStringValue) != 16:
+                return hex(0)
+            
             for character in binaryStringValue:
                 i += 1
                 if character == '1':
                     result |= 1 << (16 - i)
+                    
+                if character == '_':
+                    return hex(0)
                     
             return hex(result)
             
@@ -120,27 +209,33 @@ class IRdecoder:
             while True:
                 # Try to find start 
                 edgeTimeDetected = self.IRTimeQueue.get()
-                self.IRTimeQueue.task_done()
+                #self.IRTimeQueue.task_done()
                 
+                # Let Raspberry read whole signal before
+                # we use max CPU for decoding
                 signalTime = edgeTimeDetected - self.ir_pulseStart
                 self.ir_pulseStart = edgeTimeDetected
                 
                 # If signal starts 13,5ms
-                if signalTime > 0.008 and signalTime < 0.015:   
-                    # Let Raspberry read whole signal before
-                    # we use max CPU for decoding
-                    sleep(0.54)
+                if signalTime > 0.0035 and signalTime < 0.015:
+                    sleep(0.2)
+                    #new_time = default_timer()
+                    #while new_time < edgeTimeDetected + 0.054:
+                    #    sleep(0.01)
+                    #    new_time = default_timer()
+                    
                     return signalTime
                 else:
                     self.breakTime = signalTime
-                    print("Wrong start signal", signalTime)
                     
-                sleep(0.1)
+                    if self.DEBUG:
+                        print("Wrong start signal", signalTime)
+                    
+                sleep(0.01)
                 
         def enhanceArray(self, timeArray):
             newArray = []
             
-            #timeArray[0] += self.timeFromNextPhase
             correctSignal = ''
             correctChunks = []
             timeToCorrectArray = []
@@ -148,7 +243,6 @@ class IRdecoder:
             wrongLength = 0
             
             for pulseLength in timeArray:
-                #newArray.append(pulseLength)
                 
                 if pulseLength > self.PULSE_POSITIVE_LENGTH - self.PulseErrorRange / 2 and pulseLength < self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange / 2:
                     correctSignal += '1'
@@ -197,7 +291,8 @@ class IRdecoder:
             combinationsMix = []
             for errorTime in timeToCorrectArray:
                 
-                print ("error {0}".format( errorTime))
+                if self.DEBUG:
+                    print ("error {0}".format(errorTime))
                 
                 possibleCombinations = self.getCombinationsForTime(errorTime)
                 if not possibleCombinations:
@@ -212,27 +307,23 @@ class IRdecoder:
             for combinationToTest in self.getAllCombinations(combinationsMix):
                 testedSignal = self.connectSignalParts(correctSignal, correctChunks, combinationToTest)
                 validated = self.validateCombinationSignal(testedSignal)
-                print ("{0} result: {1}".format(testedSignal, validated))
+                
+                if self.DEBUG:
+                    print ("{0} result: {1}".format(testedSignal, validated))
+                    
                 if validated:
                     result = testedSignal
                     break
                 
+            if not result:
+                result = self.getCorrectPattern(correctSignal, correctChunks)
+                
             return result
         
-        def connectSignalParts(self, correctSignal, correctChunks, combinationToTest):
-            concatenated = ''
-            i_correct = 0
-            i_wrong = 0
-            lastCharacter = ''
-            
+        def getCorrectPattern(self, correctSignal, correctChunks):
             if len(correctSignal) < 10:
-                print ("Too many errors")
                 return False
             
-            print ("For {0} testing:".format(correctSignal))
-            for combination in combinationToTest:
-                print (combination)
-                
             correctS = ''
             connector = ''
             if correctSignal[0] == '0':
@@ -242,8 +333,25 @@ class IRdecoder:
                 correctS += connector + correct
                 connector = "__"
                 
-            print (correctS)
+            return correctS
+        
+        def connectSignalParts(self, correctSignal, correctChunks, combinationToTest):
+            concatenated = ''
+            i_correct = 0
+            i_wrong = 0
+            lastCharacter = ''
             
+            if len(correctSignal) < 10:
+                # print ("Too many errors")
+                return False
+            
+            if self.DEBUG:
+                correctS = self.getCorrectPattern()
+                print ("For {0} testing:".format(correctSignal))
+                
+                for combination in combinationToTest:
+                    print (combination)
+                
             for character in correctSignal:
                 if character == '1':
                     if lastCharacter != character:
@@ -263,7 +371,7 @@ class IRdecoder:
                 return False
             
             if pulseLengthDetected > self.PULSE_NEGATIVE_LENGTH + 2 * self.PULSE_POSITIVE_LENGTH - self.PulseErrorRange / 2:
-                return ['011', '110', '101', '1000', '0100', '0010', '0001', '0101', '1100', '0110', '0011', '1010']
+                return ['011', '110', '101', '1000', '0100', '0010', '0001'] #, '0101', '1100', '0110', '0011', '1010'
             
             if pulseLengthDetected > 2 * self.PULSE_POSITIVE_LENGTH - self.PulseErrorRange:
                 return ['11', '100', '010', '001', '000', '0000']
@@ -281,8 +389,8 @@ class IRdecoder:
                 print(elements)
                 
                 #for element in elements:
-                #    print(element)
-                print("---")
+                #    # print(element)
+                # print("---")
             
         def incrementIndexes(self, indexes, max_values, key, max_key):
             if key >= max_key:
@@ -307,20 +415,20 @@ class IRdecoder:
                 
             finished = False
             
-            print("Combination Mix")
-            self.printCombination(combinationMix)
+            # print("Combination Mix")
+            # self.printCombination(combinationMix)
             
             while not finished:
                 combinationArray = []
                 
                 for i in range(0, max_key):
-                    print ("Combination: i={0} value = {1}".format(i, indexes[i]))
+                    # print ("Combination: i={0} value = {1}".format(i, indexes[i]))
                     combinationArray.append(combinationMix[i][indexes[i]])
                 
                 finished = not self.incrementIndexes(indexes, max_values, 0, max_key)
                     
                 allCombinations.append(combinationArray)
-                self.printCombination(combinationArray)
+                # self.printCombination(combinationArray)
                 
             return allCombinations
             
@@ -329,17 +437,9 @@ class IRdecoder:
                 return False
             
             if len(signalString) != 16:
-                print("Invalid length")
+                if self.DEBUG:
+                    print("Invalid length")
                 return False
-            
-            #ones = 0
-            #for pulse in signalString:
-            #    if pulse == '1':
-            #        ones += 1
-                    
-            #if ones != 8:
-            #    print("Invalid 1 count")
-            #    return False
             
             difference = 0
             for i in range(0, 8):
@@ -347,7 +447,8 @@ class IRdecoder:
                     difference += 1
                     
             if difference > 0 and difference < 8:        
-                print("Invalid reflection")
+                if self.DEBUG:
+                    print("Invalid reflection")
                 return False
                 
             return True
@@ -356,7 +457,9 @@ class IRdecoder:
                 
         def fillInKnownValues(self, timeArray):
             commandDecoded = ''
-            finalSignalString = self.enhanceArray(timeArray) 
+            #finalSignalString =
+            return self.enhanceArray(timeArray)
+            #return (finalSignalString)
             
             if not finalSignalString:
                 return False
@@ -376,31 +479,38 @@ class IRdecoder:
             commandDecoded = finalSignalString  
             return commandDecoded
     
-    def __init__(self):
+    def __init__(self, GPIO_Mode, GPIO_PIN):
+        
         self.IRTimeQueue = Queue(self.MAX_QUEUE_SIZE)
         self.Commands = Queue(self.MAX_COMMANDS)
+        self.GPIO_Mode = GPIO_Mode
+        self.GPIO_PIN = GPIO_PIN
         
         worker = Thread(target=self.QueueConsumer)
         worker.daemon = True
         worker.start()
+        
+        GPIO.setmode(self.GPIO_Mode)
+        GPIO.setup(self.GPIO_PIN, GPIO.IN) #, pull_up_down = GPIO.PUD_UP) 
+        GPIO.add_event_detect(self.GPIO_PIN, GPIO.RISING, callback = self.SignalEdgeDetected) #, bouncetime = 1)
+
     
     def QueueConsumer(self):
         
-        nec = self.NECDecoder(self.IRTimeQueue)
+        nec = self.NECDecoder(self.IRTimeQueue, self.DEBUG)
         while True:
             
             currentCommand = nec.getCommand()
+            self.Commands.put_nowait(currentCommand)
             
-            if currentCommand != '':
-                self.Commands.put_nowait(currentCommand)
-                
-            sleep(0.1)
+            # Minimum time for next IR command
+            sleep(0.07)
             
     def DecodeIRTimeQueue(self):
         self.ConvertArray(self.IRTimeQueue)
         self.Reset()
     
-    def isDetected(self):
+    def hasDetected(self):
         return not self.Commands.empty()
     
     def getCommand(self):
@@ -411,29 +521,20 @@ class IRdecoder:
     def SignalEdgeDetected(self, PinNumber):
         self.IRTimeQueue.put_nowait(default_timer())
         
+    def __del__(self):
+        GPIO.cleanup(self.GPIO_PIN)
 
     
-IReader = IRdecoder()
-old = 0    
-detect = False
-i = 1
-lastIRTimeQueue = ""
-repeat = 0
-
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(16, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
-GPIO.add_event_detect(16, GPIO.FALLING, callback = IReader.SignalEdgeDetected)
-
-command = 0
-lastCommand = 0
+# Program start
+# Example
+IReader = IRdecoder(GPIO.BCM, 16)
 
 while True:
-    sleep(0.002)
+    sleep(0.1)
     
-    if IReader.isDetected():
+    if IReader.hasDetected():
         cmd = IReader.getCommand()
         print(cmd)
-        #print("{0} {1} {2} {3}".format(cmd[0:8], cmd[8:16], cmd[16:24], cmd[24:32]))
-    
 
-GPIO.cleanup(16)
+
+
