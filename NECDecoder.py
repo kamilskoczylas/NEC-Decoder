@@ -27,7 +27,10 @@ class IRdecoder:
     class NECDecoder:
         AddressLengthSeconds = 0.027
         CommandLengthSeconds = 0.027
-        PulseErrorRange = 0.0008
+        
+        # Maximum value is half of the difference between
+        # positive and negative signal length: 0.00055125
+        PulseErrorRange = 0.00055125
         
         PULSE_POSITIVE_LENGTH = 0.00225
         PULSE_NEGATIVE_LENGTH = 0.001125
