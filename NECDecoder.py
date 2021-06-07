@@ -508,8 +508,8 @@ class IRdecoder:
         worker.start()
         
         GPIO.setmode(self.GPIO_Mode)
-        GPIO.setup(self.GPIO_PIN, GPIO.IN) #, pull_up_down = GPIO.PUD_UP) 
-        GPIO.add_event_detect(self.GPIO_PIN, GPIO.RISING, callback = self.SignalEdgeDetected) #, bouncetime = 1)
+        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+        GPIO.add_event_detect(self.GPIO_PIN, GPIO.RISING, callback = self.SignalDetected, bouncetime = 70)
 
     
     def QueueConsumer(self):
@@ -535,8 +535,45 @@ class IRdecoder:
         self.Commands.task_done()
         return command
             
+    # Too many errors
     def SignalEdgeDetected(self, PinNumber):
         self.IRTimeQueue.put_nowait(default_timer())
+        
+    def WaitUntilEndOfSignal(self, Zero_One, PinNumber):
+        input_value = Zero_One
+        i = 0
+        while input_value == Zero_One and i < 1000:
+                input_value = GPIO.input(PinNumber)
+                i += 1
+                
+    # New approach
+    def SignalDetected(self, PinNumber):
+        
+        currentTime = default_timer()
+        self.IRTimeQueue.put_nowait(currentTime)
+        
+        # Wait until end of beginning signal, aprox. 9ms and 4.5 ms
+        self.WaitUntilEndOfSignal(1, PinNumber)
+        self.WaitUntilEndOfSignal(0, PinNumber)
+        
+        currentTime = default_timer()
+        self.IRTimeQueue.put_nowait(currentTime)
+        
+        # Maximum time when we need to keep reading, 54ms
+        maxTime = currentTime + 0.054
+        
+        # After detecting a signal, try to catch remaining pulses in loop
+        while currentTime < maxTime:
+            
+            self.WaitUntilEndOfSignal(1, PinNumber)
+            currentTime = default_timer()
+            self.IRTimeQueue.put_nowait(currentTime)
+            
+            self.WaitUntilEndOfSignal(0, PinNumber)
+                
+             
+                
+            
         
     def __del__(self):
         GPIO.cleanup(self.GPIO_PIN)
