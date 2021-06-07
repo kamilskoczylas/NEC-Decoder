@@ -359,7 +359,7 @@ class IRdecoder:
                 return False
             
             if self.DEBUG:
-                correctS = self.getCorrectPattern()
+                correctS = self.getCorrectPattern(correctSignal, correctChunks)
                 print ("For {0} testing:".format(correctSignal))
                 
                 for combination in combinationToTest:
