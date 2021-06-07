@@ -19,7 +19,7 @@ class IRdecoder:
     startIRTimeQueue = 0
     MAX_QUEUE_SIZE = 512
     MAX_COMMANDS = 10
-    DEBUG = False
+    DEBUG = True
     
     GPIO_Mode = GPIO.BCM
     GPIO_PIN = 16
@@ -509,7 +509,7 @@ class IRdecoder:
         
         GPIO.setmode(self.GPIO_Mode)
         GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
-        GPIO.add_event_detect(self.GPIO_PIN, GPIO.RISING, callback = self.SignalDetected, bouncetime = 70)
+        GPIO.add_event_detect(self.GPIO_PIN, GPIO.RISING, callback = self.SignalEdgeDetected) #, bouncetime = 70)
 
     
     def QueueConsumer(self):
