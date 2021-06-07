@@ -563,11 +563,13 @@ class IRdecoder:
         maxTime = currentTime + 0.054
         
         # After detecting a signal, try to catch remaining pulses in loop
-        while currentTime < maxTime:
+        pulsesCount = 0
+        while currentTime < maxTime and pulsesCount < 32:
             
             self.WaitUntilEndOfSignal(1, PinNumber)
             currentTime = default_timer()
             self.IRTimeQueue.put_nowait(currentTime)
+            pulsesCount += 1
             
             self.WaitUntilEndOfSignal(0, PinNumber)
                 
