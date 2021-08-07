@@ -512,8 +512,8 @@ class IRdecoder:
         worker.start()
         
         GPIO.setmode(self.GPIO_Mode)
-        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_DOWN) 
-        GPIO.add_event_detect(self.GPIO_PIN, GPIO.RISING, callback = self.SignalEdgeDetected) #, bouncetime = 70)
+        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+        GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback = self.SignalEdgeDetected) #, bouncetime = 70)
 
     
     def QueueConsumer(self):
