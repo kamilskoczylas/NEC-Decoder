@@ -1,8 +1,12 @@
 #
 #   IR Receiver
 #   NEC Protocol
-#   Designed for Raspberry Pi
-#   Tested on Raspberry Pi Zero
+#   Designed for Raspberry Pi Zero
+#
+#   ! Still in testing phase !
+#   Quite often GPIO.add_event_detect calls procedure too early or too late
+#   It happens that it skip signal
+#
 #   2021 Kamil Skoczylas
 #
 
@@ -340,11 +344,11 @@ class IRdecoder:
             correctS = ''
             connector = ''
             if correctSignal[0] == '0':
-                connector = "__"
+                connector = "_"
                 
             for correct in correctChunks:
                 correctS += connector + correct
-                connector = "__"
+                connector = "_"
                 
             return correctS
         
@@ -508,7 +512,7 @@ class IRdecoder:
         worker.start()
         
         GPIO.setmode(self.GPIO_Mode)
-        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_DOWN) 
         GPIO.add_event_detect(self.GPIO_PIN, GPIO.RISING, callback = self.SignalEdgeDetected) #, bouncetime = 70)
 
     
