@@ -7,3 +7,9 @@ The idea of this module is to retrieve, translate and fill in missing InfraRed s
 Raspberry is convenient device, but has unreliable signal retrieving speed.
 
 This module try to guess missing signal phrases.
+
+Before using make sure your Raspberry PI has
+- appropriate power adapter
+- good cooling
+
+Additionally, follow IR Receiver documentation to use appropriate resistors to eliminate unnecessary noises
