@@ -16,12 +16,12 @@ Additionally, follow IR Receiver documentation to use appropriate resistors to e
 
 Use case example:
 
-# Example
-IReader = IRdecoder()
+    # Example
+    IReader = IRdecoder()
 
-while True:
-    sleep(0.1)
-    
-    if IReader.hasDetected():
-        cmd = IReader.getCommand()
-        print(cmd)
+    while True:
+        sleep(0.1)
+
+        if IReader.hasDetected():
+            cmd = IReader.getCommand()
+            print(cmd)
