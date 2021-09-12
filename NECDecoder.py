@@ -28,6 +28,54 @@ class IRdecoder:
     GPIO_Mode = GPIO.BCM
     GPIO_PIN = 16
     
+    def __init__(self, GPIO_Mode = None, GPIO_PIN = None):
+
+        self.IRTimeQueue = Queue(self.MAX_QUEUE_SIZE)
+        self.Commands = Queue(self.MAX_COMMANDS)
+
+        if not GPIO_Mode is None:
+            self.GPIO_Mode = GPIO_Mode
+
+        if not GPIO_PIN is None:    
+            self.GPIO_PIN = GPIO_PIN
+
+        worker = Thread(target=self.QueueConsumer)
+        worker.daemon = True
+        worker.start()
+
+        GPIO.setmode(self.GPIO_Mode)
+        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+        GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback = self.SignalEdgeDetected) #, bouncetime = 70)
+
+    
+    def QueueConsumer(self):
+        nec = self.NECDecoder(self.IRTimeQueue, self.DEBUG)
+        while True:
+            
+            currentCommand = nec.getCommand()
+            self.Commands.put_nowait(currentCommand)
+            
+            # Minimum time for next IR command
+            sleep(0.07)
+            
+    def DecodeIRTimeQueue(self):
+        self.ConvertArray(self.IRTimeQueue)
+        self.Reset()
+    
+    def hasDetected(self):
+        return not self.Commands.empty()
+    
+    def getCommand(self):
+        command = self.Commands.get_nowait()
+        self.Commands.task_done()
+        return command
+            
+    def SignalEdgeDetected(self, PinNumber):
+        self.IRTimeQueue.put_nowait(default_timer())
+        
+    def __del__(self):
+        GPIO.cleanup(self.GPIO_PIN)
+    
     class NECDecoder:
         AddressLengthSeconds = 0.027
         CommandLengthSeconds = 0.027
@@ -496,105 +544,3 @@ class IRdecoder:
             commandDecoded = finalSignalString  
             return commandDecoded
     
-    def __init__(self, GPIO_Mode = None, GPIO_PIN = None):
-        
-        self.IRTimeQueue = Queue(self.MAX_QUEUE_SIZE)
-        self.Commands = Queue(self.MAX_COMMANDS)
-        
-        if not GPIO_Mode is None:
-            self.GPIO_Mode = GPIO_Mode
-            
-        if not GPIO_PIN is None:    
-            self.GPIO_PIN = GPIO_PIN
-        
-        worker = Thread(target=self.QueueConsumer)
-        worker.daemon = True
-        worker.start()
-        
-        GPIO.setmode(self.GPIO_Mode)
-        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
-        GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback = self.SignalEdgeDetected) #, bouncetime = 70)
-
-    
-    def QueueConsumer(self):
-        
-        nec = self.NECDecoder(self.IRTimeQueue, self.DEBUG)
-        while True:
-            
-            currentCommand = nec.getCommand()
-            self.Commands.put_nowait(currentCommand)
-            
-            # Minimum time for next IR command
-            sleep(0.07)
-            
-    def DecodeIRTimeQueue(self):
-        self.ConvertArray(self.IRTimeQueue)
-        self.Reset()
-    
-    def hasDetected(self):
-        return not self.Commands.empty()
-    
-    def getCommand(self):
-        command = self.Commands.get_nowait()
-        self.Commands.task_done()
-        return command
-            
-    # Too many errors
-    def SignalEdgeDetected(self, PinNumber):
-        self.IRTimeQueue.put_nowait(default_timer())
-        
-    def WaitUntilEndOfSignal(self, Zero_One, PinNumber):
-        input_value = Zero_One
-        i = 0
-        while input_value == Zero_One and i < 1000:
-                input_value = GPIO.input(PinNumber)
-                i += 1
-                
-    # New approach
-    def SignalDetected(self, PinNumber):
-        
-        currentTime = default_timer()
-        self.IRTimeQueue.put_nowait(currentTime)
-        
-        # Wait until end of beginning signal, aprox. 9ms and 4.5 ms
-        self.WaitUntilEndOfSignal(1, PinNumber)
-        self.WaitUntilEndOfSignal(0, PinNumber)
-        
-        currentTime = default_timer()
-        self.IRTimeQueue.put_nowait(currentTime)
-        
-        # Maximum time when we need to keep reading, 54ms
-        maxTime = currentTime + 0.054
-        
-        # After detecting a signal, try to catch remaining pulses in loop
-        pulsesCount = 0
-        while currentTime < maxTime and pulsesCount < 32:
-            
-            self.WaitUntilEndOfSignal(1, PinNumber)
-            currentTime = default_timer()
-            self.IRTimeQueue.put_nowait(currentTime)
-            pulsesCount += 1
-            
-            self.WaitUntilEndOfSignal(0, PinNumber)
-                
-             
-                
-            
-        
-    def __del__(self):
-        GPIO.cleanup(self.GPIO_PIN)
-
-    
-# Program start
-# Example
-IReader = IRdecoder()
-
-while True:
-    sleep(0.1)
-    
-    if IReader.hasDetected():
-        cmd = IReader.getCommand()
-        print(cmd)
-
-
-
