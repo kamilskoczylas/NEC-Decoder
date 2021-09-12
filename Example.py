@@ -1,6 +1,6 @@
 # Program start
 import RPi.GPIO as GPIO
-import NECDecoder
+from NECDecoder import IRdecoder
 
 GPIO_Mode = GPIO.BCM
 GPIO_PIN = 16
