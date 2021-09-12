@@ -1,6 +1,7 @@
-# Program start
 import RPi.GPIO as GPIO
+from time import sleep
 from NECDecoder import IRdecoder
+
 
 GPIO_Mode = GPIO.BCM
 GPIO_PIN = 16
