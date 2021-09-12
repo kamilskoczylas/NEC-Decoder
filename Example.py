@@ -1,4 +1,5 @@
 # Program start
+import RPi.GPIO as GPIO
 import NECDecoder
 
 GPIO_Mode = GPIO.BCM
