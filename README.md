@@ -16,7 +16,7 @@ Additionally, follow IR Receiver documentation to use appropriate resistors to e
 
 Use case example:
 
-    import NecDecoder
+    import NECDecoder
 
     GPIO_Mode = GPIO.BCM
     GPIO_PIN = 16
