@@ -1,5 +1,5 @@
 # Program start
-import NecDecoder
+import NECDecoder
 
 GPIO_Mode = GPIO.BCM
 GPIO_PIN = 16
