@@ -17,16 +17,19 @@ Additionally, follow IR Receiver documentation to use appropriate resistors to e
 Use case example:
 
     
-    import RPi.GPIO as GPIO # Only for value of GPIO.BCM
-    from time import sleep # Sleeping allows CPU to increase performance for other applications on Raspberry
+    # Only for value of GPIO.BCM
+    import RPi.GPIO as GPIO 
+    # Sleeping allows CPU to increase performance for other applications on Raspberry
+    # CPU goes down from 100% to 5-15% on NECDecoder
+    from time import sleep 
     
     from NECDecoder import IRdecoder
-
 
     GPIO_Mode = GPIO.BCM
     GPIO_PIN = 16
 
-    # Example
+    # Initialization of the class. Sets thread deamon
+    # Default values are GPIO.BCM and PIN 16
     IReader = IRdecoder(GPIO_Mode, GPIO_PIN)
 
     while True:
