@@ -23,12 +23,13 @@ class IRdecoder:
     startIRTimeQueue = 0
     MAX_QUEUE_SIZE = 512
     MAX_COMMANDS = 10
-    DEBUG = True
     
     GPIO_Mode = GPIO.BCM
     GPIO_PIN = 16
     
-    def __init__(self, GPIO_Mode = None, GPIO_PIN = None):
+    def __init__(self, GPIO_Mode = None, GPIO_PIN = None, DEBUG = False):
+        
+        self.DEBUG = DEBUG
 
         self.IRTimeQueue = Queue(self.MAX_QUEUE_SIZE)
         self.Commands = Queue(self.MAX_COMMANDS)
