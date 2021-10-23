@@ -57,7 +57,7 @@ class IRdecoder:
             self.Commands.put_nowait(currentCommand)
             
             # Minimum time for next IR command
-            sleep(0.045)
+            sleep(0.01)
             
     def DecodeIRTimeQueue(self):
         self.ConvertArray(self.IRTimeQueue)
@@ -207,9 +207,7 @@ class IRdecoder:
             
             return { "hex": self.ConvertString16ToHex(address[:8] + command[:8]),
                      "address": address,
-                     "command": command,
-                     "bestCommand": self.bestCommand(command),
-                     "bestAddress": self.bestAddress(address)
+                     "command": command
                      }
         
         def calculateSimilarity(self, string1, string2, string3):
