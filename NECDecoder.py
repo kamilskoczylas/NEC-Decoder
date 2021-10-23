@@ -282,7 +282,7 @@ class IRdecoder:
                 
                 # If signal starts 13,5ms
                 if signalTime > 0.0035 and signalTime < 0.015:
-                    sleep(0.2)
+                    sleep(0.05)
                     #new_time = default_timer()
                     #while new_time < edgeTimeDetected + 0.054:
                     #    sleep(0.01)
