@@ -57,7 +57,7 @@ class IRdecoder:
             self.Commands.put_nowait(currentCommand)
             
             # Minimum time for next IR command
-            sleep(0.07)
+            sleep(0.045)
             
     def DecodeIRTimeQueue(self):
         self.ConvertArray(self.IRTimeQueue)
