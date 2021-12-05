@@ -21,8 +21,8 @@ from threading import Thread
 class IRdecoder:
 
     startIRTimeQueue = 0
-    MAX_QUEUE_SIZE = 512
-    MAX_COMMANDS = 10
+    MAX_QUEUE_SIZE = 1024
+    MAX_COMMANDS = 20
     
     GPIO_Mode = GPIO.BCM
     GPIO_PIN = 16
@@ -282,7 +282,7 @@ class IRdecoder:
                 
                 # If signal starts 13,5ms
                 if signalTime > 0.0035 and signalTime < 0.015:
-                    sleep(0.05)
+                    sleep(0.054)
                     #new_time = default_timer()
                     #while new_time < edgeTimeDetected + 0.054:
                     #    sleep(0.01)
