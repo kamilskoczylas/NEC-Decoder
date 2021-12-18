@@ -13,8 +13,8 @@
 import RPi.GPIO as GPIO
 from time import sleep
 from timeit import default_timer
-from Queue import Queue
-from Queue import Empty
+from queue import Queue
+from queue import Empty
 from threading import Thread
 
 
