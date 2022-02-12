@@ -283,7 +283,7 @@ class IRdecoder:
                 # If signal starts 13,5ms
                 if signalTime > 0.0035 and signalTime < 0.015:
                     # Need to wait for the rest of the signal
-                    if len(self.IRTimeQueue) < 32:
+                    if self.IRTimeQueue.qsize() < 32:
                         sleep(0.054)
                     
                     return signalTime
