@@ -285,6 +285,9 @@ class IRdecoder:
                     # Need to wait for the rest of the signal
                     if self.IRTimeQueue.qsize() < 32:
                         sleep(0.054)
+                    else:
+                        if DEBUG:
+                            print(self.IRTimeQueue.qsize())
                     
                     return signalTime
                 else:
@@ -292,8 +295,9 @@ class IRdecoder:
                     
                     if self.DEBUG:
                         print("Wrong start signal", signalTime)
-                    
-                sleep(0.01)
+                
+                if self.IRTimeQueue.empty():
+                    sleep(0.01)
                 
         def enhanceArray(self, timeArray):
             newArray = []
