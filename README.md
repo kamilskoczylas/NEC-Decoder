@@ -1,14 +1,14 @@
 # NEC-Decoder
 
 Designed and tested on Raspberry PI Zero
-Version 0.1 under tests
+Version 0.1
+Python 3 required
 
 The idea of this module is to retrieve, translate and fill in missing InfraRed signal for Raspberry PI 
-Raspberry is convenient device, but has unreliable signal retrieving speed.
 
 This module try to guess missing signal phrases.
 
-Before using make sure your Raspberry PI has
+Before using with Raspberry Zero make sure your Raspberry PI has
 - appropriate power adapter
 - good cooling
 
