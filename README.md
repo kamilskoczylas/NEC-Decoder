@@ -18,17 +18,19 @@ Example from the recording:
 - Command: 10100010 01011101
 
 ---
-Why this module is written?
+Requirements
 -
-This module try to guess missing signal phrases.
 
 Before using with Raspberry Zero make sure your Raspberry PI has
 - appropriate power adapter
 - good cooling
+- use Python 3
 
 Additionally, follow IR Receiver documentation to use appropriate resistors to eliminate unnecessary noises
 
-Use case example:
+---
+Example
+-
 
     
     # Only for value of GPIO.BCM
