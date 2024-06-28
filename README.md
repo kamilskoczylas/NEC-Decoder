@@ -6,6 +6,9 @@ Python 3 required
 
 The idea of this module is to retrieve, translate and fill in missing InfraRed signal for Raspberry PI 
 
+IR Signal recorded by a sound card using Line-in looks like this one:
+![Recorded IR Signal](https://github.com/kamilskoczylas/NEC-Decoder/blob/main/RecordedIRsignal.jpg?raw=true)
+
 This module try to guess missing signal phrases.
 
 Before using with Raspberry Zero make sure your Raspberry PI has
