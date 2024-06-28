@@ -10,8 +10,8 @@ IR Signal recorded by a sound card using Line-in looks like this one:
 ![Recorded IR Signal](https://github.com/kamilskoczylas/NEC-Decoder/blob/main/RecordedIRsignal.jpg?raw=true)
 - 9 miliseconds of positive signal
 - 4.5 miliseconds of negative
-- 27 miliseconds Address and inversed address
-- 27 miliseconds Command and inversed command
+- 27 miliseconds 8-bit Address and 8-bit of inversed address
+- 27 miliseconds 8-bit Command and 8-bit inversed command
 
 Example from the recording:
 - Address: 00000000 11111111
