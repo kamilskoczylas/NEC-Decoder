@@ -17,6 +17,9 @@ Example from the recording:
 - Address: 00000000 11111111
 - Command: 10100010 01011101
 
+---
+Why this module is written?
+-
 This module try to guess missing signal phrases.
 
 Before using with Raspberry Zero make sure your Raspberry PI has
