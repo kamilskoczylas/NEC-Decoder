@@ -43,6 +43,9 @@ class GPIOEdgeDetectedDataProvider(ABC):
         GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback = self.SignalEdgeDetected)
         pass
 
+    def __del__(self):
+        GPIO.cleanup(self.GPIO_PIN)
+
 class TestDataProvider(ABC):
     def InitDataQueue(self, queue):
         self.Queue = queue
@@ -55,9 +58,6 @@ class SingalDecoder:
     MAX_QUEUE_SIZE = 1024
     MAX_COMMANDS = 20
     
-    GPIO_Mode = GPIO.BCM
-    GPIO_PIN = 16
-    
     def __init__(self, DataProvider: SignalDataProvider, DEBUG = False):
         
         self.DEBUG = DEBUG
@@ -65,19 +65,12 @@ class SingalDecoder:
         self.IRTimeQueue = Queue(self.MAX_QUEUE_SIZE)
         self.Commands = Queue(self.MAX_COMMANDS)
 
-        if not GPIO_Mode is None:
-            self.GPIO_Mode = GPIO_Mode
-
-        if not GPIO_PIN is None:    
-            self.GPIO_PIN = GPIO_PIN
-
         DataProvider.InitDataQueue(self.IRTimeQueue)
 
         worker = Thread(target=self.QueueConsumer)
         worker.daemon = True
         worker.start()
         pass
-
 
     
     def QueueConsumer(self):
@@ -102,8 +95,7 @@ class SingalDecoder:
         self.Commands.task_done()
         return command
         
-    def __del__(self):
-        GPIO.cleanup(self.GPIO_PIN)
+
     
     class NECDecoder:
         AddressLengthSeconds = 0.027
@@ -314,7 +306,7 @@ class SingalDecoder:
                     if self.IRTimeQueue.qsize() < 32:
                         sleep(0.054)
                     else:
-                        if DEBUG:
+                        if self.DEBUG:
                             print(self.IRTimeQueue.qsize())
                     
                     return signalTime
@@ -551,25 +543,5 @@ class SingalDecoder:
                 
         def fillInKnownValues(self, timeArray):
             commandDecoded = ''
-            #finalSignalString =
             return self.enhanceArray(timeArray)
-            #return (finalSignalString)
-            
-            if not finalSignalString:
-                return False
-            
-            if len(finalSignalString) != 16:
-                return False
-            
-            differences = 0
-            
-            for i in range(0, 8):
-                if finalSignalString[i] == finalSignalString[i + 8]:
-                    differences += 1
-                    
-            if differences > 0 and differences < 8:
-                return False
-            
-            commandDecoded = finalSignalString  
-            return commandDecoded
     
