@@ -11,14 +11,28 @@ class TestDataProvider(ABC):
         pass
 
     def ReadFile(self, filename):
-        # Open the file
         with open("Tests/" + filename, "r") as file:
-            # Read all lines from the file
             lines = file.readlines()
-        
-        # Loop through each line in the file
+            
+        timeline = False
+        edge_number = 0
         for line in lines:
-            print(line)
+            if 'Timeline' in line:
+                timeline = True
+                edge_number = 0
+                previous_signal = default_timer()
+                
+            if timeline:
+                words = string.split(' ')
+                edge_number += 1
+                if int(words[0]) == edge_number:
+                    time_delta = datetime.timedelta(0, float(words[1]))
+                    previous_signal += time_delta
+                    self.Queue.put_nowait(previous_signal)
+                else:
+                    timeline = False
+            else:
+                print(line)
         
         pass
 
