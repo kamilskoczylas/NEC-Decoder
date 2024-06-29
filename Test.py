@@ -2,19 +2,38 @@
 
 import RPi.GPIO as GPIO 
 from time import sleep 
-
+from abc import ABC
 import SignalDecoder
 
-GPIO_Mode = GPIO.BCM
-GPIO_PIN = 16
+class TestDataProvider(ABC):
+    def InitDataQueue(self, queue):
+        self.Queue = queue
+        pass
 
-# Initialization of the class. Sets thread deamon
-# Default values are GPIO.BCM and PIN 16
-IReader = SignalDecoder.SignalDecoder(SignalDecoder.GPIOEdgeDetectedDataProvider(GPIO_Mode, GPIO_PIN))
+    def ReadFile(self, filename):
+        # Open the file
+        with open("Tests/" + filename, "r") as file:
+            # Read all lines from the file
+            lines = file.readlines()
+        
+        # Loop through each line in the file
+        for line in lines:
+            print(line)
+        
+        pass
 
-while True:
+testProvider = TestDataProvider()
+IReader = SignalDecoder.SignalDecoder(testProvider)
+testProvider.ReadFile("test-001.txt")
+
+sleep(0.1)
+while IReader.hasDetected():
+    cmd = IReader.getCommand()
+    print(cmd)
     sleep(0.1)
 
-    if IReader.hasDetected():
-        cmd = IReader.getCommand()
-        print(cmd)
+
+# GPIO_Mode = GPIO.BCM
+# GPIO_PIN = 16
+# IReader = SignalDecoder.SignalDecoder(SignalDecoder.GPIOEdgeDetectedDataProvider(GPIO_Mode, GPIO_PIN))
+
