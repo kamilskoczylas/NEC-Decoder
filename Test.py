@@ -25,7 +25,8 @@ class TestDataProvider(ABC):
                 previous_signal = default_timer()
                 
             if timeline:
-                words = line.split(' ')
+                words = line.split()
+                print(words)
                 edge_number += 1
                 if int(words[0]) == edge_number:
                     time_delta = datetime.timedelta(0, float(words[1]))
