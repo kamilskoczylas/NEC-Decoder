@@ -22,7 +22,7 @@ class TestDataProvider(ABC):
             if timeline:
                 words = line.split()
                 edge_number += 1
-                if len(words) == 2 && int(words[0]) == edge_number:
+                if len(words) == 2 and int(words[0]) == edge_number:
                     #time_delta = datetime.timedelta(microseconds=int(float(words[1]) * 1000000))
                     previous_signal += float(words[1])
                     self.Queue.put_nowait(previous_signal)
