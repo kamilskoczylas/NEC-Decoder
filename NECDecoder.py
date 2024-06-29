@@ -286,7 +286,7 @@ class IRdecoder:
                     if self.IRTimeQueue.qsize() < 32:
                         sleep(0.054)
                     else:
-                        if DEBUG:
+                        if self.DEBUG:
                             print(self.IRTimeQueue.qsize())
                     
                     return signalTime
@@ -527,21 +527,21 @@ class IRdecoder:
             return self.enhanceArray(timeArray)
             #return (finalSignalString)
             
-            if not finalSignalString:
-                return False
+            #if not finalSignalString:
+            #    return False
             
-            if len(finalSignalString) != 16:
-                return False
+            #if len(finalSignalString) != 16:
+            #    return False
             
-            differences = 0
+            #differences = 0
             
-            for i in range(0, 8):
-                if finalSignalString[i] == finalSignalString[i + 8]:
-                    differences += 1
+            #for i in range(0, 8):
+            #    if finalSignalString[i] == finalSignalString[i + 8]:
+            #        differences += 1
                     
-            if differences > 0 and differences < 8:
-                return False
+            #if differences > 0 and differences < 8:
+            #    return False
             
-            commandDecoded = finalSignalString  
-            return commandDecoded
+            #commandDecoded = finalSignalString  
+            #return commandDecoded
     
