@@ -12,6 +12,42 @@ from timeit import default_timer
 from queue import Queue
 from queue import Empty
 from threading import Thread
+from abc import ABC, abstractmethod
+
+class SignalDataProvider(ABC):
+    @abstractmethod
+    def InitDataQueue(self, queue):
+        pass
+
+
+class GPIOEdgeDetectedDataProvider(ABC):
+    
+    def __init__(self, GPIO_Mode = None, GPIO_PIN = None):
+        
+        if not GPIO_Mode is None:
+            self.GPIO_Mode = GPIO_Mode
+
+        if not GPIO_PIN is None:    
+            self.GPIO_PIN = GPIO_PIN
+            
+        GPIO.setmode(self.GPIO_Mode)
+        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+        pass
+    
+    def SignalEdgeDetected(self, PinNumber):
+        self.Queue.put_nowait(default_timer())
+        pass
+        
+    def InitDataQueue(self, queue):
+        self.Queue = queue
+        GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback = self.SignalEdgeDetected))
+        pass
+
+class TestDataProvider(ABC):
+    def InitDataQueue(self, queue):
+        self.Queue = queue
+        
+        pass
 
 
 class SingalDecoder:
@@ -23,7 +59,7 @@ class SingalDecoder:
     GPIO_Mode = GPIO.BCM
     GPIO_PIN = 16
     
-    def __init__(self, GPIO_Mode = None, GPIO_PIN = None, DEBUG = False):
+    def __init__(self, DataProvider: SignalDataProvider, DEBUG = False):
         
         self.DEBUG = DEBUG
 
@@ -36,13 +72,13 @@ class SingalDecoder:
         if not GPIO_PIN is None:    
             self.GPIO_PIN = GPIO_PIN
 
+        DataProvider.InitDataQueue(self.IRTimeQueue)
+
         worker = Thread(target=self.QueueConsumer)
         worker.daemon = True
         worker.start()
+        pass
 
-        GPIO.setmode(self.GPIO_Mode)
-        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
-        GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback = self.SignalEdgeDetected) #, bouncetime = 70)
 
     
     def QueueConsumer(self):
@@ -66,9 +102,6 @@ class SingalDecoder:
         command = self.Commands.get_nowait()
         self.Commands.task_done()
         return command
-            
-    def SignalEdgeDetected(self, PinNumber):
-        self.IRTimeQueue.put_nowait(default_timer())
         
     def __del__(self):
         GPIO.cleanup(self.GPIO_PIN)
