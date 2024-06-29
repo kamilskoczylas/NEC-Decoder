@@ -19,14 +19,8 @@ class TestDataProvider(ABC):
         timeline = False
         edge_number = 0
         for line in lines:
-            if 'Timeline' in line:
-                timeline = True
-                edge_number = 0
-                previous_signal = default_timer()
-                
             if timeline:
                 words = line.split()
-                print(words)
                 edge_number += 1
                 if int(words[0]) == edge_number:
                     time_delta = datetime.timedelta(0, float(words[1]))
@@ -36,7 +30,11 @@ class TestDataProvider(ABC):
                     timeline = False
             else:
                 print(line)
-        
+                
+            if 'Timeline' in line:
+                timeline = True
+                edge_number = 0
+                previous_signal = default_timer()
         pass
 
 testProvider = TestDataProvider()
