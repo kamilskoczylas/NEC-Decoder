@@ -40,13 +40,12 @@ class GPIOEdgeDetectedDataProvider(ABC):
         
     def InitDataQueue(self, queue):
         self.Queue = queue
-        GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback = self.SignalEdgeDetected))
+        GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback = self.SignalEdgeDetected)
         pass
 
 class TestDataProvider(ABC):
     def InitDataQueue(self, queue):
         self.Queue = queue
-        
         pass
 
 
