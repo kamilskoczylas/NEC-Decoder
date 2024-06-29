@@ -23,8 +23,8 @@ class TestDataProvider(ABC):
                 words = line.split()
                 edge_number += 1
                 if int(words[0]) == edge_number:
-                    time_delta = datetime.timedelta(microseconds=int(float(words[1]) * 1000000))
-                    previous_signal += time_delta
+                    #time_delta = datetime.timedelta(microseconds=int(float(words[1]) * 1000000))
+                    previous_signal += float(words[1])
                     self.Queue.put_nowait(previous_signal)
                 else:
                     timeline = False
