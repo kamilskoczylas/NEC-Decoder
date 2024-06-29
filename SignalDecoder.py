@@ -52,7 +52,7 @@ class TestDataProvider(ABC):
         pass
 
 
-class SingalDecoder:
+class SignalDecoder:
 
     startIRTimeQueue = 0
     MAX_QUEUE_SIZE = 1024
