@@ -59,17 +59,14 @@ class NECTesting(TestCase):
         IReader = SignalDecoder.SignalDecoder(testProvider)
     
     def test_001(self):
-        testProvider.ReadFile("test-001.txt")
+        self.testProvider.ReadFile("test-001.txt")
         sleep(0.1)
-        for result in testProvider.expectedResult:
-            cmd = IReader.getCommand()
+        for result in self.testProvider.expectedResult:
+            cmd = self.IReader.getCommand()
             print(cmd)
             print("Expected:" + result)
             self.assertTrue(cmd['hex'] == result)
             sleep(0.1)
-
-    def test_always_fails(self):
-        self.assertTrue(False)
         
 
 # GPIO_Mode = GPIO.BCM
