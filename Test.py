@@ -1,6 +1,5 @@
 # Tests using text file data
 
-import RPi.GPIO as GPIO 
 from time import sleep 
 from timeit import default_timer
 import datetime
@@ -71,8 +70,4 @@ class NECTesting(TestCase):
 
 NECTest = NECTesting()
 NECTest.test_001()
-
-# GPIO_Mode = GPIO.BCM
-# GPIO_PIN = 16
-# IReader = SignalDecoder.SignalDecoder(SignalDecoder.GPIOEdgeDetectedDataProvider(GPIO_Mode, GPIO_PIN))
 
