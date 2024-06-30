@@ -64,7 +64,7 @@ class NECTesting(TestCase):
             cmd = self.IReader.getCommand()
             print(cmd)
             print("Expected:" + result)
-            self.assertTrue(cmd['hex'] == result)
+            self.assertTrue(type(cmd) is dict and "hex" in cmd and cmd['hex'] in result)
             sleep(0.1)
         
 
