@@ -48,6 +48,9 @@ Example
     # Default values are GPIO.BCM and PIN 16
     IReader = IRdecoder(GPIO_Mode, GPIO_PIN)
 
+    # New Version in testing
+    # IReader = SignalDecoder.SignalDecoder(SignalDecoder.GPIOEdgeDetectedDataProvider(GPIO_Mode, GPIO_PIN))
+
     while True:
         sleep(0.1)
 
