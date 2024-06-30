@@ -6,6 +6,7 @@ from timeit import default_timer
 import datetime
 from abc import ABC
 import SignalDecoder
+from unittest import TestCase
 
 class TestDataProvider(ABC):
 
@@ -50,18 +51,26 @@ class TestDataProvider(ABC):
             
         pass
 
-testProvider = TestDataProvider()
-IReader = SignalDecoder.SignalDecoder(testProvider)
-testProvider.ReadFile("test-001.txt")
 
-sleep(0.1)
-for result in testProvider.expectedResult:
-    cmd = IReader.getCommand()
-    print(cmd)
-    print("Expected:" + result)
+
+class NECTesting(TestCase):
+    def __init__(self):
+        testProvider = TestDataProvider()
+        IReader = SignalDecoder.SignalDecoder(testProvider)
     
-    sleep(0.1)
+    def test_001(self):
+        testProvider.ReadFile("test-001.txt")
+        sleep(0.1)
+        for result in testProvider.expectedResult:
+            cmd = IReader.getCommand()
+            print(cmd)
+            print("Expected:" + result)
+            self.assertTrue(cmd['hex'] == result)
+            sleep(0.1)
 
+    def test_always_fails(self):
+        self.assertTrue(False)
+        
 
 # GPIO_Mode = GPIO.BCM
 # GPIO_PIN = 16
