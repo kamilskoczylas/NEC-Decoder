@@ -55,7 +55,7 @@ class TestDataProvider(ABC):
 class NECTesting(TestCase):
     def __init__(self):
         self.testProvider = TestDataProvider()
-        self.IReader = SignalDecoder.SignalDecoder(testProvider)
+        self.IReader = SignalDecoder.SignalDecoder(self.testProvider)
     
     def test_001(self):
         self.testProvider.ReadFile("test-001.txt")
