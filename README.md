@@ -32,7 +32,7 @@ Additionally, follow IR Receiver documentation to use appropriate resistors to e
 Example
 -
 
-    
+```    
 # Only for value of GPIO.BCM
 import RPi.GPIO as GPIO 
 from time import sleep 
@@ -54,3 +54,4 @@ while True:
     if IReader.hasDetected():
         cmd = IReader.getCommand()
         print(cmd)
+```
