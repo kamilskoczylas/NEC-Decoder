@@ -22,8 +22,10 @@ class SignalDecoder(ABC):
     DEBUG = False
 
     @abstractmethod
-    def __init__(self, timeQueue):
+    def initialize(self, timeQueue, debug):
         self.timeQueue = timeQueue
+        self.DEBUG = debug
+        pass
 
     @abstractmethod
     def getCommand(self):
@@ -52,7 +54,8 @@ class SignalDecoder:
 
     
     def QueueConsumer(self):
-        self.decoder.DEBUG = self.DEBUG
+        self.decoder.initialize(self.IRTimeQueue, self.DEBUG)
+        
         while True:
             
             currentCommand = self.decoder.getCommand()
