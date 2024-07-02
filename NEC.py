@@ -30,10 +30,10 @@ class NECDecoder:
   
   DEBUG = False
   
-  def __init__(self, timeQueue, DebugMode = False):
-      
+  def initialize(self, timeQueue, DebugMode = False):
       self.IRTimeQueue = timeQueue
       self.DEBUG = DebugMode
+      pass
       
   def getBurst(self, pulseCount, burstStartTime, maxTime):
       resultArray = []
