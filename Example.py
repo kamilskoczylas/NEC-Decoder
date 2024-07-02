@@ -4,14 +4,14 @@ from time import sleep
 
 import NEC
 import SignalDecoder
-import GPIOEdgeDetectedDataProvider
+import GPIODataProvider
 
 GPIO_Mode = GPIO.BCM
 GPIO_PIN = 16
 
 # Initialization of the class. Sets thread deamon
 # Default values are GPIO.BCM and PIN 16
-IReader = SignalDecoder.SignalDecoder(SignalDecoder.GPIOEdgeDetectedDataProvider(GPIO_Mode, GPIO_PIN), NEC.NECDecoder())
+IReader = SignalDecoder.SignalDecoder(GPIODataProvider.EdgeDetected(GPIO_Mode, GPIO_PIN), NEC.NECDecoder())
 
 while True:
     sleep(0.1)
