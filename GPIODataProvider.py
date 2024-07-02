@@ -12,7 +12,7 @@ from queue import Queue
 from queue import Empty
 import RPi.GPIO as GPIO
 
-class GPIOEdgeDetectedDataProvider(ABC):
+class EdgeDetected(ABC):
     
     def __init__(self, GPIO_Mode = None, GPIO_PIN = None):
         
