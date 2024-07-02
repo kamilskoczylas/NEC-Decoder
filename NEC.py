@@ -1,3 +1,15 @@
+#
+#   NEC Signal Decoder
+#   Designed for Raspberry Pi, Python 3
+#
+#   2021-2024 Kamil Skoczylas
+#   MIT Licence
+#
+
+from time import sleep
+from queue import Queue
+from queue import Empty
+
 class NECDecoder:
   AddressLengthSeconds = 0.027
   CommandLengthSeconds = 0.027
