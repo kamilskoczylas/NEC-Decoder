@@ -2,10 +2,11 @@
 
 from time import sleep 
 from timeit import default_timer
-import datetime
 from abc import ABC
-import SignalDecoder
 from unittest import TestCase
+import SignalDecoder
+import datetime
+import NEC
 
 class TestDataProvider(ABC):
 
@@ -56,7 +57,7 @@ class NECTesting(TestCase):
     
     def test_001(self):
         self.testProvider = TestDataProvider()
-        self.IReader = SignalDecoder.SignalDecoder(self.testProvider)
+        self.IReader = SignalDecoder.SignalDecoder(self.testProvider, NEC.NECDecoder())
         self.testProvider.ReadFile("test-001.txt")
         sleep(0.1)
         for result in self.testProvider.expectedResult:
@@ -66,7 +67,4 @@ class NECTesting(TestCase):
             self.assertTrue(type(cmd) is dict and "hex" in cmd and cmd['hex'] in result)
             sleep(0.1)
         
-
-#NECTest = NECTesting()
-#NECTest.test_001()
 
