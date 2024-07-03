@@ -1,12 +1,10 @@
 # Tests using text file data
-import sys
-sys.path.append('../')
 
 from time import sleep 
 from timeit import default_timer
 from abc import ABC
 from unittest import TestCase
-import SignalDecoder
+import ../SignalDecoder
 import datetime
 import NEC
 
