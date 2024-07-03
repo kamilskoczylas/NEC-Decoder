@@ -1,5 +1,5 @@
 # Tests using text file data
-
+import sys
 sys.path.append('../')
 
 from time import sleep 
