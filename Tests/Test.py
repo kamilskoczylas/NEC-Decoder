@@ -1,7 +1,6 @@
 # Tests using text file data
 
-PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(PATH + '/../')
+sys.path.append('/../')
 
 from time import sleep 
 from timeit import default_timer
