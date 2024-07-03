@@ -44,8 +44,7 @@ import GPIODataProvider
 GPIO_Mode = GPIO.BCM
 GPIO_PIN = 16
 
-# Initialization of the class. Sets thread deamon
-# Default values are GPIO.BCM and PIN 16
+
 IReader = SignalDecoder.SignalDecoder(
     GPIODataProvider.EdgeDetected(
         GPIO_Mode,
