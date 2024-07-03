@@ -1,6 +1,6 @@
 # Tests using text file data
 
-sys.path.append('/../')
+sys.path.append('../')
 
 from time import sleep 
 from timeit import default_timer
