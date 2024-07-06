@@ -7,7 +7,7 @@ Python 3 required
 The idea of this module is to retrieve, translate and fill in missing InfraRed signal for Raspberry PI 
 
 IR Signal recorded by a sound card using Line-in looks like this one:
-![Recorded IR Signal](https://github.com/kamilskoczylas/NEC-Decoder/blob/main/RecordedIRsignal.jpg?raw=true)
+![Recorded IR Signal](https://github.com/kamilskoczylas/NEC-Decoder/blob/main/Tests/RecordedIRsignal.jpg?raw=true)
 - 9 miliseconds of positive signal
 - 4.5 miliseconds of negative
 - 27 miliseconds 8-bit Address and 8-bit of inversed address
@@ -16,6 +16,15 @@ IR Signal recorded by a sound card using Line-in looks like this one:
 Example from the recording:
 - Address: 00000000 11111111
 - Command: 10100010 01011101
+
+# DHT22 Signal Decoder: Humidity and temperature
+
+Designed and tested on Raspberry PI 3A+
+Version 0.1
+Python 3 required
+
+Recorded DHT22 signal (using sound card line-in)
+![Recorded DHT22 Signal](https://github.com/kamilskoczylas/NEC-Decoder/blob/main/Tests/DHT22-Recorded-signal.png?raw=true)
 
 ---
 Requirements
