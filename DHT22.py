@@ -19,10 +19,14 @@ class DHT22Decoder:
   PULSE_POSITIVE_LENGTH = 0.000120
   PULSE_NEGATIVE_LENGTH = 0.000076
 
+  MAX_DHT22_SIGNAL_LENGTH = 0.005
+
+  currentSignalStartTime = 0
+
   DEBUG = False
   
   def initialize(self, timeQueue, DebugMode = False):
-      self.IRTimeQueue = timeQueue
+      self.signalEdgeDetectedTimeQueue = timeQueue
       self.DEBUG = DebugMode
       pass
       
@@ -36,26 +40,21 @@ class DHT22Decoder:
           i += 1
   
           try:
-              edgeTimeDetected = self.IRTimeQueue.get_nowait()
-              self.IRTimeQueue.task_done()
+              edgeTimeDetected = self.signalEdgeDetectedTimeQueue.get_nowait()
+              self.signalEdgeDetectedTimeQueue.task_done()
               signalTime = edgeTimeDetected - previousPulseStart
-                  #min(maxTime - previousPulseStart, edgeTimeDetected - previousPulseStart)
           
           except Empty:
-              #if default_timer() >= maxTime:
-              #edgeTimeDetected = maxTime
-              #signalTime = maxTime - previousPulseStart
-              
-              #if self.DEBUG:
-              print("Empty: {0}".format(len(resultArray)))
+              if self.DEBUG:
+                print("Empty: {0}".format(len(resultArray)))
               
               if (maxTime - previousPulseStart < self.REPEAT_BURST_ERROR_RANGE):
                   break
               
               print (resultArray)
               print("Left: {0}".format(maxTime - previousPulseStart))
-              edgeTimeDetected = self.IRTimeQueue.get()
-              self.IRTimeQueue.task_done()
+              edgeTimeDetected = self.signalEdgeDetectedTimeQueue.get()
+              self.signalEdgeDetectedTimeQueue.task_done()
               signalTime = edgeTimeDetected - previousPulseStart
               
           resultArray.append(signalTime)
@@ -64,41 +63,18 @@ class DHT22Decoder:
               print ("{0} {1}".format(i, signalTime))
       
       self.timeFromNextPhase = edgeTimeDetected - maxTime
-      #print ("{0} {1}".format(i, self.timeFromNextPhase))
-      #resultArray.append(self.timeFromNextPhase)
+      print ("{0} {1}".format(i, self.timeFromNextPhase))
       
-      # To future calculation of breakTime
-      self.ir_pulseStart = edgeTimeDetected
       return resultArray
   
       
   def getCommand(self):
       
       signalTime = self.waitForSignal()
-      repeatCode = False
-      self.timeFromNextPhase = 0
+      pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + MAX_DHT22_SIGNAL_LENGTH)    
+
       
-      if self.DEBUG:
-          print("Break: {0}".format(self.breakTime))
-      
-      
-      new_signalStart = self.ir_pulseStart + self.AddressLengthSeconds + self.PulseErrorRange
-      pulseArray = self.getBurst(32, self.ir_pulseStart, self.ir_pulseStart + self.AddressLengthSeconds + self.CommandLengthSeconds)    
-      
-      addressArray = self.getFirst16bitsOr27ms(pulseArray)
-      address = self.fillInKnownValues(addressArray)
-      
-      commandArray = pulseArray
-      command = self.fillInKnownValues(commandArray)
-      
-      if self.DEBUG:
-          print("Address: {0}".format(address))
-          print("Command: {0}".format(command))
-      
-      if type(address) != str or type(command) != str:
-          return False
-      
-      return { "hex": self.ConvertString16ToHex(address[:8] + command[:8]),
+      return { "hex": "",
                "address": address,
                "command": command
                }
@@ -106,23 +82,22 @@ class DHT22Decoder:
   def waitForSignal(self):
       self.breakTime = 0
       while True:
-          # Try to find start 
-          edgeTimeDetected = self.IRTimeQueue.get()
-          #self.IRTimeQueue.task_done()
+          
+          edgeTimeDetected = self.signalEdgeDetectedTimeQueue.get()
           
           # Let Raspberry read whole signal before
           # we use max CPU for decoding
-          signalTime = edgeTimeDetected - self.ir_pulseStart
-          self.ir_pulseStart = edgeTimeDetected
+          signalTime = edgeTimeDetected - self.currentSignalStartTime
+          self.currentSignalStartTime = edgeTimeDetected
           
           # If signal starts 13,5ms
-          if signalTime > 0.0035 and signalTime < 0.015:
+          if signalTime > 0.0002 and signalTime < 0.0005:
               # Need to wait for the rest of the signal
-              if self.IRTimeQueue.qsize() < 32:
-                  sleep(0.054)
+              if self.signalEdgeDetectedTimeQueue.qsize() < 40:
+                  sleep(0.005)
               else:
                   if self.DEBUG:
-                      print(self.IRTimeQueue.qsize())
+                      print(self.signalEdgeDetectedTimeQueue.qsize())
               
               return signalTime
           else:
@@ -131,7 +106,7 @@ class DHT22Decoder:
               if self.DEBUG:
                   print("Wrong start signal", signalTime)
           
-          if self.IRTimeQueue.empty():
+          if self.signalEdgeDetectedTimeQueue.empty():
               sleep(0.01)
           
       
@@ -139,19 +114,9 @@ class DHT22Decoder:
       if type(signalString) != str:
           return False
       
-      if len(signalString) != 16:
+      if len(signalString) != 40:
           if self.DEBUG:
               print("Invalid length")
-          return False
-      
-      difference = 0
-      for i in range(0, 8):
-          if signalString[i] != signalString[i + 8]:
-              difference += 1
-              
-      if difference > 0 and difference < 8:        
-          if self.DEBUG:
-              print("Invalid reflection")
           return False
           
       return True
