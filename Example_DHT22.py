@@ -26,8 +26,10 @@ GPIO.setup(GPIO_PIN, GPIO.OUT)
 GPIO.output(GPIO_PIN, GPIO.LOW)
 sleep(0.005)
 
+GPIO.setup(GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+sleep(0.1)
 cmd = IReader.getCommand()
 print(cmd)
 
-GPIO.setup(GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+
 
