@@ -22,6 +22,10 @@ class DHT22Decoder:
   MAX_DHT22_SIGNAL_LENGTH = 0.005
 
   currentSignalStartTime = 0
+  
+  temperature = 0
+  humidity = 0
+  checksum = 0
 
   DEBUG = False
   
@@ -71,12 +75,10 @@ class DHT22Decoder:
       pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + self.MAX_DHT22_SIGNAL_LENGTH)    
       decodedSignal = self.translateSignal(pulseArray)
 
-      temperature = 0
-      humidity = 0
       
       return { "binary": decodedSignal,
-               "temperature": temperature,
-               "humidity": humidity
+               "temperature": self.temperature,
+               "humidity": self.humidity
                }
       
   def waitForSignal(self):
@@ -114,14 +116,32 @@ class DHT22Decoder:
 
   def translateSignal(self, timeArray):
       correctSignal = ''
+      i = 0
+      humidity = 0
+      temperature = 0
+      checksum = 0
       
       for pulseLength in timeArray:
-          
+          i+= 1
+        
           if pulseLength > self.PULSE_POSITIVE_LENGTH - self.PulseErrorRange / 2 and pulseLength < self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange / 2:
               correctSignal += '1'
+            
+              if i in range (1, 16):
+                  humidity += 1 << (i - 1)
+    
+              if i in range (17, 32):
+                  temperature += 1 << (i - 17)
+    
+              if i in range (33, 40):
+                  checksum += 1 << (i - 33)
                   
           elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange / 2 and pulseLength < self.PULSE_NEGATIVE_LENGTH + self.PulseErrorRange / 2:
               correctSignal += '0'
+
+      self.temperature = temperature
+      self.humidity = humidity
+      self.checksum = checksum
           
       return correctSignal 
       
