@@ -124,7 +124,7 @@ class DHT22Decoder:
       for pulseLength in timeArray:
           i+= 1
         
-          if pulseLength > self.PULSE_POSITIVE_LENGTH - self.PulseErrorRange / 2 and pulseLength < self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange / 2:
+          if pulseLength > self.PULSE_POSITIVE_LENGTH - self.PulseErrorRange and pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
               correctSignal += '1'
             
               if i in range (1, 16):
@@ -136,7 +136,7 @@ class DHT22Decoder:
               if i in range (33, 40):
                   checksum += 1 << (33 - i)
                   
-          elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange / 2 and pulseLength < self.PULSE_NEGATIVE_LENGTH + self.PulseErrorRange / 2:
+          elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange and pulseLength <= self.PULSE_NEGATIVE_LENGTH + self.PulseErrorRange:
               correctSignal += '0'
 
       self.temperature = temperature / 10
