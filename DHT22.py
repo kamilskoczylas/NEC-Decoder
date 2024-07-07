@@ -71,7 +71,7 @@ class DHT22Decoder:
   def getCommand(self):
       
       signalTime = self.waitForSignal()
-      pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + MAX_DHT22_SIGNAL_LENGTH)    
+      pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + self.MAX_DHT22_SIGNAL_LENGTH)    
 
       temperature = 0
       humidity = 0
