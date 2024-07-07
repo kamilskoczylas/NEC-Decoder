@@ -139,8 +139,8 @@ class DHT22Decoder:
           elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange / 2 and pulseLength < self.PULSE_NEGATIVE_LENGTH + self.PulseErrorRange / 2:
               correctSignal += '0'
 
-      self.temperature = temperature
-      self.humidity = humidity
+      self.temperature = temperature / 10
+      self.humidity = humidity / 10
       self.checksum = checksum
           
       return correctSignal 
