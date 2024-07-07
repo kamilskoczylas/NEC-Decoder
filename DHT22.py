@@ -131,10 +131,10 @@ class DHT22Decoder:
                   humidity += 1 << (16 - i)
     
               if i in range (17, 32):
-                  temperature += 1 << (17 - i)
+                  temperature += 1 << (32 - i)
     
               if i in range (33, 40):
-                  checksum += 1 << (33 - i)
+                  checksum += 1 << (40 - i)
                   
           elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange and pulseLength <= self.PULSE_NEGATIVE_LENGTH + self.PulseErrorRange:
               correctSignal += '0'
