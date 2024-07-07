@@ -60,7 +60,7 @@ class DHT22Decoder:
               print ("{0} {1}".format(i, signalTime))
       
       self.timeFromNextPhase = edgeTimeDetected - maxTime
-      print ("{0} {1}".format(i, self.timeFromNextPhase))
+      print ("{0} {:.5f}%}".format(i, self.timeFromNextPhase))
       
       return resultArray
   
