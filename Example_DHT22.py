@@ -14,7 +14,8 @@ IReader = SignalDecoder.SignalDecoder(
         GPIO_Mode,
         GPIO_PIN
     ),
-    DHT22.DHT22Decoder()
+    DHT22.DHT22Decoder(),
+    True
     )
 
 # Keep positive signal for a while
