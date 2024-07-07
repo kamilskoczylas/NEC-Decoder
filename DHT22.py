@@ -57,7 +57,7 @@ class DHT22Decoder:
           resultArray.append(signalTime)
           previousPulseStart = edgeTimeDetected
           if self.DEBUG:
-              print ("{0} {1}".format(i, signalTime))
+              print ("{:0>2} {:.5f}%".format(i, signalTime))
       
       self.timeFromNextPhase = edgeTimeDetected - maxTime
       print ("{:0>2} {:.5f}%".format(i, self.timeFromNextPhase))
