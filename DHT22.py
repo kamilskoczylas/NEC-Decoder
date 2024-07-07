@@ -110,8 +110,7 @@ class DHT22Decoder:
           
           if self.signalEdgeDetectedTimeQueue.empty():
               sleep(0.01)
-    pass
-
+      
 
   def translateSignal(self, timeArray):
       correctSignal = ''
