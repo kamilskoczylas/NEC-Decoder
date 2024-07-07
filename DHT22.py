@@ -48,9 +48,6 @@ class DHT22Decoder:
               if self.DEBUG:
                 print("Empty: {0}".format(len(resultArray)))
               
-              if (maxTime - previousPulseStart < self.REPEAT_BURST_ERROR_RANGE):
-                  break
-              
               print (resultArray)
               print("Left: {0}".format(maxTime - previousPulseStart))
               edgeTimeDetected = self.signalEdgeDetectedTimeQueue.get()
