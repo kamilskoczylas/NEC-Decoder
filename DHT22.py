@@ -14,7 +14,7 @@ class DHT22Decoder:
 
   # Maximum value is half of the difference between
   # positive and negative signal length
-  PulseErrorRange = 0.000022
+  PulseErrorRange = 0.00002
   
   PULSE_POSITIVE_LENGTH = 0.000120
   PULSE_NEGATIVE_LENGTH = 0.000076
@@ -69,11 +69,12 @@ class DHT22Decoder:
       
       signalTime = self.waitForSignal()
       pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + self.MAX_DHT22_SIGNAL_LENGTH)    
+      decodedSignal = self.translateSignal(pulseArray)
 
       temperature = 0
       humidity = 0
       
-      return { "hex": "",
+      return { "binary": decodedSignal,
                "temperature": temperature,
                "humidity": humidity
                }
@@ -109,7 +110,21 @@ class DHT22Decoder:
           
           if self.signalEdgeDetectedTimeQueue.empty():
               sleep(0.01)
+    pass
+
+
+  def translateSignal(self, timeArray):
+      correctSignal = ''
+      
+      for pulseLength in timeArray:
           
+          if pulseLength > self.PULSE_POSITIVE_LENGTH - self.PulseErrorRange / 2 and pulseLength < self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange / 2:
+              correctSignal += '1'
+                  
+          elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange / 2 and pulseLength < self.PULSE_NEGATIVE_LENGTH + self.PulseErrorRange / 2:
+              correctSignal += '0'
+          
+      return correctSignal 
       
   def validateSignal(self, signalString):
       if type(signalString) != str:
