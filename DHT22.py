@@ -92,7 +92,7 @@ class DHT22Decoder:
           print(signalTime)
           
           # If signal starts 13,5ms
-          if signalTime > 0.0002 and signalTime < 0.0005:
+          if signalTime > 0.002 and signalTime < 0.005:
               # Need to wait for the rest of the signal
               if self.signalEdgeDetectedTimeQueue.qsize() < 40:
                   sleep(0.005)
