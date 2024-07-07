@@ -91,6 +91,8 @@ class DHT22Decoder:
           # we use max CPU for decoding
           signalTime = edgeTimeDetected - self.currentSignalStartTime
           self.currentSignalStartTime = edgeTimeDetected
+
+          print(signalTime)
           
           # If signal starts 13,5ms
           if signalTime > 0.0002 and signalTime < 0.0005:
