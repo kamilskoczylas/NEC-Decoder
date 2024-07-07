@@ -24,10 +24,11 @@ sleep(1)
 GPIO.setup(GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_DOWN) 
 sleep(0.002)
 
-GPIO.setup(GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
-sleep(0.5)
-
 # waiting
 while not IReader.hasDetected():
-    cmd = IReader.getCommand()
-    print(cmd)
+    sleep(0.1)
+
+cmd = IReader.getCommand()
+print(cmd)
+
+GPIO.setup(GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
