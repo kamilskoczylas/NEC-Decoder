@@ -39,9 +39,8 @@ class DHT22Decoder:
       edgeTimeDetected = burstStartTime
       previousPulseStart = burstStartTime
       i = 0
-      print (self.signalEdgeDetectedTimeQueue)
       
-      while i < pulseCount and edgeTimeDetected <= maxTime:
+      while self.signalEdgeDetectedTimeQueue.qsize() > 0 and edgeTimeDetected <= maxTime:
           i += 1
   
           try:
