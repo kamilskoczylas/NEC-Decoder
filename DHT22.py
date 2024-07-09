@@ -167,7 +167,7 @@ class DHT22Decoder:
                   checksum += (1 << (40 - i))
                   
           elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange and pulseLength < self.PULSE_POSITIVE_LENGTH:
-              correctSignal += '0'
+              decodedSignal += '0'
 
       # Raspberry reads incorrectly beginning of the signal. But it must be 5 times 0
       correctSignal = "00000" + decodedSignal[6:len(decodedSignal)]
