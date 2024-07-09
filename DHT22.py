@@ -83,11 +83,17 @@ class DHT22Decoder:
       pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + self.MAX_DHT22_SIGNAL_LENGTH)    
       decodedSignal = self.translateSignal(pulseArray)
 
-      
-      return { "binary": decodedSignal,
-               "temperature": self.temperature,
-               "humidity": self.humidity
-               }
+      if self.validateSignal(decodedSignal):
+          return { "binary": decodedSignal,
+                   "temperature": self.temperature,
+                   "humidity": self.humidity
+                   }
+      else:
+          return { "binary": decodedSignal,
+                   "temperature": "ERROR",
+                   "humidity": "ERROR"
+                   }
+      pass
       
   def waitForSignal(self):
       self.breakTime = 0
@@ -148,7 +154,7 @@ class DHT22Decoder:
                   temperature += (1 << (32 - i))
     
               if i in range (33, 40):
-                  checksum += (1 << (i - 33))
+                  checksum += (1 << (40 - i))
                   
           elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange and pulseLength < self.PULSE_POSITIVE_LENGTH:
               correctSignal += '0'
@@ -167,6 +173,11 @@ class DHT22Decoder:
           if self.DEBUG:
               print("Invalid length")
           return False
+
+      calculated_checksum = 0
+      for i in range (1, 40):
+          if signalString[i - 1] == '1':
+              calculated_checksum += 1 << (8 - (i % 8))
           
-      return True
+      return calculated_checksum == self.checksum
       
