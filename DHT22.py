@@ -14,7 +14,7 @@ class DHT22Decoder:
 
   # Maximum value is half of the difference between
   # positive and negative signal length
-  PulseErrorRange = 0.00005
+  PulseErrorRange = 0.00006
   
   PULSE_POSITIVE_LENGTH = 0.000120
   PULSE_NEGATIVE_LENGTH = 0.000076
