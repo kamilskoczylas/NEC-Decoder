@@ -147,27 +147,28 @@ class DHT22Decoder:
       sign = 1
       
       for pulseLength in timeArray:
-          i+= 1
         
           if pulseLength >= self.PULSE_POSITIVE_LENGTH and pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
               decodedSignal += '1'
   
               # it makes no sense if humidity exceed 100%, therefore no need to calculate it
-              if i in range (6, 16):
-                  humidity += (1 << (16 - i))
+              if i in range (5, 16):
+                  humidity += (1 << (15 - i))
 
               # i = 17 is only sign digit: +/-
-              if i == 17:
+              if i == 16:
                   sign = -1
                 
-              if i in range (18, 32):
-                  temperature += (1 << (32 - i))
+              if i in range (17, 32):
+                  temperature += (1 << (31 - i))
     
-              if i in range (33, 40):
-                  checksum += (1 << (40 - i))
+              if i in range (32, 40):
+                  checksum += (1 << (39 - i))
                   
           elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange and pulseLength < self.PULSE_POSITIVE_LENGTH:
               decodedSignal += '0'
+
+          i+= 1
 
       # Raspberry reads incorrectly beginning of the signal. But it must be 5 times 0
       correctSignal = "00000" + decodedSignal[5:len(decodedSignal)]
@@ -187,9 +188,9 @@ class DHT22Decoder:
           return False
 
       self.calculated_checksum = 0
-      for i in range (1, 40):
-          if signalString[i - 1] == '1':
-              self.calculated_checksum += 1 << (8 - (i % 8 + 1))
+      for i in range (0, 40):
+          if signalString[i] == '1':
+              self.calculated_checksum += 1 << (7 - (i % 8))
 
       self.calculated_checksum = self.calculated_checksum & 255
       return self.calculated_checksum == self.checksum
