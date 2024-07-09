@@ -26,6 +26,7 @@ class DHT22Decoder:
   temperature = 0
   humidity = 0
   checksum = 0
+  calculated_checksum = 0
 
   DEBUG = False
   
@@ -90,8 +91,9 @@ class DHT22Decoder:
                    }
       else:
           return { "binary": decodedSignal,
-                   "temperature": "ERROR",
-                   "humidity": "ERROR"
+                   "result": "ERROR",
+                   "checksum": self.checksum,
+                   "calculated_checksum": self.calculated_checksum
                    }
       pass
       
@@ -174,10 +176,10 @@ class DHT22Decoder:
               print("Invalid length")
           return False
 
-      calculated_checksum = 0
+      self.calculated_checksum = 0
       for i in range (1, 40):
           if signalString[i - 1] == '1':
-              calculated_checksum += 1 << (8 - (i % 8))
+              self.calculated_checksum += 1 << (8 - (i % 8))
           
-      return calculated_checksum == self.checksum
+      return self.calculated_checksum == self.checksum
       
