@@ -120,17 +120,23 @@ class DHT22Decoder:
       humidity = 0
       temperature = 0
       checksum = 0
+      sign = 1
       
       for pulseLength in timeArray:
           i+= 1
         
           if pulseLength >= self.PULSE_POSITIVE_LENGTH and pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
               correctSignal += '1'
-            
-              if i in range (1, 16):
+
+              # it makes no sense if humidity exceed 100%, therefore no need to calculate it
+              if i in range (6, 16):
                   humidity += (1 << (16 - i))
 
-              if i in range (17, 32):
+              # i = 17 is only sign digit: +/-
+              if i == 17:
+                  sign = -1
+                
+              if i in range (18, 32):
                   temperature += (1 << (32 - i))
     
               if i in range (33, 40):
@@ -139,7 +145,7 @@ class DHT22Decoder:
           elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange and pulseLength < self.PULSE_POSITIVE_LENGTH:
               correctSignal += '0'
 
-      self.temperature = temperature / 10
+      self.temperature = sign * temperature / 10
       self.humidity = humidity / 10
       self.checksum = checksum
           
