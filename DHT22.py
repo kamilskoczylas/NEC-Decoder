@@ -188,7 +188,7 @@ class DHT22Decoder:
           return False
 
       self.calculated_checksum = 0
-      for i in range (0, 40):
+      for i in range (0, 32):
           if signalString[i] == '1':
               self.calculated_checksum += 1 << (7 - (i % 8))
 
