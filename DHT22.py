@@ -91,6 +91,7 @@ class DHT22Decoder:
 
       if self.validateSignal(decodedSignal):
           return { "binary": self.formatBinary(decodedSignal),
+                   "result": "OK",
                    "temperature": self.temperature,
                    "humidity": self.humidity
                    }
