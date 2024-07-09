@@ -170,7 +170,7 @@ class DHT22Decoder:
               decodedSignal += '0'
 
       # Raspberry reads incorrectly beginning of the signal. But it must be 5 times 0
-      correctSignal = "00000" + decodedSignal[6:len(decodedSignal)]
+      correctSignal = "00000" + decodedSignal[6:len(decodedSignal) + 1]
       self.temperature = sign * temperature / 10
       self.humidity = humidity / 10
       self.checksum = checksum
