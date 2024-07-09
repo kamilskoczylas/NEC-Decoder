@@ -93,7 +93,9 @@ class DHT22Decoder:
           return { "binary": decodedSignal,
                    "result": "ERROR",
                    "checksum": self.checksum,
-                   "calculated_checksum": self.calculated_checksum
+                   "calculated_checksum": self.calculated_checksum,
+                   "temperature": self.temperature,
+                   "humidity": self.humidity
                    }
       pass
       
