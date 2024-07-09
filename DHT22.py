@@ -78,7 +78,7 @@ class DHT22Decoder:
       return resultArray
   
   def formatBinary(self, signal):
-      return signal[0:8] + " " + signal[8:8] + " " + signal[16:8] + " " + signal[24:8] + " " + signal[32:8]
+      return signal[0:8] + " " + signal[8:15] + " " + signal[16:23] + " " + signal[24:31] + " " + signal[32:39] + (len(signal) > 40 ?  " " + signal[40:len(signal)] : "")
     
   def getCommand(self):
       
