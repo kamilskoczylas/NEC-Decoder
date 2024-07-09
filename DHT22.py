@@ -139,6 +139,7 @@ class DHT22Decoder:
 
   def translateSignal(self, timeArray):
       correctSignal = ''
+      decodedSignal = ''
       i = 0
       humidity = 0
       temperature = 0
@@ -149,8 +150,8 @@ class DHT22Decoder:
           i+= 1
         
           if pulseLength >= self.PULSE_POSITIVE_LENGTH and pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
-              correctSignal += '1'
-
+              decodedSignal += '1'
+  
               # it makes no sense if humidity exceed 100%, therefore no need to calculate it
               if i in range (6, 16):
                   humidity += (1 << (16 - i))
@@ -168,6 +169,8 @@ class DHT22Decoder:
           elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange and pulseLength < self.PULSE_POSITIVE_LENGTH:
               correctSignal += '0'
 
+      # Raspberry reads incorrectly beginning of the signal. But it must be 5 times 0
+      correctSignal = "00000" + decodedSignal[6:len(decodedSignal]
       self.temperature = sign * temperature / 10
       self.humidity = humidity / 10
       self.checksum = checksum
