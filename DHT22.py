@@ -124,25 +124,19 @@ class DHT22Decoder:
       for pulseLength in timeArray:
           i+= 1
         
-          if pulseLength > self.PULSE_POSITIVE_LENGTH - self.PulseErrorRange and pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
+          if pulseLength >= self.PULSE_POSITIVE_LENGTH and pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
               correctSignal += '1'
             
-              if i in range (1, 8):
-                  humidity += (1 << (i - 1 + 8))
+              if i in range (1, 16):
+                  humidity += (1 << (16 - i))
 
-              if i in range (9, 16):
-                  humidity += (1 << (i - 9))
-    
-              if i in range (17, 24):
-                  temperature += (1 << (i - 17 + 8))
-
-              if i in range (25, 32):
-                  temperature += (1 << (i - 25))
+              if i in range (17, 32):
+                  temperature += (1 << (32 - i))
     
               if i in range (33, 40):
                   checksum += (1 << (i - 33))
                   
-          elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange and pulseLength <= self.PULSE_NEGATIVE_LENGTH + self.PulseErrorRange:
+          elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange and pulseLength < self.PULSE_POSITIVE_LENGTH:
               correctSignal += '0'
 
       self.temperature = temperature / 10
