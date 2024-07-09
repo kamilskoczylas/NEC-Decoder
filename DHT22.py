@@ -77,7 +77,9 @@ class DHT22Decoder:
       
       return resultArray
   
-      
+  def formatBinary(self, signal):
+      return signal[0:8] + " " + signal[8:8] + " " + signal[16:8] + " " + signal[24:8] + " " + signal[32:8]
+    
   def getCommand(self):
       
       signalTime = self.waitForSignal()
@@ -85,12 +87,12 @@ class DHT22Decoder:
       decodedSignal = self.translateSignal(pulseArray)
 
       if self.validateSignal(decodedSignal):
-          return { "binary": decodedSignal,
+          return { "binary": self.formatBinary(decodedSignal),
                    "temperature": self.temperature,
                    "humidity": self.humidity
                    }
       else:
-          return { "binary": decodedSignal,
+          return { "binary": self.formatBinary(decodedSignal),
                    "result": "ERROR",
                    "checksum": self.checksum,
                    "calculated_checksum": self.calculated_checksum,
