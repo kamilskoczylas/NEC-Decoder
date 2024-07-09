@@ -81,7 +81,7 @@ class DHT22Decoder:
       ending = ""
       if len(signal) > 40:
           ending = " " + signal[40:len(signal)]
-      return signal[0:8] + " " + signal[8:15] + " " + signal[16:23] + " " + signal[24:31] + " " + signal[32:39] + ending
+      return signal[0:8] + " " + signal[8:16] + " " + signal[16:24] + " " + signal[24:32] + " " + signal[32:40] + ending
     
   def getCommand(self):
       
