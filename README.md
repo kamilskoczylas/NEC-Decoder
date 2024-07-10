@@ -17,6 +17,19 @@ Example from the recording:
 - Address: 00000000 11111111
 - Command: 10100010 01011101
 
+---
+Requirements
+-
+
+Before using with Raspberry Zero make sure your Raspberry PI has
+- appropriate power adapter
+- good cooling
+- use Python 3
+
+Additionally, follow IR Receiver documentation to use appropriate resistors to eliminate unnecessary noises
+
+---
+
 # DHT22 Signal Decoder: Humidity and temperature
 
 Designed and tested on Raspberry PI 3A+
@@ -30,15 +43,11 @@ Recorded DHT22 signal (using sound card line-in)
 Requirements
 -
 
-Before using with Raspberry Zero make sure your Raspberry PI has
-- appropriate power adapter
-- good cooling
+- Raspberry 3 or better 
 - use Python 3
 
-Additionally, follow IR Receiver documentation to use appropriate resistors to eliminate unnecessary noises
-
 ---
-Example
+NEC Decoder Example 
 -
 
 ```    
