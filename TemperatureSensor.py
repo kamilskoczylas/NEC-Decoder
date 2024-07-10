@@ -25,7 +25,7 @@ class TemperatureSensor:
             self.GPIO_PIN
         ),
         DHT22.DHT22Decoder(),
-        True
+        False
         )
 
     self.MeasureFrequencyInSeconds = MeasureFrequencyInSeconds
