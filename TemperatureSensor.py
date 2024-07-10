@@ -21,8 +21,8 @@ class TemperatureSensor:
 
     DHT22Reader = SignalDecoder.SignalDecoder(
         GPIODataProvider.EdgeDetected(
-            GPIO_Mode,
-            GPIO_PIN
+            self.GPIO_Mode,
+            self.GPIO_PIN
         ),
         DHT22.DHT22Decoder(),
         True
@@ -41,11 +41,11 @@ class TemperatureSensor:
     sleep(self.MeasureFrequencyInSeconds)
     
     # You have to set negative signal for at least 1 ms to request data from DHT22
-    GPIO.setup(GPIO_PIN, GPIO.OUT)
-    GPIO.output(GPIO_PIN, GPIO.LOW)
+    GPIO.setup(self.GPIO_PIN, GPIO.OUT)
+    GPIO.output(self.GPIO_PIN, GPIO.LOW)
     sleep(0.005)
     
-    GPIO.setup(GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+    GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
     sleep(0.1)
     measure = IReader.getCommand()
 
