@@ -29,28 +29,10 @@ Before using with Raspberry Zero make sure your Raspberry PI has
 Additionally, follow IR Receiver documentation to use appropriate resistors to eliminate unnecessary noises
 
 ---
-
-# DHT22 Signal Decoder: Humidity and temperature
-
-Designed and tested on Raspberry PI 3A+
-Version 0.1
-Python 3 required
-
-Recorded DHT22 signal (using sound card line-in)
-![Recorded DHT22 Signal](https://github.com/kamilskoczylas/NEC-Decoder/blob/main/Tests/DHT22-Recorded-signal.png?raw=true)
-
----
-Requirements
--
-
-- Raspberry 3 or better 
-- use Python 3
-
----
 NEC Decoder Example 
 -
 
-```    
+```
 # Only for value of GPIO.BCM
 import RPi.GPIO as GPIO 
 from time import sleep 
@@ -77,4 +59,45 @@ while True:
     if IReader.hasDetected():
         cmd = IReader.getCommand()
         print(cmd)
+```
+
+
+---
+
+# DHT22 Signal Decoder: Humidity and temperature
+
+Designed and tested on Raspberry PI 3A+
+Version 0.1
+Python 3 required
+
+Recorded DHT22 signal (using sound card line-in)
+![Recorded DHT22 Signal](https://github.com/kamilskoczylas/NEC-Decoder/blob/main/Tests/DHT22-Recorded-signal.png?raw=true)
+
+---
+Requirements
+-
+
+- Raspberry 3 or better 
+- use Python 3
+
+---
+DHT22 Sensor Example
+-
+
+```
+
+from time import sleep 
+
+import TemperatureSensor
+
+GPIO_PIN = 12
+
+# DHT22 connected to PIN 12 of Raspberry (BCM), class refresh every 2 seconds
+Sensor = TemperatureSensor.TemperatureSensor(GPIO_PIN, 2)
+
+while True:
+    print("Temperature = {temperature}°C, Humidity = {humidity}%".format(temperature=Sensor.Temperature, humidity=Sensor.Humidity))
+    sleep(2)
+
+
 ```
