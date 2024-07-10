@@ -19,7 +19,7 @@ class TemperatureSensor:
     assert MeasureFrequencyInSeconds>=2, "DHT22 requires that measures must be 2 seconds at minimum"
     self.GPIO_PIN = GPIO_BCM_PIN
 
-    DHT22Reader = SignalDecoder.SignalDecoder(
+    self.DHT22Reader = SignalDecoder.SignalDecoder(
         GPIODataProvider.EdgeDetected(
             self.GPIO_Mode,
             self.GPIO_PIN
@@ -47,7 +47,7 @@ class TemperatureSensor:
     
     GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
     sleep(0.1)
-    measure = IReader.getCommand()
+    measure = self.DHT22Reader.getCommand()
 
     if type(measure) is dict and "result" in measure:
       if measure['result'] == "OK":
