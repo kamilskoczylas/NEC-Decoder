@@ -36,23 +36,24 @@ class TemperatureSensor:
 
     
   def QueueConsumer(self):
-    # Keep positive signal for a while
-    GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
-    sleep(self.MeasureFrequencyInSeconds)
-    
-    # You have to set negative signal for at least 1 ms to request data from DHT22
-    GPIO.setup(self.GPIO_PIN, GPIO.OUT)
-    GPIO.output(self.GPIO_PIN, GPIO.LOW)
-    sleep(0.005)
-    
-    GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
-    sleep(0.1)
-    measure = self.DHT22Reader.getCommand()
-
-    if type(measure) is dict and "result" in measure:
-      if measure['result'] == "OK":
-        self.Temperature = measure['temperature']
-        self.Humidity = measure['humidity']
+    while True:
+      # Keep positive signal for a while
+      GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+      sleep(self.MeasureFrequencyInSeconds)
+      
+      # You have to set negative signal for at least 1 ms to request data from DHT22
+      GPIO.setup(self.GPIO_PIN, GPIO.OUT)
+      GPIO.output(self.GPIO_PIN, GPIO.LOW)
+      sleep(0.005)
+      
+      GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+      sleep(0.1)
+      measure = self.DHT22Reader.getCommand()
+  
+      if type(measure) is dict and "result" in measure:
+        if measure['result'] == "OK":
+          self.Temperature = measure['temperature']
+          self.Humidity = measure['humidity']
         
     pass
     
