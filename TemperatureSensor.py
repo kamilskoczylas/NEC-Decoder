@@ -53,10 +53,10 @@ class TemperatureSensor:
         measure = self.DHT22Reader.getCommand()
         measure = self.DHT22Reader.clear()
   
-      if type(measure) is dict and "result" in measure:
-        if measure['result'] == "OK":
-          self.Temperature = measure['temperature']
-          self.Humidity = measure['humidity']
+        if type(measure) is dict and "result" in measure:
+          if measure['result'] == "OK":
+            self.Temperature = measure['temperature']
+            self.Humidity = measure['humidity']
         
     pass
     
