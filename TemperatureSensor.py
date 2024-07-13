@@ -51,7 +51,7 @@ class TemperatureSensor:
       
       if self.DHT22Reader.hasDetected():
         measure = self.DHT22Reader.getCommand()
-        measure = self.DHT22Reader.clear()
+        self.DHT22Reader.clear()
   
         if type(measure) is dict and "result" in measure:
           if measure['result'] == "OK":
