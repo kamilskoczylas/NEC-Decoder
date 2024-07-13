@@ -70,6 +70,11 @@ class SignalDecoder:
     
     def hasDetected(self):
         return not self.Commands.empty()
+
+    def clear(self):
+        with self.Commands.mutex:
+            self.Commands.clear()
+        pass
     
     def getCommand(self):
         command = self.Commands.get_nowait()
