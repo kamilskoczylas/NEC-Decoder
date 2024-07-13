@@ -109,32 +109,33 @@ class DHT22Decoder:
   def waitForSignal(self):
       self.breakTime = 0
       while True:
-          
-          edgeTimeDetected = self.signalEdgeDetectedTimeQueue.get()
-          
-          # Let Raspberry read whole signal before
-          # we use max CPU for decoding
-          signalTime = edgeTimeDetected - self.currentSignalStartTime
-          self.currentSignalStartTime = edgeTimeDetected
 
-          if self.DEBUG:
-            print(signalTime)
+          if self.signalEdgeDetectedTimeQueue > 0:
+            edgeTimeDetected = self.signalEdgeDetectedTimeQueue.get()
           
-          # If signal starts 13,5ms
-          if signalTime > 0.002 and signalTime < 0.008:
-              # Need to wait for the rest of the signal
-              if self.signalEdgeDetectedTimeQueue.qsize() < 40:
-                  sleep(0.005)
-              else:
-                  if self.DEBUG:
-                      print(self.signalEdgeDetectedTimeQueue.qsize())
-              
-              return signalTime
-          else:
-              self.breakTime = signalTime
-              
-              if self.DEBUG:
-                  print("Wrong start signal", signalTime)
+            # Let Raspberry read whole signal before
+            # we use max CPU for decoding
+            signalTime = edgeTimeDetected - self.currentSignalStartTime
+            self.currentSignalStartTime = edgeTimeDetected
+  
+            if self.DEBUG:
+              print(signalTime)
+            
+            # If signal starts 13,5ms
+            if signalTime > 0.002 and signalTime < 0.008:
+                # Need to wait for the rest of the signal
+                if self.signalEdgeDetectedTimeQueue.qsize() < 40:
+                    sleep(0.005)
+                else:
+                    if self.DEBUG:
+                        print(self.signalEdgeDetectedTimeQueue.qsize())
+                
+                return signalTime
+            else:
+                self.breakTime = signalTime
+                
+                if self.DEBUG:
+                    print("Wrong start signal", signalTime)
           
           if self.signalEdgeDetectedTimeQueue.empty():
               sleep(0.01)
