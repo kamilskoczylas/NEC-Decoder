@@ -110,7 +110,7 @@ class DHT22Decoder:
       self.breakTime = 0
       while True:
 
-          if self.signalEdgeDetectedTimeQueue > 0:
+          if self.signalEdgeDetectedTimeQueue.qsize() > 0:
             edgeTimeDetected = self.signalEdgeDetectedTimeQueue.get()
           
             # Let Raspberry read whole signal before
