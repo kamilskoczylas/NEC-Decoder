@@ -48,7 +48,10 @@ class TemperatureSensor:
       
       GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
       sleep(0.1)
-      measure = self.DHT22Reader.getCommand()
+      
+      if self.DHT22Reader.hasDetected():
+        measure = self.DHT22Reader.getCommand()
+        measure = self.DHT22Reader.clear()
   
       if type(measure) is dict and "result" in measure:
         if measure['result'] == "OK":
