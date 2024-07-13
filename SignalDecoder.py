@@ -71,9 +71,14 @@ class SignalDecoder:
     def hasDetected(self):
         return not self.Commands.empty()
 
-    def clear(self):
+    def clear(self, number_of_elements_to_leave = 0):
         with self.Commands.mutex:
-            self.Commands.clear()
+            while self.Commands.qsize() > number_of_elements:
+            try:
+                self.Commands.get(block=False)
+            except Empty:
+                continue
+            self.Commands.task_done()
         pass
     
     def getCommand(self):
