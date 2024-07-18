@@ -73,7 +73,7 @@ class SignalDecoder:
 
     def clear(self, number_of_elements_to_leave = 0):
         with self.Commands.mutex:
-            while self.Commands.qsize() > number_of_elements:
+            while self.Commands.qsize() > number_of_elements_to_leave:
                 try:
                     self.Commands.get(block=False)
                 except Empty:
