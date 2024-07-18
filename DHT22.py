@@ -9,6 +9,7 @@
 from time import sleep
 from queue import Queue
 from queue import Empty
+from timeit import default_timer
 
 class DHT22Decoder:
 
