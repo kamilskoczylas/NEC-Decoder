@@ -41,7 +41,7 @@ class DHT22Decoder:
       previousPulseStart = burstStartTime
       i = 0
 
-      if DEBUG:
+      if self.DEBUG:
           print("Queue length: {0}".format(self.signalEdgeDetectedTimeQueue.qsize()))
 
       while self.signalEdgeDetectedTimeQueue.qsize() > 40:
