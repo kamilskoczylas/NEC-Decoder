@@ -47,7 +47,7 @@ class TemperatureSensor:
       sleep(0.005)
       
       GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
-      sleep(0.1)
+      sleep(0.2)
 
       if self.DHT22Reader.hasDetected():
         measure = self.DHT22Reader.getCommand()
