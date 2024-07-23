@@ -57,7 +57,7 @@ class AverageMeasure:
       if divider > 0:
           return Measure(temperature = self.sum.Temperature / divider, humidity = self.sum.Humidity / divider, dateTime = self.lastMeasureDateTime)
       else:
-          return Measure()
+          return Measure(0, 0, 0)
 
 
 class DHT22Decoder:
