@@ -145,11 +145,10 @@ class DHT22Decoder:
 
       if self.validateSignal(decodedSignal):
           measure = Measure(temperature = self.temperature, humidity = self.humidity, dateTime = self.currentSignalStartTime)
+          self.averageMeasure.append(measure)
+          average = self.averageMeasure.getAvegareMeasure()
 
           if self.averageMeasure.canAddMeasure(measure):
-              self.averageMeasure.append(measure)
-              average = self.averageMeasure.getAvegareMeasure()
-            
               return { "binary": self.formatBinary(decodedSignal),
                        "result": "OK",
                        "temperature": self.temperature,
