@@ -47,7 +47,7 @@ class AverageMeasure:
       self.lastMeasureDateTime = measure.DateTime
 
   def canAddMeasure(self, measure: Measure):
-      average = self.getAvegareMeasure
+      average = self.getAvegareMeasure()
       return measure.Temperature - average.Temperature <= self.ALLOW_TEMPERATURE_DIFFERENCE and measure.Humidity - average.Humidity <= self.ALLOW_HUMIDITY_DIFFERENCE
 
   def getAvegareMeasure(self):
