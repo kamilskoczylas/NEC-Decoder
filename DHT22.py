@@ -52,7 +52,7 @@ class AverageMeasure:
 
   def canAddMeasure(self, measure: Measure):
       average = self.getAvegareMeasure()
-      return self.counter < self.results.maxlen or (measure.Temperature - average.Temperature <= self.ALLOW_TEMPERATURE_DIFFERENCE and measure.Humidity - average.Humidity <= self.ALLOW_HUMIDITY_DIFFERENCE)
+      return self.counter < self.results.maxlen or (abs(measure.Temperature - average.Temperature) <= self.ALLOW_TEMPERATURE_DIFFERENCE and abs(measure.Humidity - average.Humidity) <= self.ALLOW_HUMIDITY_DIFFERENCE)
 
   def getAvegareMeasure(self):
       divider = min(self.counter, self.results.maxlen)
