@@ -13,6 +13,8 @@ class TemperatureSensor:
 
   Temperature = 0
   Humidity = 0
+  AvgTemperature = 0
+  AvgHumidity = 0
   MeasureFrequencyInSeconds = 8
   
   def __init__(self, GPIO_BCM_PIN, MeasureFrequencyInSeconds = 8):
@@ -56,6 +58,8 @@ class TemperatureSensor:
           if measure['result'] == "OK":
             self.Temperature = measure['temperature']
             self.Humidity = measure['humidity']
+            self.AvgTemperature = measure['avg_temperature']
+            self.AvgHumidity = measure['avg_humidity']
         
     pass
     
