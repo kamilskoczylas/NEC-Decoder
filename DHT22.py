@@ -28,6 +28,7 @@ class AverageMeasure:
 
   sum = Measure(0, 0, 0)
   lastMeasureDateTime = 0
+  counter = 0
 
   ALLOW_TEMPERATURE_DIFFERENCE = 1
   ALLOW_HUMIDITY_DIFFERENCE = 2
@@ -45,10 +46,11 @@ class AverageMeasure:
       self.sum.Humidity += measure.Humidity
       self.sum.DateTime = measure.DateTime
       self.lastMeasureDateTime = measure.DateTime
+      self.counter += 1
 
   def canAddMeasure(self, measure: Measure):
       average = self.getAvegareMeasure()
-      return measure.Temperature - average.Temperature <= self.ALLOW_TEMPERATURE_DIFFERENCE and measure.Humidity - average.Humidity <= self.ALLOW_HUMIDITY_DIFFERENCE
+      return self.counter < self.results.maxlen or (measure.Temperature - average.Temperature <= self.ALLOW_TEMPERATURE_DIFFERENCE and measure.Humidity - average.Humidity <= self.ALLOW_HUMIDITY_DIFFERENCE)
 
   def getAvegareMeasure(self):
       divider = self.results.maxlen
