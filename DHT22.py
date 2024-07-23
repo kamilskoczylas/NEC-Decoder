@@ -38,7 +38,7 @@ class AverageMeasure:
 
 
   def append(self, measure: Measure):
-      first = self.results.popLeft()
+      first = self.results.popleft()
       self.sum.Temperature -= first.Temperature
       self.sum.Humidity -= first.Humidity
       self.results.append(measure)
@@ -53,8 +53,11 @@ class AverageMeasure:
       return self.counter < self.results.maxlen or (measure.Temperature - average.Temperature <= self.ALLOW_TEMPERATURE_DIFFERENCE and measure.Humidity - average.Humidity <= self.ALLOW_HUMIDITY_DIFFERENCE)
 
   def getAvegareMeasure(self):
-      divider = self.results.maxlen
-      return Measure(temperature = self.sum.Temperature / divider, humidity = self.sum.Humidity / divider, dateTime = self.lastMeasureDateTime)
+      divider = min(self.counter, self.results.maxlen)
+      if divider > 0:
+          return Measure(temperature = self.sum.Temperature / divider, humidity = self.sum.Humidity / divider, dateTime = self.lastMeasureDateTime)
+      else
+          return Measure()
 
 
 class DHT22Decoder:
