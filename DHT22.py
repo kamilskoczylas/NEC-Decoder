@@ -56,7 +56,7 @@ class AverageMeasure:
       divider = min(self.counter, self.results.maxlen)
       if divider > 0:
           return Measure(temperature = self.sum.Temperature / divider, humidity = self.sum.Humidity / divider, dateTime = self.lastMeasureDateTime)
-      else
+      else:
           return Measure()
 
 
