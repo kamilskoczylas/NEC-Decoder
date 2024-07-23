@@ -10,6 +10,50 @@ from time import sleep
 from queue import Queue
 from queue import Empty
 from timeit import default_timer
+from collections import deque
+
+
+class Measure:
+  Temperature = 0
+  Humidity = 0
+  DateTime = 0
+
+  def __init__(self, temperature, humidity, dateTime):
+      self.Temperature = temperature
+      self.Humidity = humidity
+      self.DateTime = dateTime
+
+
+class AverageMeasure:
+
+  sum = Measure(0, 0, 0)
+  lastMeasureDateTime = 0
+
+  ALLOW_TEMPERATURE_DIFFERENCE = 1
+  ALLOW_HUMIDITY_DIFFERENCE = 2
+
+  def __init__(self, maximum_length = 3):
+      self.results = deque(maxlen = maximum_length)
+
+
+  def append(self, measure: Measure):
+      first = self.results.popLeft()
+      self.sum.Temperature -= first.Temperature
+      self.sum.Humidity -= first.Humidity
+      self.results.append(measure)
+      self.sum.Temperature += measure.Temperature
+      self.sum.Humidity += measure.Humidity
+      self.sum.DateTime = measure.DateTime
+      self.lastMeasureDateTime = measure.DateTime
+
+  def canAddMeasure(self, measure: Measure):
+      average = self.getAvegareMeasure
+      return measure.Temperature - average.Temperature <= self.ALLOW_TEMPERATURE_DIFFERENCE and measure.Humidity - average.Humidity <= self.ALLOW_HUMIDITY_DIFFERENCE
+
+  def getAvegareMeasure(self):
+      divider = self.results.maxlen
+      return Measure(temperature = self.sum.Temperature / divider, humidity = self.sum.Humidity / divider, dateTime = self.lastMeasureDateTime)
+
 
 class DHT22Decoder:
 
@@ -28,6 +72,7 @@ class DHT22Decoder:
   humidity = 0
   checksum = 0
   calculated_checksum = 0
+  averageMeasure = AverageMeasure()
 
   DEBUG = False
   
@@ -92,20 +137,27 @@ class DHT22Decoder:
       decodedSignal = self.translateSignal(pulseArray)
 
       if self.validateSignal(decodedSignal):
-          return { "binary": self.formatBinary(decodedSignal),
-                   "result": "OK",
-                   "temperature": self.temperature,
-                   "humidity": self.humidity
-                   }
-      else:
-          return { "binary": self.formatBinary(decodedSignal),
-                   "result": "ERROR",
-                   "checksum": self.checksum,
-                   "calculated_checksum": self.calculated_checksum,
-                   "temperature": self.temperature,
-                   "humidity": self.humidity
-                   }
-      pass
+          measure = Measure(temperature = self.temperature, humidity = self.humidity, dateTime = self.currentSignalStartTime)
+
+          if self.averageMeasure.canAddMeasure(measure):
+              self.averageMeasure.append(measure)
+              average = self.averageMeasure.getAvegareMeasure()
+            
+              return { "binary": self.formatBinary(decodedSignal),
+                       "result": "OK",
+                       "temperature": self.temperature,
+                       "humidity": self.humidity,
+                       "avg_temperature": average.Temperature,
+                       "avg_humidity": average.Humidity
+                       }
+      
+      return { "binary": self.formatBinary(decodedSignal),
+               "result": "ERROR",
+               "checksum": self.checksum,
+               "calculated_checksum": self.calculated_checksum,
+               "temperature": self.temperature,
+               "humidity": self.humidity
+               }
       
   def waitForSignal(self):
       self.breakTime = 0
