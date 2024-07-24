@@ -38,10 +38,13 @@ class AverageMeasure:
 
 
   def append(self, measure: Measure):
+      temp = 0
+    
       if self.counter >= self.results.maxlen:
           first = self.results.popleft()
           self.sum.Temperature -= first.Temperature
           self.sum.Humidity -= first.Humidity
+          temp = first.Temperature
     
       self.results.append(measure)
       self.sum.Temperature += measure.Temperature
@@ -54,11 +57,14 @@ class AverageMeasure:
       if divider > 0:
         result = self.sum.Temperature / divider  
 
-      print("{1} + {2} - {3} / {4} = {5}".format(self.sum.Temperature, measure.Temperature, first.Temperature, divider, result))
+      print("{1} + {2} - {3} / {4} = {5}".format(self.sum.Temperature, measure.Temperature, temp, divider, result))
       pass
 
   def canAddMeasure(self, measure: Measure):
       average = self.getAvegareMeasure()
+      print(abs(measure.Temperature - average.Temperature))
+      print(abs(measure.Humidity - average.Humidity))
+    
       return self.counter < self.results.maxlen or (abs(measure.Temperature - average.Temperature) <= self.ALLOW_TEMPERATURE_DIFFERENCE and abs(measure.Humidity - average.Humidity) <= self.ALLOW_HUMIDITY_DIFFERENCE)
 
   def getAvegareMeasure(self):
