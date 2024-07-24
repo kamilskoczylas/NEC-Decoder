@@ -54,7 +54,8 @@ class AverageMeasure:
       if divider > 0:
         result = self.sum.Temperature / divider  
 
-      print("{1} + {2} - {3} / {4} = {5}".format(self.sum.Temperature, measure.Temperature, first.Temperature, divider, result)
+      print("{1} + {2} - {3} / {4} = {5}".format(self.sum.Temperature, measure.Temperature, first.Temperature, divider, result))
+      pass
 
   def canAddMeasure(self, measure: Measure):
       average = self.getAvegareMeasure()
