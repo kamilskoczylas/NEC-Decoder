@@ -42,6 +42,7 @@ class AverageMeasure:
     
       if self.counter >= self.results.maxlen:
           first = self.results.popleft()
+          print(first)
           self.sum.Temperature -= first.Temperature
           self.sum.Humidity -= first.Humidity
           temp = first.Temperature
