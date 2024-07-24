@@ -30,8 +30,8 @@ class AverageMeasure:
   lastMeasureDateTime = 0
   counter = 0
 
-  ALLOW_TEMPERATURE_DIFFERENCE = 1
-  ALLOW_HUMIDITY_DIFFERENCE = 2
+  ALLOW_TEMPERATURE_DIFFERENCE = 2
+  ALLOW_HUMIDITY_DIFFERENCE = 4
 
   def __init__(self, maximum_length = 3):
       self.results = deque(maxlen = maximum_length)
