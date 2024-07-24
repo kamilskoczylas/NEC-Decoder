@@ -40,12 +40,14 @@ class AverageMeasure:
   def append(self, measure: Measure):
       temp = 0
     
-      if self.counter >= len(self.results):
+      if len(self.results) == self.results.maxlen:
           first = self.results.popleft()
           print(first)
           self.sum.Temperature -= first.Temperature
           self.sum.Humidity -= first.Humidity
-          temp = first.Temperature
+          temp = first.Temperature 
+      else:
+          print(self.results.maxlen)  
     
       self.results.append(measure)
       self.sum.Temperature += measure.Temperature
