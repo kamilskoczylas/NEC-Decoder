@@ -18,7 +18,7 @@ class SignalDataProvider(ABC):
     def InitDataQueue(self, queue):
         pass
 
-class SignalDecoder(ABC):
+class SignalAdapter(ABC):
     DEBUG = False
 
     @abstractmethod
@@ -37,15 +37,15 @@ class SignalDecoder:
     MAX_QUEUE_SIZE = 128
     MAX_COMMANDS = 20
     
-    def __init__(self, dataProvider: SignalDataProvider, decoder: SignalDecoder, DEBUG = False):
+    def __init__(self, dataProvider: SignalDataProvider, decoder: SignalAdapter, DEBUG = False):
         
         self.DEBUG = DEBUG
 
-        self.IRTimeQueue = Queue(self.MAX_QUEUE_SIZE)
+        self.timeQueue = Queue(self.MAX_QUEUE_SIZE)
         self.Commands = Queue(self.MAX_COMMANDS)
         self.decoder = decoder
 
-        dataProvider.InitDataQueue(self.IRTimeQueue)
+        dataProvider.InitDataQueue(self.timeQueue)
 
         worker = Thread(target=self.QueueConsumer)
         worker.daemon = True
@@ -54,7 +54,7 @@ class SignalDecoder:
 
     
     def QueueConsumer(self):
-        self.decoder.initialize(self.IRTimeQueue, self.DEBUG)
+        self.decoder.initialize(self.timeQueue, self.DEBUG)
         
         while True:
             
@@ -63,10 +63,7 @@ class SignalDecoder:
             
             # Minimum time for next IR command
             sleep(0.01)
-            
-    def DecodeIRTimeQueue(self):
-        self.ConvertArray(self.IRTimeQueue)
-        self.Reset()
+        pass
     
     def hasDetected(self):
         return not self.Commands.empty()
