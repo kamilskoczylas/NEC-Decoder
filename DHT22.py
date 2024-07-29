@@ -43,7 +43,7 @@ class AverageMeasure:
     
       while len(self.results) > 0 and default_timer() - self.results[0].DateTime > self.maximum_length_seconds:
           first = self.results.popleft()
-          print("removing first measure after {0} seconds: {1}C".format(first.Temperature, default_timer() - self.results[0].DateTime))
+          print("removing first measure after {0} seconds: {1}C".format(default_timer() - first.DateTime, first.Temperature))
           self.sum.Temperature -= first.Temperature
           self.sum.Humidity -= first.Humidity
           #temp = first.Temperature 
