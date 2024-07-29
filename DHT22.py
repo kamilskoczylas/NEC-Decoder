@@ -38,15 +38,14 @@ class AverageMeasure:
       self.maximum_length_seconds = maximum_length_seconds
 
 
-  def append(self, measure: Measure):
-      temp = 0
-    
+  def remove(self):
       while len(self.results) > 0 and default_timer() - self.results[0].DateTime > self.maximum_length_seconds:
           first = self.results.popleft()
           print("removing first measure after {0} seconds: {1}C".format(default_timer() - first.DateTime, first.Temperature))
           self.sum.Temperature -= first.Temperature
           self.sum.Humidity -= first.Humidity
-          #temp = first.Temperature 
+    
+  def append(self, measure: Measure):
     
       self.results.append(measure)
       self.sum.Temperature += measure.Temperature
@@ -161,6 +160,8 @@ class DHT22Decoder:
 
       if self.validateSignal(decodedSignal):
           measure = Measure(temperature = self.temperature, humidity = self.humidity, dateTime = self.currentSignalStartTime)
+
+          self.averageMeasure.remove()
         
           if self.averageMeasure.canAddMeasure(measure):
               self.averageMeasure.append(measure)
