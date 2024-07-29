@@ -33,21 +33,20 @@ class AverageMeasure:
   ALLOW_TEMPERATURE_DIFFERENCE = 2
   ALLOW_HUMIDITY_DIFFERENCE = 10
 
-  def __init__(self, maximum_length = 3):
-      self.results = deque(maxlen = maximum_length)
+  def __init__(self, maximum_length_seconds = 60):
+      self.results = deque()
+      self.maximum_length_seconds = maximum_length_seconds
 
 
   def append(self, measure: Measure):
       temp = 0
     
-      if len(self.results) == self.results.maxlen:
+      while len(self.results) > 0 and default_timer() - self.results[0].DateTime > maximum_length_seconds:
           first = self.results.popleft()
-          print(first)
+          print("removing first measure after {0} seconds: {1}C".format(first.Temperature, default_timer() - self.results[0].DateTime))
           self.sum.Temperature -= first.Temperature
           self.sum.Humidity -= first.Humidity
-          temp = first.Temperature 
-      else:
-          print(self.results.maxlen)  
+          #temp = first.Temperature 
     
       self.results.append(measure)
       self.sum.Temperature += measure.Temperature
@@ -55,12 +54,13 @@ class AverageMeasure:
       self.sum.DateTime = measure.DateTime
       self.lastMeasureDateTime = measure.DateTime
       self.counter += 1
-      divider = min(self.counter, len(self.results))
+      divider = len(self.results)
+    
       result = 0
       if divider > 0:
         result = self.sum.Temperature / divider  
 
-      print("{0} + {1} - {2} / {3} = {4}".format(self.sum.Temperature, measure.Temperature, temp, divider, result))
+      print("+ {0} = {1} / {2} = {3}".format(measure.Temperature, self.sum.Temperature, divider, result))
       pass
 
   def canAddMeasure(self, measure: Measure):
@@ -68,10 +68,10 @@ class AverageMeasure:
       print(abs(measure.Temperature - average.Temperature))
       print(abs(measure.Humidity - average.Humidity))
     
-      return self.counter < self.results.maxlen or (abs(measure.Temperature - average.Temperature) <= self.ALLOW_TEMPERATURE_DIFFERENCE and abs(measure.Humidity - average.Humidity) <= self.ALLOW_HUMIDITY_DIFFERENCE)
+      return len(self.results) > 0 and (abs(measure.Temperature - average.Temperature) <= self.ALLOW_TEMPERATURE_DIFFERENCE and abs(measure.Humidity - average.Humidity) <= self.ALLOW_HUMIDITY_DIFFERENCE)
 
   def getAvegareMeasure(self):
-      divider = min(self.counter, len(self.results))
+      divider = len(self.results)
       if divider > 0:
           return Measure(temperature = round(self.sum.Temperature / divider, 1), humidity = round(self.sum.Humidity / divider, 1), dateTime = self.lastMeasureDateTime)
       else:
