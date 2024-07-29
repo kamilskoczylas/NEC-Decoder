@@ -157,11 +157,10 @@ class DHT22Decoder:
       signalTime = self.waitForSignal()
       pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + self.MAX_DHT22_SIGNAL_LENGTH)    
       decodedSignal = self.translateSignal(pulseArray)
+      self.averageMeasure.remove()
 
       if self.validateSignal(decodedSignal):
           measure = Measure(temperature = self.temperature, humidity = self.humidity, dateTime = self.currentSignalStartTime)
-
-          self.averageMeasure.remove()
         
           if self.averageMeasure.canAddMeasure(measure):
               self.averageMeasure.append(measure)
