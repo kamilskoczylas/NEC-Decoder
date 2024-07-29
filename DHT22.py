@@ -68,7 +68,7 @@ class AverageMeasure:
       print(abs(measure.Temperature - average.Temperature))
       print(abs(measure.Humidity - average.Humidity))
     
-      return len(self.results) > 0 and (abs(measure.Temperature - average.Temperature) <= self.ALLOW_TEMPERATURE_DIFFERENCE and abs(measure.Humidity - average.Humidity) <= self.ALLOW_HUMIDITY_DIFFERENCE)
+      return len(self.results) < 2 or (abs(measure.Temperature - average.Temperature) <= self.ALLOW_TEMPERATURE_DIFFERENCE and abs(measure.Humidity - average.Humidity) <= self.ALLOW_HUMIDITY_DIFFERENCE)
 
   def getAvegareMeasure(self):
       divider = len(self.results)
