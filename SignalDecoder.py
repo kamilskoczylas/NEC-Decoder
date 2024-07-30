@@ -78,8 +78,8 @@ class SignalDecoder:
                 self.Commands.task_done()
         pass
     
-    def getCommand(self):
-        command = self.Commands.get_nowait()
+    def getCommand(self, wait_for_result = False):
+        command = self.Commands.get(wait_for_result)
         self.Commands.task_done()
         return command
         
