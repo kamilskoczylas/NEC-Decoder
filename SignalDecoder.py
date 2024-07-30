@@ -34,7 +34,7 @@ class SignalAdapter(ABC):
 class SignalDecoder:
 
     startIRTimeQueue = 0
-    MAX_QUEUE_SIZE = 128
+    MAX_QUEUE_SIZE = 1024
     MAX_COMMANDS = 20
     
     def __init__(self, dataProvider: SignalDataProvider, decoder: SignalAdapter, DEBUG = False):
