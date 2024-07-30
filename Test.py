@@ -75,10 +75,10 @@ class DHT22Testing(TestCase):
         self.testProvider = TestDataProvider()
         self.DHT22Reader = SignalDecoder.SignalDecoder(self.testProvider, DHT22.DHT22Decoder())
         self.testProvider.ReadFile("test-dht22-01.txt")
-        sleep(0.1)
+        #sleep(0.1)
         #for result in self.testProvider.expectedResult:
         
-        cmd = self.DHT22Reader.getCommand()
+        cmd = self.DHT22Reader.getCommand(True)
         print(cmd)
         #print("Expected:" + result)
         self.assertTrue(True)
