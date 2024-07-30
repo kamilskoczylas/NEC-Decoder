@@ -42,6 +42,7 @@ class TestDataProvider(ABC):
                 timeline = True
                 edge_number = 0
                 previous_signal = default_timer()
+                self.Queue.put_nowait(previous_signal)
 
             if result:
                 self.expectedResult.append(line)
