@@ -77,12 +77,12 @@ class DHT22Testing(TestCase):
         self.testProvider = TestDataProvider()
         self.DHT22Reader = SignalDecoder.SignalDecoder(self.testProvider, DHT22.DHT22Decoder(), True)
         self.testProvider.ReadFile("test-dht22-01.txt", True)
-        sleep(1)
-        #for result in self.testProvider.expectedResult:
-        
-        cmd = self.DHT22Reader.getCommand()
-        print(cmd)
-        #print("Expected:" + result)
-        self.assertTrue(True)
         sleep(0.1)
+        
+        for result in self.testProvider.expectedResult:
+            cmd = self.DHT22Reader.getCommand()
+            print(cmd)
+            print("Expected:" + result)
+            self.assertTrue(result == "Error = {0}, Temperature = {1}°C, Humidity = {2}%. Avg. Temperature = {3}°C, Avg. Humidity = {4}%".format(cmd['result'], cmd['temperature'], cmd['humidity'], cmd['avg_temperature'], cmd['avg_humidity']))
+            sleep(0.1)
         
