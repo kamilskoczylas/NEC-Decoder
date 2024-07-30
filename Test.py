@@ -73,8 +73,8 @@ class NECTesting(TestCase):
 
 class DHT22Testing(TestCase):
     
-    def test_001(self):
-        self.testProvider = TestDataProvider()
+    def dht_test_001(self):
+        self.dhtTestProvider = TestDataProvider()
         self.DHT22Reader = SignalDecoder.SignalDecoder(self.testProvider, DHT22.DHT22Decoder(), True)
         self.testProvider.ReadFile("test-dht22-01.txt", True)
         sleep(0.1)
