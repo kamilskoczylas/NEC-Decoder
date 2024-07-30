@@ -80,7 +80,7 @@ class DHT22Testing(TestCase):
         
         cmd = self.DHT22Reader.getCommand()
         print(cmd)
-        print("Expected:" + result)
+        #print("Expected:" + result)
         self.assertTrue(True)
         sleep(0.1)
         
