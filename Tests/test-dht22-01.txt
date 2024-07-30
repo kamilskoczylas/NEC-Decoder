@@ -43,6 +43,5 @@ Timeline
 41 0.000073
 
 Returns
-Temperature = 27.2°C, Humidity = 50.0%
-Avg. Temperature = 27.2°C, Avg. Humidity = 50.0%
+Temperature = 27.2°C, Humidity = 50.0%. Avg. Temperature = 27.2°C, Avg. Humidity = 50.0%
 
