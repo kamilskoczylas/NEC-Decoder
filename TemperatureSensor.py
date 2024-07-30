@@ -46,10 +46,10 @@ class TemperatureSensor:
       # You have to set negative signal for at least 1 ms to request data from DHT22
       GPIO.setup(self.GPIO_PIN, GPIO.OUT)
       GPIO.output(self.GPIO_PIN, GPIO.LOW)
-      sleep(0.005)
+      sleep(0.002)
       
       GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
-      sleep(0.2)
+      sleep(0.05)
 
       if self.DHT22Reader.hasDetected():
         measure = self.DHT22Reader.getCommand()
