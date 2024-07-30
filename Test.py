@@ -17,7 +17,7 @@ class TestDataProvider(ABC):
         self.Queue = queue
         pass
 
-    def ReadFile(self, filename):
+    def ReadFile(self, filename, addZeroTime = False):
         with open("Tests/" + filename, "r") as file:
             lines = file.readlines()
             
@@ -42,7 +42,8 @@ class TestDataProvider(ABC):
                 timeline = True
                 edge_number = 0
                 previous_signal = default_timer()
-                self.Queue.put_nowait(previous_signal)
+                if addZeroTime:
+                    self.Queue.put_nowait(previous_signal)
 
             if result:
                 self.expectedResult.append(line)
@@ -75,7 +76,7 @@ class DHT22Testing(TestCase):
     def test_001(self):
         self.testProvider = TestDataProvider()
         self.DHT22Reader = SignalDecoder.SignalDecoder(self.testProvider, DHT22.DHT22Decoder(), True)
-        self.testProvider.ReadFile("test-dht22-01.txt")
+        self.testProvider.ReadFile("test-dht22-01.txt", True)
         sleep(1)
         #for result in self.testProvider.expectedResult:
         
