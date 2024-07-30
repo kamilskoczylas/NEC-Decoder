@@ -83,6 +83,6 @@ class DHT22Testing(TestCase):
             cmd = self.DHT22Reader.getCommand()
             print(cmd)
             print("Expected:" + result)
-            self.assertTrue(result == "Error = {0}, Temperature = {1}°C, Humidity = {2}%. Avg. Temperature = {3}°C, Avg. Humidity = {4}%".format(cmd['result'], cmd['temperature'], cmd['humidity'], cmd['avg_temperature'], cmd['avg_humidity']))
+            self.assertTrue(result == "Result = {0}, Temperature = {1}°C, Humidity = {2}%. Avg. Temperature = {3}°C, Avg. Humidity = {4}%".format(cmd['result'], cmd['temperature'], cmd['humidity'], cmd['avg_temperature'], cmd['avg_humidity']))
             sleep(0.1)
         
