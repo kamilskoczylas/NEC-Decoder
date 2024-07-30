@@ -43,5 +43,6 @@ Timeline
 41 0.000073
 
 Returns
-Result = OK, Temperature = 27.2°C, Humidity = 50.0%. Avg. Temperature = 27.2°C, Avg. Humidity = 50.0%
+Result = OK, Temperature = 27.2°C, Humidity = 49.8%. Avg. Temperature = 27.2°C, Avg. Humidity = 49.8%
+
 
