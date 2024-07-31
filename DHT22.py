@@ -112,11 +112,11 @@ class DHT22Decoder:
       if self.DEBUG:
           print("Queue length: {0}".format(self.signalEdgeDetectedTimeQueue.qsize()))
 
-      #while self.signalEdgeDetectedTimeQueue.qsize() > 40:
-      #    i += 1
-      #    edgeTimeDetected = self.signalEdgeDetectedTimeQueue.get_nowait()
-      #    signalTime = edgeTimeDetected - previousPulseStart
-      #    previousPulseStart = edgeTimeDetected
+      while self.signalEdgeDetectedTimeQueue.qsize() > 40:
+          i += 1
+          edgeTimeDetected = self.signalEdgeDetectedTimeQueue.get_nowait()
+          signalTime = edgeTimeDetected - previousPulseStart
+          previousPulseStart = edgeTimeDetected
 
       i = 0
       while self.signalEdgeDetectedTimeQueue.qsize() > 0 and i < pulseCount and edgeTimeDetected <= maxTime:
