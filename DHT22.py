@@ -33,6 +33,9 @@ class AverageMeasure:
   ALLOW_TEMPERATURE_DIFFERENCE = 2
   ALLOW_HUMIDITY_DIFFERENCE = 10
 
+  REMOVE_READING_WHEN_TEMPERATURE_DIFFERENT_FROM_AVG = 20
+  REMOVE_READING_WHEN_HUMIDITY_DIFFERENT_FROM_AVG = 20
+
   def __init__(self, maximum_length_seconds = 120):
       self.results = deque()
       self.maximum_length_seconds = maximum_length_seconds
@@ -311,6 +314,15 @@ class DHT22Decoder:
           if self.DEBUG:
               print("Invalid length")
           return False
+
+
+      temperatureDifference = abs(self.lastAverageTemperature - self.temperature)
+      humidityDifference = abs(self.lastAverageHumidity - self.humidity)
+      if self.lastAverageTemperature != 0 and self.lastAverageHumidity != 0 
+        and (temperatureDifference > REMOVE_READING_WHEN_TEMPERATURE_DIFFERENT_FROM_AVG 
+        or humidityDifference > REMOVE_READING_WHEN_HUMIDITY_DIFFERENT_FROM_AVG):
+          return False
+
 
       self.calculated_checksum = 0
       for i in range (0, 32):
