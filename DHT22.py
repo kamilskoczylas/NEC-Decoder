@@ -318,7 +318,7 @@ class DHT22Decoder:
 
       temperatureDifference = abs(self.lastAverageTemperature - self.temperature)
       humidityDifference = abs(self.lastAverageHumidity - self.humidity)
-      if self.lastAverageTemperature != 0 and self.lastAverageHumidity != 0 and (temperatureDifference > REMOVE_READING_WHEN_TEMPERATURE_DIFFERENT_FROM_AVG or humidityDifference > REMOVE_READING_WHEN_HUMIDITY_DIFFERENT_FROM_AVG):
+      if self.lastAverageTemperature != 0 and self.lastAverageHumidity != 0 and (temperatureDifference > self.REMOVE_READING_WHEN_TEMPERATURE_DIFFERENT_FROM_AVG or humidityDifference > self.REMOVE_READING_WHEN_HUMIDITY_DIFFERENT_FROM_AVG):
           return False
 
 
