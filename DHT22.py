@@ -69,6 +69,9 @@ class AverageMeasure:
     
       return len(self.results) < 2 or (abs(measure.Temperature - average.Temperature) <= self.ALLOW_TEMPERATURE_DIFFERENCE and abs(measure.Humidity - average.Humidity) <= self.ALLOW_HUMIDITY_DIFFERENCE)
 
+  def isStableAverage(self):
+      return len(self.results) >= 3
+    
   def getAvegareMeasure(self):
       divider = len(self.results)
       if divider > 0:
@@ -95,6 +98,9 @@ class DHT22Decoder:
   checksum = 0
   calculated_checksum = 0
   averageMeasure = AverageMeasure()
+
+  lastAverageTemperature = 0
+  lastAverageHumidity = 0
 
   DEBUG = False
   
@@ -159,7 +165,7 @@ class DHT22Decoder:
 
       if not self.validateSignal(decodedSignal):
           decodedSignal = self.correctSignal(decodedSignal)
-        
+    
       self.averageMeasure.remove()
 
       if self.validateSignal(decodedSignal):
@@ -168,6 +174,10 @@ class DHT22Decoder:
           if self.averageMeasure.canAddMeasure(measure):
               self.averageMeasure.append(measure)
               average = self.averageMeasure.getAvegareMeasure()
+
+              if self.averageMeasure.isStableAverage():
+                  self.lastAverageTemperature = average.Temperature
+                  self.lastAverageHumidity = average.Humidity
 
           
               return { "binary": self.formatBinary(decodedSignal),
@@ -195,11 +205,21 @@ class DHT22Decoder:
       counts = 0
       print("Bitwise difference {0}".format(difference))
 
+      temperatureDifference = self.lastAverageTemperature - self.temperature
+      humidityDifference = self.lastAverageHumidity - self.humidity
+
+      print("Temperature difference {0}".format(temperatureDifference))
+      print("Humidity difference {0}".format(humidityDifference))
+
       for i in range(0, 8):
           if difference & (1 << i) > 0:
               counts += 1
+
+              
             
       print("Bits different {0}".format(counts))
+
+    
     
       return correctedSignal
       
