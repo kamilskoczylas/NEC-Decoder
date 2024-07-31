@@ -33,9 +33,6 @@ class AverageMeasure:
   ALLOW_TEMPERATURE_DIFFERENCE = 2
   ALLOW_HUMIDITY_DIFFERENCE = 10
 
-  REMOVE_READING_WHEN_TEMPERATURE_DIFFERENT_FROM_AVG = 20
-  REMOVE_READING_WHEN_HUMIDITY_DIFFERENT_FROM_AVG = 20
-
   def __init__(self, maximum_length_seconds = 120):
       self.results = deque()
       self.maximum_length_seconds = maximum_length_seconds
@@ -93,6 +90,9 @@ class DHT22Decoder:
   PULSE_NEGATIVE_LENGTH = 0.000076
 
   MAX_DHT22_SIGNAL_LENGTH = 0.0048
+
+  REMOVE_READING_WHEN_TEMPERATURE_DIFFERENT_FROM_AVG = 20
+  REMOVE_READING_WHEN_HUMIDITY_DIFFERENT_FROM_AVG = 20
 
   currentSignalStartTime = 0
   
