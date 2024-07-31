@@ -287,8 +287,9 @@ class DHT22Decoder:
               # i = 17 is only sign digit: +/-
               if i == 16:
                   sign = -1
-                
-              if i in range (17, 32):
+
+              # skipping 17-21 bits, because temperature cannot be as high but it detects errors
+              if i in range (22, 32):
                   temperature += (1 << (31 - i))
     
               if i in range (32, 40):
