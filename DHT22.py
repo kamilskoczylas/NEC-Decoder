@@ -211,8 +211,8 @@ class DHT22Decoder:
       temperatureDifference = self.lastAverageTemperature - self.temperature
       humidityDifference = self.lastAverageHumidity - self.humidity
 
-      print("Temperature difference {0}".format(temperatureDifference))
-      print("Humidity difference {0}".format(humidityDifference))
+      print("Temperature difference {0} = {1} (avg) - {2} (last)".format(temperatureDifference, self.lastAverageTemperature, self.temperature))
+      print("Humidity difference {0} = {1} (avg) - {2} (last)".format(humidityDifference, self.lastAverageHumidity, self.humidity))
 
       for i in range(0, 8):
           if difference & (1 << i) > 0:
