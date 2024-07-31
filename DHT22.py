@@ -197,6 +197,9 @@ class DHT22Decoder:
                }
 
   def correctSignal(self, decodedSignal):
+      if len(decodedSignal) != 40:
+          return decodedSignal
+      
       correctedSignal = decodedSignal
       print("Correcting {0}".format(self.formatBinary(decodedSignal)))
       print("Checksum read {0} == {1} calculated".format(self.checksum, self.calculated_checksum))
