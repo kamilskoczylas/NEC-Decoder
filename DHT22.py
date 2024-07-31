@@ -86,7 +86,7 @@ class DHT22Decoder:
   PULSE_POSITIVE_LENGTH = 0.000107
   PULSE_NEGATIVE_LENGTH = 0.000076
 
-  MAX_DHT22_SIGNAL_LENGTH = 0.005
+  MAX_DHT22_SIGNAL_LENGTH = 0.0048
 
   currentSignalStartTime = 0
   
@@ -112,14 +112,14 @@ class DHT22Decoder:
       if self.DEBUG:
           print("Queue length: {0}".format(self.signalEdgeDetectedTimeQueue.qsize()))
 
-      while self.signalEdgeDetectedTimeQueue.qsize() > 40:
-          i += 1
-          edgeTimeDetected = self.signalEdgeDetectedTimeQueue.get_nowait()
-          signalTime = edgeTimeDetected - previousPulseStart
-          previousPulseStart = edgeTimeDetected
+      #while self.signalEdgeDetectedTimeQueue.qsize() > 40:
+      #    i += 1
+      #    edgeTimeDetected = self.signalEdgeDetectedTimeQueue.get_nowait()
+      #    signalTime = edgeTimeDetected - previousPulseStart
+      #    previousPulseStart = edgeTimeDetected
 
       i = 0
-      while self.signalEdgeDetectedTimeQueue.qsize() > 0:
+      while self.signalEdgeDetectedTimeQueue.qsize() > 0 and i < pulseCount and edgeTimeDetected <= maxTime:
           i += 1
   
           try:
@@ -153,10 +153,13 @@ class DHT22Decoder:
       return signal[0:8] + " " + signal[8:16] + " " + signal[16:24] + " " + signal[24:32] + " " + signal[32:40] + ending
     
   def getCommand(self):
-      
       signalTime = self.waitForSignal()
-      pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + self.MAX_DHT22_SIGNAL_LENGTH)    
+      pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + signalTime + self.MAX_DHT22_SIGNAL_LENGTH)    
       decodedSignal = self.translateSignal(pulseArray)
+
+      if not self.validateSignal(decodedSignal):
+          decodedSignal = self.correctSignal(decodedSignal)
+        
       self.averageMeasure.remove()
 
       if self.validateSignal(decodedSignal):
@@ -182,6 +185,23 @@ class DHT22Decoder:
                "temperature": self.temperature,
                "humidity": self.humidity
                }
+
+  def correctSignal(self, decodedSignal):
+      correctedSignal = decodedSignal
+      print("Correcting {0}".format(self.formatBinary(decodedSignal)))
+      print("Checksum read {0} == {1} calculated".format(self.checksum, self.calculated_checksum))
+
+      difference = self.checksum ^ self.calculated_checksum
+      counts = 0
+      print("Bitwise difference {0}".format(difference))
+
+      for i in range(0, 8):
+          if difference & (1 << i) > 0:
+              counts += 1
+            
+      print("Bits different {0}".format(counts))
+    
+      return correctedSignal
       
   def waitForSignal(self):
       self.breakTime = 0
