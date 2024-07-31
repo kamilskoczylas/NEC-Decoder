@@ -117,6 +117,7 @@ class DHT22Decoder:
       edgeTimeDetected = burstStartTime
       previousPulseStart = burstStartTime
       i = 0
+      signalTime = 0
 
       if self.DEBUG:
           print("Queue length: {0}".format(self.signalEdgeDetectedTimeQueue.qsize()))
