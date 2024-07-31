@@ -33,7 +33,7 @@ class AverageMeasure:
   ALLOW_TEMPERATURE_DIFFERENCE = 2
   ALLOW_HUMIDITY_DIFFERENCE = 10
 
-  def __init__(self, maximum_length_seconds = 60):
+  def __init__(self, maximum_length_seconds = 120):
       self.results = deque()
       self.maximum_length_seconds = maximum_length_seconds
 
