@@ -201,7 +201,7 @@ class DHT22Decoder:
       print("Correcting {0}".format(self.formatBinary(decodedSignal)))
       print("Checksum read {0} == {1} calculated".format(self.checksum, self.calculated_checksum))
 
-      difference = (256 + self.checksum - self.calculated_checksum) & 255
+      difference = (256 - self.checksum) & self.calculated_checksum
       counts = 0
       print("Bitwise difference {0}".format(difference))
 
