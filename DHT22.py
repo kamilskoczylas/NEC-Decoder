@@ -208,9 +208,20 @@ class DHT22Decoder:
       print("Correcting {0}".format(self.formatBinary(decodedSignal)))
       print("Checksum read {0} == {1} calculated".format(self.checksum, self.calculated_checksum))
 
-      difference = (256 - self.checksum) & self.calculated_checksum
-      counts = 0
-      print("Bitwise difference {0}".format(difference))
+      difference_too_high = (256 - self.checksum) & self.calculated_checksum
+      difference_too_low = (256 - self.calculated_checksum) & self.checksum
+
+
+      counts_too_high = 0
+      counts_too_low = 0
+      for i in range(0, 8):
+          if difference_too_high & (1 << i) > 0:
+              counts_too_high += 1
+          if difference_too_low & (1 << i) > 0:
+              counts_too_low += 1
+      
+      print("Bitwise difference HI {0}, LOW {1}".format(difference_too_high, difference_too_low))
+      print("Bits different HI {0}, LOW {1}".format(counts_too_high, counts_too_low))
 
       temperatureDifference = self.lastAverageTemperature - self.temperature
       humidityDifference = self.lastAverageHumidity - self.humidity
@@ -218,16 +229,6 @@ class DHT22Decoder:
       print("Temperature difference {0} = {1} (avg) - {2} (last)".format(temperatureDifference, self.lastAverageTemperature, self.temperature))
       print("Humidity difference {0} = {1} (avg) - {2} (last)".format(humidityDifference, self.lastAverageHumidity, self.humidity))
 
-      for i in range(0, 8):
-          if difference & (1 << i) > 0:
-              counts += 1
-
-              
-            
-      print("Bits different {0}".format(counts))
-
-    
-    
       return correctedSignal
       
   def waitForSignal(self):
