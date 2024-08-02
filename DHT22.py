@@ -13,6 +13,55 @@ from timeit import default_timer
 from collections import deque
 
 
+class BitNeuron:
+	stability = 0
+	value = 0
+	pulseLength = 0
+	previousPulseLengthLeft = 0
+	bitNumber = 0
+
+	pulseLengthFactor = 1
+	previousPulseLengthLeftFactor = 1
+
+	PulseErrorRange = 0.00006
+  
+  	PULSE_POSITIVE_LENGTH = 0.000120
+	PULSE_NEGATIVE_LENGTH = 0.000076
+
+	def calculate(self):
+		factorSum = self.pulseLengthFactor + self.previousPulseLengthLeftFactor
+		pulseLengthDifference = 0
+		previousPulseLengthLeftDifference = 0
+		ValueBasedOnPulseLength = 0
+		
+		if self.pulseLength >= self.PULSE_POSITIVE_LENGTH and self.pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
+        	ValueBasedOnPulseLength = 1
+			pulseLengthDifference = self.pulseLength - self.PULSE_POSITIVE_LENGTH
+		else:
+			pulseLengthDifference = self.pulseLength - self.PULSE_NEGATIVE_LENGTH
+
+		ValueBasedOnPulseLengthLeft = 0
+		
+		if self.pulseLength + self.previousPulseLengthLeft >= self.PULSE_POSITIVE_LENGTH and self.pulseLength + self.previousPulseLengthLeft <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
+        	ValueBasedOnPulseLengthLeft = 1
+			previousPulseLengthLeftDifference = self.pulseLength + self.previousPulseLengthLeft - self.PULSE_POSITIVE_LENGTH
+		else:
+			previousPulseLengthLeftDifference = self.pulseLength + self.previousPulseLengthLeft - self.PULSE_NEGATIVE_LENGTH
+
+		
+		self.stability = 1 - max(pulseLengthDifference, self.PulseErrorRange) / self.PulseErrorRange
+
+
+
+
+class NeuralSignalRecognizer:
+	class Neural
+	
+	def calculate(self, inputTimeBuffer):
+	pass
+	
+
+  
 class Measure:
   Temperature = 0
   Humidity = 0
