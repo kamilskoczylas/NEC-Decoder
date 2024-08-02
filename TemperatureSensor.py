@@ -6,6 +6,7 @@ import DHT22
 import SignalDecoder
 import GPIODataProvider
 
+
 class TemperatureSensor:
 
   GPIO_Mode = GPIO.BCM
@@ -17,8 +18,8 @@ class TemperatureSensor:
   AvgHumidity = 0
   MeasureFrequencyInSeconds = 8
   
-  def __init__(self, GPIO_BCM_PIN, MeasureFrequencyInSeconds = 8):
-    assert MeasureFrequencyInSeconds>=2, "DHT22 requires that measures must be 2 seconds at minimum"
+  def __init__(self, GPIO_BCM_PIN, MeasureFrequencyInSeconds=8):
+    assert MeasureFrequencyInSeconds >= 2, "DHT22 requires that measures must be 2 seconds at minimum"
     self.GPIO_PIN = GPIO_BCM_PIN
 
     self.DHT22Reader = SignalDecoder.SignalDecoder(
@@ -35,12 +36,11 @@ class TemperatureSensor:
     worker.daemon = True
     worker.start()
     pass
-
     
   def QueueConsumer(self):
     while True:
       # Keep positive signal for a while
-      GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+      GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
       sleep(self.MeasureFrequencyInSeconds)
       
       # You have to set negative signal for at least 1 ms to request data from DHT22
@@ -48,7 +48,7 @@ class TemperatureSensor:
       GPIO.output(self.GPIO_PIN, GPIO.LOW)
       sleep(0.002)
       
-      GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+      GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
       sleep(0.05)
 
       if self.DHT22Reader.hasDetected():
@@ -62,9 +62,4 @@ class TemperatureSensor:
             self.AvgHumidity = measure['avg_humidity']
         
     pass
-    
-
-
-
-
 

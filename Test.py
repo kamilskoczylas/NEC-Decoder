@@ -9,6 +9,7 @@ import datetime
 import NEC
 import DHT22
 
+
 class TestDataProvider(ABC):
 
     expectedResult = []
@@ -17,7 +18,7 @@ class TestDataProvider(ABC):
         self.Queue = queue
         pass
 
-    def ReadFile(self, filename, addZeroTime = False):
+    def ReadFile(self, filename, addZeroTime=False):
         with open("Tests/" + filename, "r") as file:
             lines = file.readlines()
             
@@ -53,7 +54,6 @@ class TestDataProvider(ABC):
                 result = False
             
         pass
-
 
 
 class NECTesting(TestCase):

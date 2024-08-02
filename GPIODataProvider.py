@@ -14,18 +14,19 @@ from queue import Full
 import RPi.GPIO as GPIO
 import sys 
 
+
 class EdgeDetected(ABC):
     
-    def __init__(self, GPIO_Mode = None, GPIO_PIN = None):
+    def __init__(self, GPIO_Mode=None, GPIO_PIN=None):
         
         if not GPIO_Mode is None:
             self.GPIO_Mode = GPIO_Mode
 
-        if not GPIO_PIN is None:    
+        if not GPIO_PIN is None: 
             self.GPIO_PIN = GPIO_PIN
             
         GPIO.setmode(self.GPIO_Mode)
-        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
+        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
         pass
     
     def SignalEdgeDetected(self, PinNumber):
@@ -38,7 +39,7 @@ class EdgeDetected(ABC):
         
     def InitDataQueue(self, queue):
         self.Queue = queue
-        GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback = self.SignalEdgeDetected)
+        GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback=self.SignalEdgeDetected)
         pass
 
     def __del__(self):

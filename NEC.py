@@ -10,6 +10,7 @@ from time import sleep
 from queue import Queue
 from queue import Empty
 
+
 class NECDecoder:
   AddressLengthSeconds = 0.027
   CommandLengthSeconds = 0.027
@@ -29,20 +30,9 @@ class NECDecoder:
   ir_pulseStart = 0
   timeFromNextPhase = 0
   
-  REMOTE_CONTROLLER_COMMANDS = {
-      "00001100": "ON",
-      "00011010": "OK",
-      "01011010": "RIGHT"
-      }
-  
-  REMOTE_CONTROLLERS = {
-      "10110100": "DVD",
-      "00000000": "Custom"
-      }
-  
   DEBUG = False
   
-  def initialize(self, timeQueue, DebugMode = False):
+  def initialize(self, timeQueue, DebugMode=False):
       self.IRTimeQueue = timeQueue
       self.DEBUG = DebugMode
       pass
@@ -60,14 +50,14 @@ class NECDecoder:
               edgeTimeDetected = self.IRTimeQueue.get_nowait()
               self.IRTimeQueue.task_done()
               signalTime = edgeTimeDetected - previousPulseStart
-                  #min(maxTime - previousPulseStart, edgeTimeDetected - previousPulseStart)
+                  # min(maxTime - previousPulseStart, edgeTimeDetected - previousPulseStart)
           
           except Empty:
-              #if default_timer() >= maxTime:
-              #edgeTimeDetected = maxTime
-              #signalTime = maxTime - previousPulseStart
+              # if default_timer() >= maxTime:
+              # edgeTimeDetected = maxTime
+              # signalTime = maxTime - previousPulseStart
               
-              #if self.DEBUG:
+              # if self.DEBUG:
               print("Empty: {0}".format(len(resultArray)))
               
               if (maxTime - previousPulseStart < self.REPEAT_BURST_ERROR_RANGE):
@@ -85,8 +75,8 @@ class NECDecoder:
               print ("{0} {1}".format(i, signalTime))
       
       self.timeFromNextPhase = edgeTimeDetected - maxTime
-      #print ("{0} {1}".format(i, self.timeFromNextPhase))
-      #resultArray.append(self.timeFromNextPhase)
+      # print ("{0} {1}".format(i, self.timeFromNextPhase))
+      # resultArray.append(self.timeFromNextPhase)
       
       # To future calculation of breakTime
       self.ir_pulseStart = edgeTimeDetected
@@ -160,30 +150,7 @@ class NECDecoder:
                   score -= 1
               
       return score
-          
-      
-  
-  def bestMatch(self, command, arrayOfMatches):
-      bestValue = ''
-      bestScore = 0
-      i = 0
-      
-      for key in arrayOfMatches:
-          score = self.calculateSimilarity(key, command[:8], command[8:16])
-          if bestScore < score:
-              bestScore = score
-              bestValue = arrayOfMatches[key]
-      
-      return {
-          "score": bestScore,
-          "value": bestValue
-          }
-  
-  def bestAddress(self, command):
-      return self.bestMatch(command, self.REMOTE_CONTROLLERS)
-  
-  def bestCommand(self, command):
-      return self.bestMatch(command, self.REMOTE_CONTROLLER_COMMANDS)
+
   
   def ConvertString16ToHex(self, binaryStringValue):
       result = 0
@@ -206,7 +173,7 @@ class NECDecoder:
       while True:
           # Try to find start 
           edgeTimeDetected = self.IRTimeQueue.get()
-          #self.IRTimeQueue.task_done()
+          # self.IRTimeQueue.task_done()
           
           # Let Raspberry read whole signal before
           # we use max CPU for decoding
@@ -279,7 +246,6 @@ class NECDecoder:
               #    better to concatenate incorrect signal and try to
               #    check all possibilities
               wrongLength += pulseLength
-              
               
       if wrongLength > 0:
           timeToCorrectArray.append(wrongLength)
@@ -364,13 +330,12 @@ class NECDecoder:
               
       return concatenated
   
-  
   def getCombinationsForTime(self, pulseLengthDetected):
       if pulseLengthDetected > 3 * self.PULSE_POSITIVE_LENGTH - self.PulseErrorRange / 2:
           return False
       
       if pulseLengthDetected > self.PULSE_NEGATIVE_LENGTH + 2 * self.PULSE_POSITIVE_LENGTH - self.PulseErrorRange / 2:
-          return ['011', '110', '101', '1000', '0100', '0010', '0001'] #, '0101', '1100', '0110', '0011', '1010'
+          return ['011', '110', '101', '1000', '0100', '0010', '0001']  # , '0101', '1100', '0110', '0011', '1010'
       
       if pulseLengthDetected > 2 * self.PULSE_POSITIVE_LENGTH - self.PulseErrorRange:
           return ['11', '100', '010', '001', '000', '0000']
@@ -387,7 +352,7 @@ class NECDecoder:
       for elements in combination:
           print(elements)
           
-          #for element in elements:
+          # for element in elements:
           #    # print(element)
           # print("---")
       
@@ -401,7 +366,6 @@ class NECDecoder:
       else:
           indexes[key] = 0
           return self.incrementIndexes(indexes, max_values, key + 1, max_key)
-      
       
   def getAllCombinations(self, combinationMix):
       allCombinations = []
@@ -445,14 +409,12 @@ class NECDecoder:
           if signalString[i] != signalString[i + 8]:
               difference += 1
               
-      if difference > 0 and difference < 8:        
+      if difference > 0 and difference < 8: 
           if self.DEBUG:
               print("Invalid reflection")
           return False
           
       return True
-      
-      
           
   def fillInKnownValues(self, timeArray):
       commandDecoded = ''

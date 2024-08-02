@@ -6,17 +6,19 @@
 #   MIT Licence
 #
 
-
 from time import sleep
 from queue import Queue
 from queue import Empty
 from threading import Thread
 from abc import ABC, abstractmethod
 
+
 class SignalDataProvider(ABC):
+
     @abstractmethod
     def InitDataQueue(self, queue):
         pass
+
 
 class SignalAdapter(ABC):
     DEBUG = False
@@ -31,13 +33,14 @@ class SignalAdapter(ABC):
     def getCommand(self):
         pass
 
+
 class SignalDecoder:
 
     startIRTimeQueue = 0
     MAX_QUEUE_SIZE = 1024
     MAX_COMMANDS = 20
     
-    def __init__(self, dataProvider: SignalDataProvider, decoder: SignalAdapter, DEBUG = False):
+    def __init__(self, dataProvider: SignalDataProvider, decoder: SignalAdapter, DEBUG=False):
         
         self.DEBUG = DEBUG
 
@@ -51,7 +54,6 @@ class SignalDecoder:
         worker.daemon = True
         worker.start()
         pass
-
     
     def QueueConsumer(self):
         self.decoder.initialize(self.timeQueue, self.DEBUG)
@@ -68,7 +70,7 @@ class SignalDecoder:
     def hasDetected(self):
         return not self.Commands.empty()
 
-    def clear(self, number_of_elements_to_leave = 0):
+    def clear(self, number_of_elements_to_leave=0):
         with self.Commands.mutex:
             while self.Commands.qsize() > number_of_elements_to_leave:
                 try:
@@ -78,12 +80,8 @@ class SignalDecoder:
                 self.Commands.task_done()
         pass
     
-    def getCommand(self, wait_for_result = False):
+    def getCommand(self, wait_for_result=False):
         command = self.Commands.get(wait_for_result)
         self.Commands.task_done()
         return command
-        
-
-    
-    
     

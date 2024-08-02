@@ -28,15 +28,14 @@ class BitNeuron:
 
 	PulseErrorRange = 0.00006
   
-  	PULSE_POSITIVE_LENGTH = 0.000120
+    PULSE_POSITIVE_LENGTH = 0.000120
 	PULSE_NEGATIVE_LENGTH = 0.000076
 
-	def __init__(self, pulseLength, previousPulseLengthLeft = 0, pulseLengthFactor = 1, previousPulseLengthLeftFactor = 1):
+	def __init__(self, pulseLength, previousPulseLengthLeft=0, pulseLengthFactor=1, previousPulseLengthLeftFactor=1):
 		self.pulseLength = pulseLength
 		self.previousPulseLengthLeft = previousPulseLengthLeft
 		self.pulseLengthFactor = pulseLengthFactor
 		self.previousPulseLengthLeftFactor = previousPulseLengthLeftFactor
-		
 
 	def calculate(self):
 		factorSum = self.pulseLengthFactor + self.previousPulseLengthLeftFactor
@@ -53,34 +52,31 @@ class BitNeuron:
 		self.ValueBasedOnPulseLengthLeft = 0
 		
 		if self.pulseLength + self.previousPulseLengthLeft >= self.PULSE_POSITIVE_LENGTH and self.pulseLength + self.previousPulseLengthLeft <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
-        	self.ValueBasedOnPulseLengthLeft = 1
-			previousPulseLengthLeftDifference = self.pulseLength + self.previousPulseLengthLeft - self.PULSE_POSITIVE_LENGTH
-		else:
-			previousPulseLengthLeftDifference = self.pulseLength + self.previousPulseLengthLeft - self.PULSE_NEGATIVE_LENGTH
-
+            self.ValueBasedOnPulseLengthLeft = 1
+            previousPulseLengthLeftDifference = self.pulseLength + self.previousPulseLengthLeft - self.PULSE_POSITIVE_LENGTH
+        else:
+            previousPulseLengthLeftDifference = self.pulseLength + self.previousPulseLengthLeft - self.PULSE_NEGATIVE_LENGTH
 		
-		self.stability = (self.pulseLengthFactor * (1 - min(abs(pulseLengthDifference), self.PulseErrorRange) / self.PulseErrorRange) +
+		self.stability = (self.pulseLengthFactor * (1 - min(abs(pulseLengthDifference), self.PulseErrorRange) / self.PulseErrorRange) + 
 			self.previousPulseLengthLeftFactor * (1 - min(abs(previousPulseLengthLeftDifference), self.PulseErrorRange) / self.PulseErrorRange)) / factorSum
 
-		self.value = round((self.pulseLengthFactor * ValueBasedOnPulseLength) +
-			self.previousPulseLengthLeftFactor * ValueBasedOnPulseLengthLeft) / factorSum)
+		self.value = round((self.pulseLengthFactor * self.ValueBasedOnPulseLength + 
+			self.previousPulseLengthLeftFactor * self.ValueBasedOnPulseLengthLeft) / factorSum)
 
 	def reward(self, value):
 		if self.ValueBasedOnPulseLength == value:
 			self.pulseLengthFactor += 1
 		if self.ValueBasedOnPulseLengthLeft == value:
 			self.previousPulseLengthLeftFactor += 1
-			
-
-
 
 
 class NeuralSignalRecognizer:
+
 	class Neural
 	
 	def calculate(self, inputTimeBuffer):
+
 	pass
-	
 
   
 class Measure:
@@ -103,10 +99,9 @@ class AverageMeasure:
   ALLOW_TEMPERATURE_DIFFERENCE = 2
   ALLOW_HUMIDITY_DIFFERENCE = 10
 
-  def __init__(self, maximum_length_seconds = 120):
+  def __init__(self, maximum_length_seconds=120):
       self.results = deque()
       self.maximum_length_seconds = maximum_length_seconds
-
 
   def remove(self):
       while len(self.results) > 0 and default_timer() - self.results[0].DateTime > self.maximum_length_seconds:
@@ -145,7 +140,7 @@ class AverageMeasure:
   def getAvegareMeasure(self):
       divider = len(self.results)
       if divider > 0:
-          return Measure(temperature = round(self.sum.Temperature / divider, 1), humidity = round(self.sum.Humidity / divider, 1), dateTime = self.lastMeasureDateTime)
+          return Measure(temperature=round(self.sum.Temperature / divider, 1), humidity=round(self.sum.Humidity / divider, 1), dateTime=self.lastMeasureDateTime)
       else:
           return Measure(0, 0, 0)
 
@@ -177,7 +172,7 @@ class DHT22Decoder:
 
   DEBUG = False
   
-  def initialize(self, timeQueue, DebugMode = False):
+  def initialize(self, timeQueue, DebugMode=False):
       self.signalEdgeDetectedTimeQueue = timeQueue
       self.DEBUG = DebugMode
       pass
@@ -243,7 +238,7 @@ class DHT22Decoder:
       self.averageMeasure.remove()
 
       if self.validateSignal(decodedSignal):
-          measure = Measure(temperature = self.temperature, humidity = self.humidity, dateTime = self.currentSignalStartTime)
+          measure = Measure(temperature=self.temperature, humidity=self.humidity, dateTime=self.currentSignalStartTime)
         
           if self.averageMeasure.canAddMeasure(measure):
               self.averageMeasure.append(measure)
@@ -252,7 +247,6 @@ class DHT22Decoder:
               if self.averageMeasure.isStableAverage():
                   self.lastAverageTemperature = average.Temperature
                   self.lastAverageHumidity = average.Humidity
-
           
               return { "binary": self.formatBinary(decodedSignal),
                        "result": "OK",
@@ -280,7 +274,6 @@ class DHT22Decoder:
 
       difference_too_high = (256 - self.checksum) & self.calculated_checksum
       difference_too_low = (256 - self.calculated_checksum) & self.checksum
-
 
       counts_too_high = 0
       counts_too_low = 0
@@ -320,7 +313,7 @@ class DHT22Decoder:
             if signalTime > 0.002 and signalTime < 0.008:
                 # Need to wait for the rest of the signal
                 if self.signalEdgeDetectedTimeQueue.qsize() < 40:
-                    #sleep(0.005) - for quarantee that signal has been read increased
+                    # sleep(0.005) - for quarantee that signal has been read increased
                     sleep(0.01)
                 else:
                     if self.DEBUG:
@@ -335,7 +328,6 @@ class DHT22Decoder:
           
           if self.signalEdgeDetectedTimeQueue.empty():
               sleep(0.01)
-      
 
   def translateSignal(self, timeArray):
       correctSignal = ''
@@ -369,7 +361,7 @@ class DHT22Decoder:
           elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange and pulseLength < self.PULSE_POSITIVE_LENGTH:
               decodedSignal += '0'
 
-          i+= 1
+          i += 1
 
       # Raspberry reads incorrectly beginning of the signal. But it must be 5 times 0
       correctSignal = "00000" + decodedSignal[5:len(decodedSignal)]
@@ -388,12 +380,10 @@ class DHT22Decoder:
               print("Invalid length")
           return False
 
-
       temperatureDifference = abs(self.lastAverageTemperature - self.temperature)
       humidityDifference = abs(self.lastAverageHumidity - self.humidity)
       if self.lastAverageTemperature != 0 and self.lastAverageHumidity != 0 and (temperatureDifference > self.REMOVE_READING_WHEN_TEMPERATURE_DIFFERENT_FROM_AVG or humidityDifference > self.REMOVE_READING_WHEN_HUMIDITY_DIFFERENT_FROM_AVG):
           return False
-
 
       self.calculated_checksum = 0
       for i in range (0, 32):
