@@ -23,33 +23,54 @@ class BitNeuron:
 	pulseLengthFactor = 1
 	previousPulseLengthLeftFactor = 1
 
+	ValueBasedOnPulseLength = 0
+	ValueBasedOnPulseLengthLeft = 0
+
 	PulseErrorRange = 0.00006
   
   	PULSE_POSITIVE_LENGTH = 0.000120
 	PULSE_NEGATIVE_LENGTH = 0.000076
 
+	def __init__(self, pulseLength, previousPulseLengthLeft = 0, pulseLengthFactor = 1, previousPulseLengthLeftFactor = 1):
+		self.pulseLength = pulseLength
+		self.previousPulseLengthLeft = previousPulseLengthLeft
+		self.pulseLengthFactor = pulseLengthFactor
+		self.previousPulseLengthLeftFactor = previousPulseLengthLeftFactor
+		
+
 	def calculate(self):
 		factorSum = self.pulseLengthFactor + self.previousPulseLengthLeftFactor
 		pulseLengthDifference = 0
 		previousPulseLengthLeftDifference = 0
-		ValueBasedOnPulseLength = 0
+		self.ValueBasedOnPulseLength = 0
 		
 		if self.pulseLength >= self.PULSE_POSITIVE_LENGTH and self.pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
-        	ValueBasedOnPulseLength = 1
+        	self.ValueBasedOnPulseLength = 1
 			pulseLengthDifference = self.pulseLength - self.PULSE_POSITIVE_LENGTH
 		else:
 			pulseLengthDifference = self.pulseLength - self.PULSE_NEGATIVE_LENGTH
 
-		ValueBasedOnPulseLengthLeft = 0
+		self.ValueBasedOnPulseLengthLeft = 0
 		
 		if self.pulseLength + self.previousPulseLengthLeft >= self.PULSE_POSITIVE_LENGTH and self.pulseLength + self.previousPulseLengthLeft <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
-        	ValueBasedOnPulseLengthLeft = 1
+        	self.ValueBasedOnPulseLengthLeft = 1
 			previousPulseLengthLeftDifference = self.pulseLength + self.previousPulseLengthLeft - self.PULSE_POSITIVE_LENGTH
 		else:
 			previousPulseLengthLeftDifference = self.pulseLength + self.previousPulseLengthLeft - self.PULSE_NEGATIVE_LENGTH
 
 		
-		self.stability = 1 - max(pulseLengthDifference, self.PulseErrorRange) / self.PulseErrorRange
+		self.stability = (self.pulseLengthFactor * (1 - min(abs(pulseLengthDifference), self.PulseErrorRange) / self.PulseErrorRange) +
+			self.previousPulseLengthLeftFactor * (1 - min(abs(previousPulseLengthLeftDifference), self.PulseErrorRange) / self.PulseErrorRange)) / factorSum
+
+		self.value = round((self.pulseLengthFactor * ValueBasedOnPulseLength) +
+			self.previousPulseLengthLeftFactor * ValueBasedOnPulseLengthLeft) / factorSum)
+
+	def reward(self, value):
+		if self.ValueBasedOnPulseLength == value:
+			self.pulseLengthFactor += 1
+		if self.ValueBasedOnPulseLengthLeft == value:
+			self.previousPulseLengthLeftFactor += 1
+			
 
 
 
