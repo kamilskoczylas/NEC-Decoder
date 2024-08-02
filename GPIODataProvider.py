@@ -11,6 +11,7 @@ from timeit import default_timer
 from queue import Queue
 from queue import Empty
 import RPi.GPIO as GPIO
+import sys 
 
 class EdgeDetected(ABC):
     
@@ -27,7 +28,11 @@ class EdgeDetected(ABC):
         pass
     
     def SignalEdgeDetected(self, PinNumber):
-        self.Queue.put_nowait(default_timer())
+        try:
+            self.Queue.put_nowait(default_timer())
+          
+        except queue.Full:
+            sys.exit()
         pass
         
     def InitDataQueue(self, queue):
