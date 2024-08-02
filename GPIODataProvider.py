@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 from timeit import default_timer
 from queue import Queue
 from queue import Empty
+from queue import Full
 import RPi.GPIO as GPIO
 import sys 
 
@@ -31,7 +32,7 @@ class EdgeDetected(ABC):
         try:
             self.Queue.put_nowait(default_timer())
           
-        except queue.Full:
+        except Full:
             sys.exit()
         pass
         
