@@ -9,6 +9,7 @@
 from time import sleep
 from queue import Queue
 from queue import Empty
+from typing import List
 from timeit import default_timer
 from collections import deque
 from abc import ABC, abstractmethod
@@ -146,7 +147,7 @@ class NeuralBoolean(ABC):
 		print("Factors: pulse length {2}, previous pulse length left {3}".format(self.pulseLengthFactor, self.previousPulseLengthLeftFactor))
 
 	@abstractmethod
-	def load(self, neuralFactors: list[SingleNeuralFactor]):
+	def load(self, neuralFactors: List[SingleNeuralFactor]):
 		self.neuralFactors = neuralFactors
 
 	def addFactor(self, neuralFactor: SingleNeuralFactor):
