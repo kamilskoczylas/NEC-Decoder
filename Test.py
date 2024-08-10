@@ -101,11 +101,11 @@ class NeuralNetworkTesting(TestCase):
         self.assertTrue(zeroFactor.calculate() == 0)
 
         neuralBit0 = neuralValue.getBit(0)
-        neuralBit1.addFactor(zeroFactor)
+        neuralBit0.addFactor(zeroFactor)
         self.assertTrue(neuralBit0.calculate() == 0)
 
         neuralBit1 = neuralValue.getBit(1)
-        neuralBit0.addFactor(oneFactor)
+        neuralBit1.addFactor(oneFactor)
         self.assertTrue(neuralBit1.calculate() == 1)
 
         print(neuralValue)
