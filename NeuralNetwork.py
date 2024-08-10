@@ -72,8 +72,9 @@ class NeuralBoolean(ABC):
 			valueSum += neuralFactor.calculate()
 			stabilitySum += neuralFactor.stability
 
-		self.value = valueSum / factorSum
-		self.stability = stabilitySum / factorSum
+		if factorSum > 0:
+			self.value = valueSum / factorSum
+			self.stability = stabilitySum / factorSum
 		pass
 
 	def reward(self, value):
