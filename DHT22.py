@@ -20,7 +20,7 @@ class SingleNeuralFactor(ABC):
 	value = 0
 	stability = 1
 
-	def __init__(self, name, input_value, factor) -> None:
+	def __init__(self, name: str, input_value: float, factor: float) -> None:
 		self.name = name
 		self.input_value = input_value
 		self.factor = factor
@@ -127,7 +127,7 @@ class NeuralBoolean(ABC):
 	previousPulseLengthLeft = 0
 	bitNumber = 0
 
-	neuralFactors = []
+	neuralFactors = List[SingleNeuralFactor]
 
 	pulseLengthFactor = 1
 	previousPulseLengthLeftFactor = 1
@@ -174,9 +174,9 @@ class DHT22Bit(ABC):
 
 	def load(self, pulseLength, pulseLengthLeft, averageBitValue):
 		self.neuralFactors = [
-			DHT22PulseLength(pulseLength),
-			DHT22AverageValue(averageBitValue),
-			DHT22PulseLengthLeft(pulseLengthLeft)
+			DHT22PulseLength(pulseLength, 1),
+			DHT22AverageValue(averageBitValue, 1),
+			DHT22PulseLengthLeft(pulseLengthLeft, 1)
 		]
 
 
