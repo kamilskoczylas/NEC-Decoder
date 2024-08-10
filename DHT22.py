@@ -13,6 +13,17 @@ from collections import deque
 from NeuralNetwork import SingleNeuralFactor, NeuralBoolean, NeuralValue, NeuralCalculation
 
 
+class Measure:
+	Temperature = 0
+	Humidity = 0
+	DateTime = 0
+
+	def __init__(self, temperature, humidity, dateTime):
+		self.Temperature = temperature
+		self.Humidity = humidity
+		self.DateTime = dateTime
+
+
 class DHT22PulseLength(SingleNeuralFactor):
 
 	PULSE_ERROR_MAX_RANGE = 0.000060
@@ -159,17 +170,6 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.NeuralHumidity.calculate()
 		self.NeuralTemperature.calculate()
 		pass
-
-  
-class Measure:
-  Temperature = 0
-  Humidity = 0
-  DateTime = 0
-
-  def __init__(self, temperature, humidity, dateTime):
-      self.Temperature = temperature
-      self.Humidity = humidity
-      self.DateTime = dateTime
 
 
 class AverageMeasure:
