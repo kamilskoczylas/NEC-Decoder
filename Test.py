@@ -70,6 +70,7 @@ class NECTesting(unittest.TestCase):
             print("Expected:" + result)
             self.assertTrue(type(cmd) is dict and "hex" in cmd and cmd['hex'] in result)
             sleep(0.1)
+        pass
         
 
 class DHT22Testing(unittest.TestCase):
@@ -86,6 +87,7 @@ class DHT22Testing(unittest.TestCase):
             print("Expected:" + result)
             self.assertTrue(result == "Result = {0}, Temperature = {1}°C, Humidity = {2}%. Avg. Temperature = {3}°C, Avg. Humidity = {4}%".format(cmd['result'], cmd['temperature'], cmd['humidity'], cmd['avg_temperature'], cmd['avg_humidity']))
             sleep(0.1)
+        pass
 
         
 class NeuralNetworkTesting(unittest.TestCase):
@@ -110,6 +112,7 @@ class NeuralNetworkTesting(unittest.TestCase):
 
         print(neuralValue)
         self.assertTrue(neuralValue.calculate() == 2)
+        pass
 
 
 if __name__ == '__main__':
