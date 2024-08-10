@@ -122,7 +122,7 @@ class NeuralValue(ABC):
 				if i == 0 and self.is_signed:
 					multiply_by = -1
 				else:
-					value += 1 << (self.max_bits - 1 - i)
+					self.value += 1 << (self.max_bits - 1 - i)
 		self.value = multiply_by * self.value
 		return self.value
 
