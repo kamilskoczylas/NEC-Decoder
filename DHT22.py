@@ -7,39 +7,13 @@
 #
 
 from time import sleep
-from queue import Queue
 from queue import Empty
-from typing import List
 from timeit import default_timer
 from collections import deque
-from abc import ABC, abstractmethod
+from NeuralNetwork import SingleNeuralFactor, NeuralBoolean, NeuralValue, NeuralCalculation
 
 
-class SingleNeuralFactor(ABC):
-
-	value = 0
-	stability = 1
-
-	def __init__(self, name: str, input_value: float, factor: float) -> None:
-		self.name = name
-		self.input_value = input_value
-		self.factor = factor
-		pass
-
-	def __str__(self):
-		print("value: {0}, stability: {1}, length {2}, previous pulse length left {3}".format(self.value, self.stability, self.pulseLength, self.previousPulseLengthLeft))
-		print("Factors: pulse length {2}, previous pulse length left {3}".format(self.pulseLengthFactor, self.previousPulseLengthLeftFactor))
-		pass
-
-	@abstractmethod
-	def calculate(self):
-		return 0
-
-	def reward(self):
-		self.factor += 1
-
-
-class DHT22PulseLength(ABC):
+class DHT22PulseLength(SingleNeuralFactor):
 
 	PULSE_ERROR_MAX_RANGE = 0.000060
 	PULSE_POSITIVE_LENGTH = 0.000120
@@ -66,7 +40,7 @@ class DHT22PulseLength(ABC):
 		return ValueBasedOnPulseLength
 
 
-class DHT22PulseLengthLeft(ABC):
+class DHT22PulseLengthLeft(SingleNeuralFactor):
 
 	PULSE_ERROR_MAX_RANGE = 0.000060
 	PULSE_POSITIVE_LENGTH = 0.000120
@@ -93,7 +67,7 @@ class DHT22PulseLengthLeft(ABC):
 		return ValueBasedOnPulseLength
 
 
-class DHT22AverageValue(ABC):
+class DHT22AverageValue(SingleNeuralFactor):
 
 	def __init__(self, input_value, factor) -> None:
 		self.name = "Average"
@@ -106,7 +80,7 @@ class DHT22AverageValue(ABC):
 		return self.input_value
 
 
-class DHT22Checksum(ABC):
+class DHT22Checksum(SingleNeuralFactor):
 
 	def __init__(self, input_value, factor) -> None:
 		self.name = "Checksum"
@@ -118,108 +92,16 @@ class DHT22Checksum(ABC):
 		self.stability = 1
 		return self.input_value
 
-   
-class NeuralBoolean(ABC):
-        
-	stability = 0
-	value = 0
-	pulseLength = 0
-	previousPulseLengthLeft = 0
-	bitNumber = 0
 
-	neuralFactors = List[SingleNeuralFactor]
+class DHT22Bit(NeuralBoolean):
 
-	pulseLengthFactor = 1
-	previousPulseLengthLeftFactor = 1
-
-	ValueBasedOnPulseLength = 0
-	ValueBasedOnPulseLengthLeft = 0
-
-	def __init__(self, bitNumber):
+	def load(self, bitNumber, pulseLength, pulseLengthLeft, averageBitValue):
 		self.bitNumber = bitNumber
-
-	def __str__(self):
-		print("BIT: {0}".format(self.bitNumber))
-		print("value: {0}, stability: {1}, length {2}, previous pulse length left {3}".format(self.value, self.stability, self.pulseLength, self.previousPulseLengthLeft))
-		print("Factors: pulse length {2}, previous pulse length left {3}".format(self.pulseLengthFactor, self.previousPulseLengthLeftFactor))
-
-	def load(self, neuralFactors: List[SingleNeuralFactor]):
-		self.neuralFactors = neuralFactors
-
-	def addFactor(self, neuralFactor: SingleNeuralFactor):
-		self.neuralFactors.append(neuralFactor)
-		return self.calculate()
-
-	def calculate(self):
-		factorSum = 0
-		valueSum = 0
-		stabilitySum = 0
-  
-		for neuralFactor in self.neuralFactors:
-			factorSum += neuralFactor.factor
-			valueSum += neuralFactor.calculate()
-			stabilitySum += neuralFactor.stability
-
-		self.value = valueSum / factorSum
-		self.stability = stabilitySum / factorSum
-		pass
-
-	def reward(self, value):
-		for neuralFactor in self.neuralFactors:
-			if neuralFactor.value == value:
-				neuralFactor.reward()
-
-
-class DHT22Bit(ABC):
-
-	def load(self, pulseLength, pulseLengthLeft, averageBitValue):
 		self.neuralFactors = [
 			DHT22PulseLength(pulseLength, 1),
 			DHT22AverageValue(averageBitValue, 1),
 			DHT22PulseLengthLeft(pulseLengthLeft, 1)
 		]
-
-
-class NeuralValue(ABC):
-	neuralBits = []
-	name = "NeuralValue"
-	max_bits = 0
-	is_signed = False
-	value = 0
-
-	def __init__(self, name, max_bits, is_signed):
-		self.name = name
-		self.max_bits = max_bits
-		self.is_signed = is_signed
-  
-		for i in range(0, max_bits):
-			self.neuralBits.append(
-				NeuralBoolean(max_bits - i)
-			)
-
-	def __str__(self):
-		print("{0}".format(self.name))
-		for neuralBit in self.neuralBits:
-			print(neuralBit)
-
-	def load(self, pulseLengthArray):
-		for i in range(0, self.max_bits):
-			self.neuralBits[i].load(pulseLengthArray[i])
-		pass
-
-	def calculate(self):
-		self.value = 0
-		multiply_by = 1
-		for i in range(0, self.max_bits):
-			self.neuralBits[i].calculate()	
-		for i in range(0, self.max_bits):
-			if round(self.neuralBits[i].value) == 1:
-				if i == 0 and self.is_signed:
-					multiply_by = -1
-				else:
-					value += 1 << (self.max_bits - 1 - i)
-		self.value = multiply_by * self.value
-		return self.value
 
 """class NeuralTemperature(ABC):
 	neuralBits = []
@@ -245,7 +127,7 @@ class NeuralValue(ABC):
 """
 
     
-class NeuralSignalRecognizer:
+class NeuralSignalRecognizer(NeuralCalculation):
 	
 	def __init__(self):
 		self.NeuralTemperature = NeuralValue("Temperature", 16, True)
@@ -268,6 +150,10 @@ class NeuralSignalRecognizer:
 		self.NeuralHumidity.load(inputTimeBuffer[0:16])
 		self.NeuralTemperature.load(inputTimeBuffer[16:32])
 		self.NeuralChecksum.load(inputTimeBuffer[32:40])
+
+	def reward(self, value: Measure):
+		self.NeuralHumidity.reward()
+		pass
 
 	def calculate(self):
 		self.NeuralHumidity.calculate()
