@@ -3,7 +3,7 @@
 from time import sleep 
 from timeit import default_timer
 from abc import ABC
-from unittest import TestCase
+import unittest
 import SignalDecoder
 import datetime
 import NEC
@@ -57,7 +57,7 @@ class TestDataProvider(ABC):
         pass
 
 
-class NECTesting(TestCase):
+class NECTesting(unittest.TestCase):
     
     def test_001(self):
         self.testProvider = TestDataProvider()
@@ -72,7 +72,7 @@ class NECTesting(TestCase):
             sleep(0.1)
         
 
-class DHT22Testing(TestCase):
+class DHT22Testing(unittest.TestCase):
     
     def dht_test_001(self):
         self.dhtTestProvider = TestDataProvider()
@@ -88,7 +88,7 @@ class DHT22Testing(TestCase):
             sleep(0.1)
 
         
-class NeuralNetworkTesting(TestCase):
+class NeuralNetworkTesting(unittest.TestCase):
     
     def basic_concepts(self):
         neuralValue = NeuralValue("value", 2, False)
@@ -110,3 +110,7 @@ class NeuralNetworkTesting(TestCase):
 
         print(neuralValue)
         self.assertTrue(neuralValue.calculate() == 2)
+
+
+if __name__ == '__main__':
+    unittest.main()
