@@ -8,6 +8,8 @@ import SignalDecoder
 import datetime
 import NEC
 import DHT22
+from NeuralNetwork import SingleNeuralFactor, NeuralBoolean, NeuralValue, NeuralCalculation
+
 
 class TestDataProvider(ABC):
 
@@ -17,7 +19,7 @@ class TestDataProvider(ABC):
         self.Queue = queue
         pass
 
-    def ReadFile(self, filename, addZeroTime = False):
+    def ReadFile(self, filename, addZeroTime=False):
         with open("Tests/" + filename, "r") as file:
             lines = file.readlines()
             
@@ -55,7 +57,6 @@ class TestDataProvider(ABC):
         pass
 
 
-
 class NECTesting(TestCase):
     
     def test_001(self):
@@ -85,4 +86,24 @@ class DHT22Testing(TestCase):
             print("Expected:" + result)
             self.assertTrue(result == "Result = {0}, Temperature = {1}°C, Humidity = {2}%. Avg. Temperature = {3}°C, Avg. Humidity = {4}%".format(cmd['result'], cmd['temperature'], cmd['humidity'], cmd['avg_temperature'], cmd['avg_humidity']))
             sleep(0.1)
+
         
+class NeuralNetworkTesting(TestCase):
+    
+    def neural_test_001(self):
+        neuralValue = NeuralValue("value", 2, False)
+        neuralValue.load()
+        
+        oneFactor = SingleNeuralFactor("one", 1, 1)
+        self.assertTrue(oneFactor.calculate() == 1)
+
+        zeroFactor = SingleNeuralFactor("zero", 0, 1)
+        self.assertTrue(zeroFactor.calculate() == 0)
+
+        neuralBit0 = neuralValue.getBit(0)
+        neuralBit0.addFactor(oneFactor)
+        self.assertTrue(neuralBit0.calculate() == 1)
+
+        neuralBit1 = neuralValue.getBit(1)
+        neuralBit1.addFactor(oneFactor)
+        self.assertTrue(neuralBit1.calculate() == 0)
