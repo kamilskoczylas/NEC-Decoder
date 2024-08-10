@@ -41,7 +41,7 @@ class NeuralBoolean(ABC):
 	previousPulseLengthLeft = 0
 	bitNumber = 0
 
-	neuralFactors = List[SingleNeuralFactor]
+	neuralFactors = []
 
 	def __init__(self, bitNumber):
 		self.bitNumber = bitNumber
@@ -52,7 +52,7 @@ class NeuralBoolean(ABC):
 		for neuralFactor in self.neuralFactors:
 			print(neuralFactor)
 
-	def load(self, neuralFactors: List[SingleNeuralFactor]):
+	def load(self, neuralFactors):
 		self.neuralFactors = neuralFactors
 
 	def addFactor(self, neuralFactor: SingleNeuralFactor):
@@ -83,7 +83,7 @@ class NeuralBoolean(ABC):
 
 
 class NeuralValue(ABC):
-	neuralBits = list[SingleNeuralFactor]
+	neuralBits = []
 	name = "NeuralValue"
 	max_bits = 0
 	is_signed = False
