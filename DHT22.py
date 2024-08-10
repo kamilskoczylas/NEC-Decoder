@@ -75,7 +75,6 @@ class DHT22PulseLengthLeft(ABC):
 	pulseLength = 0
 
 	def __init__(self, input_value, factor) -> None:
-
 		self.name = "Pulse Length + Left from previous"
 		self.pulseLength = input_value
 		self.factor = factor
@@ -97,7 +96,6 @@ class DHT22PulseLengthLeft(ABC):
 class DHT22AverageValue(ABC):
 
 	def __init__(self, input_value, factor) -> None:
-
 		self.name = "Average"
 		self.input_value = input_value
 		self.factor = factor
@@ -111,7 +109,6 @@ class DHT22AverageValue(ABC):
 class DHT22Checksum(ABC):
 
 	def __init__(self, input_value, factor) -> None:
-
 		self.name = "Checksum"
 		self.input_value = input_value
 		self.factor = factor
@@ -146,7 +143,6 @@ class NeuralBoolean(ABC):
 		print("value: {0}, stability: {1}, length {2}, previous pulse length left {3}".format(self.value, self.stability, self.pulseLength, self.previousPulseLengthLeft))
 		print("Factors: pulse length {2}, previous pulse length left {3}".format(self.pulseLengthFactor, self.previousPulseLengthLeftFactor))
 
-	@abstractmethod
 	def load(self, neuralFactors: List[SingleNeuralFactor]):
 		self.neuralFactors = neuralFactors
 
@@ -184,11 +180,12 @@ class DHT22Bit(ABC):
 		]
 
 
-class NeuralValue:
+class NeuralValue(ABC):
 	neuralBits = []
 	name = "NeuralValue"
 	max_bits = 0
 	is_signed = False
+	value = 0
 
 	def __init__(self, name, max_bits, is_signed):
 		self.name = name
@@ -206,11 +203,25 @@ class NeuralValue:
 			print(neuralBit)
 
 	def load(self, pulseLengthArray):
-		for i in range(0, 16):
+		for i in range(0, self.max_bits):
 			self.neuralBits[i].load(pulseLengthArray[i])
+		pass
 
+	def calculate(self):
+		self.value = 0
+		multiply_by = 1
+		for i in range(0, self.max_bits):
+			self.neuralBits[i].calculate()	
+		for i in range(0, self.max_bits):
+			if round(self.neuralBits[i].value) == 1:
+				if i == 0 and self.is_signed:
+					multiply_by = -1
+				else:
+					value += 1 << (self.max_bits - 1 - i)
+		self.value = multiply_by * self.value
+		return self.value
 
-class NeuralTemperature:
+"""class NeuralTemperature(ABC):
 	neuralBits = []
 	name = "NeuralTemperature"
 	max_bits = 16
@@ -231,6 +242,7 @@ class NeuralTemperature:
 		for i in range(0, 16):
 			
 			self.neuralBits[i].load(pulseLengthArray[i])
+"""
 
     
 class NeuralSignalRecognizer:
@@ -256,6 +268,11 @@ class NeuralSignalRecognizer:
 		self.NeuralHumidity.load(inputTimeBuffer[0:16])
 		self.NeuralTemperature.load(inputTimeBuffer[16:32])
 		self.NeuralChecksum.load(inputTimeBuffer[32:40])
+
+	def calculate(self):
+		self.NeuralHumidity.calculate()
+		self.NeuralTemperature.calculate()
+		pass
 
   
 class Measure:
@@ -411,6 +428,8 @@ class DHT22Decoder:
 		signalTime = self.waitForSignal()
 		pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + signalTime + self.MAX_DHT22_SIGNAL_LENGTH)   
 		self.neuralSignalRecognizer.load(pulseArray)
+		self.neuralSignalRecognizer.calculate()
+		print(self.neuralSignalRecognizer)
 
 		# decodedSignal = self.translateSignal(pulseArray)
 
