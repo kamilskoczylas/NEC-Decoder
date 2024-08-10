@@ -8,7 +8,7 @@ import SignalDecoder
 import datetime
 import NEC
 import DHT22
-from NeuralNetwork import SingleNeuralFactor, NeuralBoolean, NeuralValue, NeuralCalculation
+from NeuralNetwork import SingleNeuralFactor, NeuralValue, NeuralCalculation
 
 
 class TestDataProvider(ABC):
@@ -90,7 +90,7 @@ class DHT22Testing(TestCase):
         
 class NeuralNetworkTesting(TestCase):
     
-    def neural_test_001(self):
+    def basic_concepts(self):
         neuralValue = NeuralValue("value", 2, False)
         neuralValue.load()
         
@@ -101,9 +101,12 @@ class NeuralNetworkTesting(TestCase):
         self.assertTrue(zeroFactor.calculate() == 0)
 
         neuralBit0 = neuralValue.getBit(0)
-        neuralBit0.addFactor(oneFactor)
-        self.assertTrue(neuralBit0.calculate() == 1)
+        neuralBit1.addFactor(zeroFactor)
+        self.assertTrue(neuralBit0.calculate() == 0)
 
         neuralBit1 = neuralValue.getBit(1)
-        neuralBit1.addFactor(oneFactor)
-        self.assertTrue(neuralBit1.calculate() == 0)
+        neuralBit0.addFactor(oneFactor)
+        self.assertTrue(neuralBit1.calculate() == 1)
+
+        print(neuralValue)
+        self.assertTrue(neuralValue.calculate() == 2)
