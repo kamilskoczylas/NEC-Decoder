@@ -94,6 +94,9 @@ class NeuralValue(ABC):
 		self.name = name
 		self.max_bits = max_bits
 		self.is_signed = is_signed
+
+		print("{0}: {1}".format(name, max_bits))
+		print(self.neuralBits)
   
 		for i in range(0, max_bits):
 			self.neuralBits.append(
