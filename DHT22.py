@@ -80,11 +80,12 @@ class DHT22PulseLengthLeft(SingleNeuralFactor):
 		if self.pulseLength >= self.PULSE_POSITIVE_LENGTH and self.pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE:
 			self.value = 1
 			pulseLengthDifference = self.pulseLength - self.PULSE_POSITIVE_LENGTH
-		if self.pulseLength <= self.PULSE_NEGATIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE / 2:
-			self.value = -1
-			pulseLengthDifference = self.pulseLength - self.PULSE_NEGATIVE_LENGTH
 		else:
-			pulseLengthDifference = self.PULSE_ERROR_MAX_RANGE
+			if self.pulseLength <= self.PULSE_NEGATIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE / 2:
+				self.value = -1
+				pulseLengthDifference = self.pulseLength - self.PULSE_NEGATIVE_LENGTH
+			else:
+				pulseLengthDifference = self.PULSE_ERROR_MAX_RANGE
 
 		self.stability = self.factor * (1 - min(abs(pulseLengthDifference), self.PULSE_ERROR_MAX_RANGE) / self.PULSE_ERROR_MAX_RANGE)
 		return self.value
@@ -136,7 +137,10 @@ class NeuralReading(NeuralValue):
 	def load(self, pulseLengthArray):
 		for i in range(0, 16):
 			pulseLength = pulseLengthArray[i]
-			averageBitValue = self.averageValue.value & (1 << (16 - i)) > 0
+			if int(self.averageValue.value * 10) & (1 << (16 - i)) > 0:
+				averageBitValue = 1
+			else:
+				averageBitValue = 0
    
 			neuralFactors = [
 				DHT22PulseLength(pulseLength, 1),
@@ -178,12 +182,18 @@ class NeuralTemperature(NeuralReading):
 		super(NeuralTemperature, self).__init__("Temperature", linkedAverageMeasure)
 		pass
 
+	def calculate(self):
+		self.temperature = super().calculate() / 10
+
 
 class NeuralHumidity(NeuralReading):
 	
 	def __init__(self, linkedAverageMeasure):
 		super(NeuralHumidity, self).__init__("Humidity", linkedAverageMeasure)
 		pass
+
+	def calculate(self):
+		self.humidity = super().calculate() / 10
 
     
 class NeuralSignalRecognizer(NeuralCalculation):
@@ -223,8 +233,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 		calculated_checksum = self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi
 		if calculated_checksum == self.NeuralChecksum.value:
-			self.averageTemperature.append(BasicMeasure(self.NeuralTemperature.value, self.firstReadingDateTime))
-			self.averageHumidity.append(BasicMeasure(self.NeuralHumidity.value, self.firstReadingDateTime))
+			self.averageTemperature.append(BasicMeasure(self.NeuralTemperature.temperature, self.firstReadingDateTime))
+			self.averageHumidity.append(BasicMeasure(self.NeuralHumidity.humidity, self.firstReadingDateTime))
 			return True
 
 		return False
