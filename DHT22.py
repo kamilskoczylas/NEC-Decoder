@@ -185,8 +185,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			return
 
 		self.NeuralHumidity.load(inputTimeBuffer[0:16])
-		self.NeuralTemperature.load(inputTimeBuffer[16:32])
-		self.NeuralChecksum.load(inputTimeBuffer[32:40])
+		# self.NeuralTemperature.load(inputTimeBuffer[16:32])
+		# self.NeuralChecksum.load(inputTimeBuffer[32:40])
 
 	def reward(self, value: BasicMeasure):
 		self.NeuralHumidity.reward(value)
