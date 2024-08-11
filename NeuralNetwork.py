@@ -107,7 +107,7 @@ class NeuralValue():
 
 	def __str__(self):
 		result = "{0}\n".format(self.name)
-		result += "{0}\n".format(self.value)	
+		result += "{0}, HI: {1}, LOW: {2}\n".format(self.value, self.value >> 8, self.value & 255)	
 		line1 = "------"
 		line2 = "| bit |"
 		line3 = "| val |"

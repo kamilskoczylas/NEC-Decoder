@@ -126,6 +126,8 @@ class DHT22Checksum(SingleNeuralFactor):
 
 
 class NeuralReading(NeuralValue):
+	value_hi = 0
+	value_low = 0
 	
 	def __init__(self, name, averageValue: BasicMeasure):
 		super(NeuralReading, self).__init__(name, 16, True)
@@ -142,6 +144,13 @@ class NeuralReading(NeuralValue):
 				# DHT22PulseLengthLeft(pulseLengthLeft, 1)
 			]
 			self.neuralBits[i].load(neuralFactors)
+
+	def calculate(self):
+		result = super().calculate()
+		self.value_hi = result >> 8
+		self.value_low = result & 255
+  
+		return result
 
 	def reward(self, value: BasicMeasure):
 		# super().
