@@ -21,8 +21,7 @@ class SingleNeuralFactor(ABC):
 		pass
 
 	def __str__(self):
-		print("value: {0}, stability: {1}, length {2}, previous pulse length left {3}".format(self.value, self.stability, self.pulseLength, self.previousPulseLengthLeft))
-		print("Factors: pulse length {2}, previous pulse length left {3}".format(self.pulseLengthFactor, self.previousPulseLengthLeftFactor))
+		print("Name: {0}, stability: {1}, value {2}, factor {3}".format(self.name, self.stability, self.value, self.factor))
 		pass
 
 	def calculate(self):
