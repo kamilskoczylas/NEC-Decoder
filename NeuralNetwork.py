@@ -102,10 +102,16 @@ class NeuralValue(ABC):
 
 	def __str__(self):
 		result = "{0}\n".format(self.name)
-		result += "{0}\n".format(self.value)
+		result += "{0}\n".format(self.value)	
+		line1 = "------"
+		line2 = "| bit |"
+		line3 = "| val |"
 		for neuralBit in self.neuralBits:
-			result += str(neuralBit)
-		return result
+			# result += str(neuralBit)
+			line1 += "------"
+			line2 += " {:2o} |".format(neuralBit.bitNumber)
+			line3 += "{:4.1f} |".format(neuralBit.value)
+		return result + line1 + line2 + line3 + line1
 
 	def load(self, neuralFactorsList):
 		for i in range(0, self.max_bits):
