@@ -136,6 +136,21 @@ class NeuralReading(NeuralValue):
 		pass
 
 
+class NeuralChecksum(NeuralValue):
+	
+	def __init__(self):
+		super().__init__("Checksum", 8, False)
+
+	def load(self, pulseLengthArray):
+		for i in range(0, 8):
+			pulseLength = pulseLengthArray[i]
+			neuralFactors = [
+				DHT22PulseLength(pulseLength, 1),
+				# DHT22PulseLengthLeft(pulseLengthLeft, 1)
+			]
+			self.neuralBits[i].load(neuralFactors)
+
+
 class NeuralTemperature(NeuralReading):
 	
 	def __init__(self, linkedAverageMeasure):
@@ -157,7 +172,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.averageHumidity = AverageValue()
 		self.NeuralTemperature = NeuralTemperature(self.averageTemperature.measure)
 		self.NeuralHumidity = NeuralHumidity(self.averageHumidity.measure)
-		self.NeuralChecksum = NeuralValue("Checksum", 8, False)
+		self.NeuralChecksum = NeuralChecksum()
 		pass
 
 	def __str__(self):
