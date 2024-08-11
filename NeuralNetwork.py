@@ -31,7 +31,7 @@ class SingleNeuralFactor(ABC):
 		pass
 
    
-class NeuralBoolean(ABC):
+class NeuralBoolean():
         
 	stability = 0
 	value = 0
@@ -42,15 +42,16 @@ class NeuralBoolean(ABC):
 	neuralFactors = []
 
 	def __init__(self, bitNumber):
+		print(self)
 		self.bitNumber = bitNumber
 
-	def __str__(self):
-		result = "BIT: {0}\n".format(self.bitNumber)
-		result += "value: {0}, stability: {1}\n".format(self.value, self.stability)
-		for neuralFactor in self.neuralFactors:
-			result += str(neuralFactor)
+	# def __str__(self):
+	# 	result = "BIT: {0}\n".format(self.bitNumber)
+	# 	result += "value: {0}, stability: {1}\n".format(self.value, self.stability)
+	# 	for neuralFactor in self.neuralFactors:
+	# 		result += str(neuralFactor)
    
-		return result
+	# 	return result
 
 	def load(self, neuralFactors):
 		self.neuralFactors = neuralFactors
@@ -95,13 +96,13 @@ class NeuralValue(ABC):
 		self.max_bits = max_bits
 		self.is_signed = is_signed
 
-		print("{0}: {1}".format(name, max_bits))
-		print(self.neuralBits)
-  
 		for i in range(0, max_bits):
 			self.neuralBits.append(
 				NeuralBoolean(max_bits - i - 1)
 			)
+   
+		print("{0}: {1}".format(name, max_bits))
+		print(self.neuralBits)
 
 	def __str__(self):
 		result = "{0}\n".format(self.name)
