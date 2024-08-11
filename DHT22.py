@@ -139,7 +139,7 @@ class NeuralReading(NeuralValue):
 class NeuralChecksum(NeuralValue):
 	
 	def __init__(self):
-		NeuralChecksum.__init__("Checksum", 8, False)
+		super(NeuralChecksum, self).__init__("Checksum", 8, False)
 
 	def load(self, pulseLengthArray):
 		for i in range(0, 8):
