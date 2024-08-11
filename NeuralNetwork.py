@@ -45,13 +45,12 @@ class NeuralBoolean():
 		print(self)
 		self.bitNumber = bitNumber
 
-	# def __str__(self):
-	# 	result = "BIT: {0}\n".format(self.bitNumber)
-	# 	result += "value: {0}, stability: {1}\n".format(self.value, self.stability)
-	# 	for neuralFactor in self.neuralFactors:
-	# 		result += str(neuralFactor)
-   
-	# 	return result
+	def __str__(self):
+		result = "BIT: {0}\n".format(self.bitNumber)
+		result += "value: {0}, stability: {1}\n".format(self.value, self.stability)
+		for neuralFactor in self.neuralFactors:
+			result += str(neuralFactor)
+		return result
 
 	def load(self, neuralFactors):
 		self.neuralFactors = neuralFactors
@@ -114,8 +113,8 @@ class NeuralValue():
 		for neuralBit in self.neuralBits:
 			# result += str(neuralBit)
 			line1 += "----"
-			line2 += " {:2}|".format(neuralBit.bitNumber)
-			line3 += "{:3.1f}|".format(neuralBit.value)
+			line2 += " {:3}|".format(neuralBit.bitNumber)
+			line3 += "{:4.1f}|".format(neuralBit.value)
 		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line1 + "\n"
 
 	def load(self, neuralFactorsList):
