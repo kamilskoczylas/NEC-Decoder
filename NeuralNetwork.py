@@ -63,17 +63,18 @@ class NeuralBoolean():
 		return self.neuralFactors[number]
 
 	def calculate(self):
-		factorSum = 0
 		valueSum = 0
+		factorSum = 0
 		stabilitySum = 0
   
 		for neuralFactor in self.neuralFactors:
-			factorSum += neuralFactor.factor
-			valueSum += neuralFactor.calculate()
-			stabilitySum += neuralFactor.stability
+			if neuralFactor.factor > 0:
+				factorSum += neuralFactor.factor
+				valueSum += neuralFactor.calculate()
+				stabilitySum += neuralFactor.stability
 
 		if factorSum > 0:
-			self.value = round(valueSum / factorSum)
+			self.value = valueSum / factorSum
 			self.stability = stabilitySum / factorSum
 		pass
 
