@@ -170,7 +170,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 	def __init__(self):
 		self.averageTemperature = AverageValue()
 		self.averageHumidity = AverageValue()
-		self.NeuralTemperature = NeuralTemperature(self.averageTemperature.measure)
+		# self.NeuralTemperature = NeuralTemperature(self.averageTemperature.measure)
 		self.NeuralHumidity = NeuralHumidity(self.averageHumidity.measure)
 		self.NeuralChecksum = NeuralChecksum()
 		pass
@@ -194,7 +194,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 	def calculate(self):
 		self.NeuralHumidity.calculate()
-		self.NeuralTemperature.calculate()
+		# self.NeuralTemperature.calculate()
 		pass
 
 
