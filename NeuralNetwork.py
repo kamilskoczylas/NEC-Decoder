@@ -110,12 +110,14 @@ class NeuralValue():
 		line1 = "------"
 		line2 = "| bit |"
 		line3 = "| val |"
+		line4 = "| ..% |"
 		for neuralBit in self.neuralBits:
 			# result += str(neuralBit)
-			line1 += "----"
+			line1 += "-----"
 			line2 += " {:3}|".format(neuralBit.bitNumber)
 			line3 += "{:4.1f}|".format(neuralBit.value)
-		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line1 + "\n"
+			line4 += "{:4.1f}|".format(neuralBit.stability * 100)
+		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line4 + "\n" + line1 + "\n"
 
 	def load(self, neuralFactorsList):
 		for i in range(0, self.max_bits):

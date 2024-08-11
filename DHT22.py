@@ -80,8 +80,11 @@ class DHT22PulseLengthLeft(SingleNeuralFactor):
 		if self.pulseLength >= self.PULSE_POSITIVE_LENGTH and self.pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE:
 			self.value = 1
 			pulseLengthDifference = self.pulseLength - self.PULSE_POSITIVE_LENGTH
-		else:
+		if self.pulseLength <= self.PULSE_NEGATIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE / 2:
+			self.value = -1
 			pulseLengthDifference = self.pulseLength - self.PULSE_NEGATIVE_LENGTH
+		else:
+			pulseLengthDifference = self.PULSE_ERROR_MAX_RANGE
 
 		self.stability = self.factor * (1 - min(abs(pulseLengthDifference), self.PULSE_ERROR_MAX_RANGE) / self.PULSE_ERROR_MAX_RANGE)
 		return self.value
