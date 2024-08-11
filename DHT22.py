@@ -126,7 +126,7 @@ class NeuralReading(NeuralValue):
    
 			neuralFactors = [
 				DHT22PulseLength(pulseLength, 1),
-				DHT22AverageValue(averageBitValue, 1)
+				DHT22AverageValue(averageBitValue, 0)
 				# DHT22PulseLengthLeft(pulseLengthLeft, 1)
 			]
 			self.neuralBits[i].load(neuralFactors)

@@ -73,7 +73,7 @@ class NeuralBoolean(ABC):
 			stabilitySum += neuralFactor.stability
 
 		if factorSum > 0:
-			self.value = valueSum / factorSum
+			self.value = round(valueSum / factorSum)
 			self.stability = stabilitySum / factorSum
 		pass
 
