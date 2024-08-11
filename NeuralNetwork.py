@@ -9,7 +9,7 @@ from typing import List
 from abc import ABC, abstractmethod
 
 
-class SingleNeuralFactor(ABC):
+class SingleNeuralFactor():
 
 	value = 0
 	stability = 1
@@ -84,8 +84,8 @@ class NeuralBoolean():
 				neuralFactor.reward()
 
 
-class NeuralValue(ABC):
-	neuralBits = []
+class NeuralValue():
+	
 	name = "NeuralValue"
 	max_bits = 0
 	is_signed = False
@@ -95,6 +95,7 @@ class NeuralValue(ABC):
 		self.name = name
 		self.max_bits = max_bits
 		self.is_signed = is_signed
+		self.neuralBits = []
 
 		for i in range(0, max_bits):
 			self.neuralBits.append(
