@@ -109,7 +109,7 @@ class NeuralValue(ABC):
 		for neuralBit in self.neuralBits:
 			# result += str(neuralBit)
 			line1 += "------"
-			line2 += " {:2o} |".format(neuralBit.bitNumber)
+			line2 += " {:2} |".format(neuralBit.bitNumber)
 			line3 += "{:4.1f} |".format(neuralBit.value)
 		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line1 + "\n"
 
