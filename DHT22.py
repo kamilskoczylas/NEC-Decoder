@@ -199,11 +199,12 @@ class NeuralSignalRecognizer(NeuralCalculation):
 	def __str__(self):
 		return "{0}\n{1}\n{2}".format(str(self.NeuralHumidity), str(self.NeuralTemperature), str(self.NeuralChecksum))
 
-	def load(self, inputTimeBuffer):
+	def load(self, inputTimeBuffer, timeStarted):
 		if len(inputTimeBuffer) != 40:
 			print("Invalid length")
 			return
 
+		self.firstReadingDateTime = timeStarted
 		self.NeuralHumidity.load(inputTimeBuffer[0:16])
 		self.NeuralTemperature.load(inputTimeBuffer[16:32])
 		self.NeuralChecksum.load(inputTimeBuffer[32:40])
@@ -216,7 +217,17 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.NeuralHumidity.calculate()
 		self.NeuralTemperature.calculate()
 		self.NeuralChecksum.calculate()
-		pass
+
+		self.averageTemperature.remove()
+		self.averageTemperature.remove()
+
+		calculated_checksum = self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi
+		if calculated_checksum == self.NeuralChecksum.value:
+			self.averageTemperature.append(BasicMeasure(self.NeuralTemperature.value, self.firstReadingDateTime))
+			self.averageHumidity.append(BasicMeasure(self.NeuralHumidity.value, self.firstReadingDateTime))
+			return True
+
+		return False
 
 
 class AverageValue:
@@ -257,6 +268,13 @@ class AverageValue:
 		if self.DEBUG:
 			print("+ {0} = {1} / {2} = {3}".format(measure.value, self.sum, len(self.results), self.measure.value))
 		pass
+
+	def getValue(self):
+		divider = len(self.results)
+		if divider > 0:
+			return round(self.sum / divider)
+		else:
+			return 0
 
 
 class AverageMeasure:
@@ -401,8 +419,11 @@ class DHT22Decoder:
 		signalTime = self.waitForSignal()
 		pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + signalTime + self.MAX_DHT22_SIGNAL_LENGTH)   
 		self.neuralSignalRecognizer.load(pulseArray)
-		self.neuralSignalRecognizer.calculate()
+		result = self.neuralSignalRecognizer.calculate()
 		print(self.neuralSignalRecognizer)
+
+		self.temperature = self.neuralSignalRecognizer.averageTemperature.getValue()
+		self.humidity = self.neuralSignalRecognizer.averageHumidity.getValue()
 
 		# decodedSignal = self.translateSignal(pulseArray)
 
@@ -442,7 +463,7 @@ class DHT22Decoder:
 				"""
 
 		return  { "binary": "TESTING NEURAL",
-				"result": "ERROR",
+				"result": "OK" if result else "ERROR",
 				"checksum": self.checksum,
 				"calculated_checksum": self.calculated_checksum,
 				"temperature": self.temperature,
