@@ -53,6 +53,7 @@ class NeuralBoolean(ABC):
 			print(neuralFactor)
 
 	def load(self, neuralFactors):
+		print(neuralFactors)
 		self.neuralFactors = neuralFactors
 
 	def addFactor(self, neuralFactor: SingleNeuralFactor):
