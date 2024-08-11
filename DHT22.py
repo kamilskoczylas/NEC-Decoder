@@ -115,6 +115,15 @@ class DHT22Checksum(SingleNeuralFactor):
 		self.stability = 1
 		return self.value
 
+	def load(self, pulseLengthArray):
+		for i in range(0, 8):
+			pulseLength = pulseLengthArray[i]
+   
+			neuralFactors = [
+				DHT22PulseLength(pulseLength, 1)
+			]
+			self.neuralBits[i].load(neuralFactors)
+
 
 class NeuralReading(NeuralValue):
 	
