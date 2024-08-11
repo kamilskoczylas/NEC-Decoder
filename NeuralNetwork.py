@@ -53,7 +53,6 @@ class NeuralBoolean(ABC):
 		return result
 
 	def load(self, neuralFactors):
-		print(neuralFactors)
 		self.neuralFactors = neuralFactors
 
 	def addFactor(self, neuralFactor: SingleNeuralFactor):
@@ -103,6 +102,7 @@ class NeuralValue(ABC):
 
 	def __str__(self):
 		result = "{0}\n".format(self.name)
+		result += "{0}\n".format(self.value)
 		for neuralBit in self.neuralBits:
 			result += str(neuralBit)
 		return result

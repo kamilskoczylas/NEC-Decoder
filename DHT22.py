@@ -51,7 +51,7 @@ class DHT22PulseLength(SingleNeuralFactor):
 		ValueBasedOnPulseLength = 0
 		pulseLengthDifference = 0
 		if self.pulseLength >= self.PULSE_POSITIVE_LENGTH and self.pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE:
-			self.ValueBasedOnPulseLength = 1
+			ValueBasedOnPulseLength = 1
 			pulseLengthDifference = self.pulseLength - self.PULSE_POSITIVE_LENGTH
 		else:
 			pulseLengthDifference = self.pulseLength - self.PULSE_NEGATIVE_LENGTH
