@@ -97,7 +97,7 @@ class NeuralValue(ABC):
   
 		for i in range(0, max_bits):
 			self.neuralBits.append(
-				NeuralBoolean(max_bits - i)
+				NeuralBoolean(max_bits - i - 1)
 			)
 
 	def __str__(self):
@@ -108,9 +108,9 @@ class NeuralValue(ABC):
 		line3 = "| val |"
 		for neuralBit in self.neuralBits:
 			# result += str(neuralBit)
-			line1 += "------"
-			line2 += " {:2} |".format(neuralBit.bitNumber)
-			line3 += "{:4.1f} |".format(neuralBit.value)
+			line1 += "----"
+			line2 += " {:2}|".format(neuralBit.bitNumber)
+			line3 += "{:3.1f}|".format(neuralBit.value)
 		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line1 + "\n"
 
 	def load(self, neuralFactorsList):
