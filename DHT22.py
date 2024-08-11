@@ -116,7 +116,7 @@ class DHT22Checksum(SingleNeuralFactor):
 class NeuralReading(NeuralValue):
 	
 	def __init__(self, name, averageValue: BasicMeasure):
-		super().__init__(name, 16, True)
+		super(NeuralValue, self).__init__(name, 16, True)
 		self.averageValue = averageValue
 
 	def load(self, pulseLengthArray):
@@ -139,7 +139,7 @@ class NeuralReading(NeuralValue):
 class NeuralChecksum(NeuralValue):
 	
 	def __init__(self):
-		super().__init__("Checksum", 8, False)
+		super(NeuralValue, self).__init__("Checksum", 8, False)
 
 	def load(self, pulseLengthArray):
 		for i in range(0, 8):
@@ -154,14 +154,14 @@ class NeuralChecksum(NeuralValue):
 class NeuralTemperature(NeuralReading):
 	
 	def __init__(self, linkedAverageMeasure):
-		super().__init__("Temperature", linkedAverageMeasure)
+		super(NeuralReading, self).__init__("Temperature", linkedAverageMeasure)
 		pass
 
 
 class NeuralHumidity(NeuralReading):
 	
 	def __init__(self, linkedAverageMeasure):
-		super().__init__("Humidity", linkedAverageMeasure)
+		super(NeuralReading, self).__init__("Humidity", linkedAverageMeasure)
 		pass
 
     
@@ -170,14 +170,13 @@ class NeuralSignalRecognizer(NeuralCalculation):
 	def __init__(self):
 		self.averageTemperature = AverageValue()
 		self.averageHumidity = AverageValue()
-		# self.NeuralTemperature = NeuralTemperature(self.averageTemperature.measure)
+		self.NeuralTemperature = NeuralTemperature(self.averageTemperature.measure)
 		self.NeuralHumidity = NeuralHumidity(self.averageHumidity.measure)
 		self.NeuralChecksum = NeuralChecksum()
 		pass
 
 	def __str__(self):
-		return "{0}\n".format(str(self.NeuralHumidity))
-		# return "{0}\n{1}\n{2}".format(str(self.NeuralHumidity), str(self.NeuralTemperature), str(self.NeuralChecksum))
+		return "{0}\n{1}\n{2}".format(str(self.NeuralHumidity), str(self.NeuralTemperature), str(self.NeuralChecksum))
 
 	def load(self, inputTimeBuffer):
 		if len(inputTimeBuffer) != 40:
@@ -185,8 +184,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			return
 
 		self.NeuralHumidity.load(inputTimeBuffer[0:16])
-		# self.NeuralTemperature.load(inputTimeBuffer[16:32])
-		# self.NeuralChecksum.load(inputTimeBuffer[32:40])
+		self.NeuralTemperature.load(inputTimeBuffer[16:32])
+		self.NeuralChecksum.load(inputTimeBuffer[32:40])
 
 	def reward(self, value: BasicMeasure):
 		self.NeuralHumidity.reward(value)
@@ -194,7 +193,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 	def calculate(self):
 		self.NeuralHumidity.calculate()
-		# self.NeuralTemperature.calculate()
+		self.NeuralTemperature.calculate()
 		pass
 
 
