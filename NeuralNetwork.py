@@ -111,7 +111,7 @@ class NeuralValue(ABC):
 			line1 += "------"
 			line2 += " {:2o} |".format(neuralBit.bitNumber)
 			line3 += "{:4.1f} |".format(neuralBit.value)
-		return result + line1 + line2 + line3 + line1
+		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line1 + "\n"
 
 	def load(self, neuralFactorsList):
 		for i in range(0, self.max_bits):
