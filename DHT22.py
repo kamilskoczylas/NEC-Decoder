@@ -418,7 +418,7 @@ class DHT22Decoder:
 	def getCommand(self):
 		signalTime = self.waitForSignal()
 		pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + signalTime + self.MAX_DHT22_SIGNAL_LENGTH)   
-		self.neuralSignalRecognizer.load(pulseArray)
+		self.neuralSignalRecognizer.load(pulseArray, self.currentSignalStartTime)
 		result = self.neuralSignalRecognizer.calculate()
 		print(self.neuralSignalRecognizer)
 
