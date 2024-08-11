@@ -170,7 +170,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 	def __init__(self):
 		self.averageTemperature = AverageValue()
 		self.averageHumidity = AverageValue()
-		self.NeuralTemperature = NeuralTemperature(self.averageTemperature.measure)
+		# self.NeuralTemperature = NeuralTemperature(self.averageTemperature.measure)
 		self.NeuralHumidity = NeuralHumidity(self.averageHumidity.measure)
 		self.NeuralChecksum = NeuralChecksum()
 		pass
@@ -184,7 +184,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			return
 
 		self.NeuralHumidity.load(inputTimeBuffer[0:16])
-		self.NeuralTemperature.load(inputTimeBuffer[16:32])
+		# self.NeuralTemperature.load(inputTimeBuffer[16:32])
 		self.NeuralChecksum.load(inputTimeBuffer[32:40])
 
 	def reward(self, value: BasicMeasure):
@@ -193,7 +193,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 	def calculate(self):
 		self.NeuralHumidity.calculate()
-		self.NeuralTemperature.calculate()
+		# self.NeuralTemperature.calculate()
 		pass
 
 
