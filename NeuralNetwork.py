@@ -105,9 +105,9 @@ class NeuralValue(ABC):
 		for neuralBit in self.neuralBits:
 			print(neuralBit)
 
-	def load(self, pulseLengthArray):
+	def load(self, neuralFactorsList):
 		for i in range(0, self.max_bits):
-			self.neuralBits[i].load(pulseLengthArray[i])
+			self.neuralBits[i].load(neuralFactorsList[i])
 		pass
 
 	def getBit(self, number: int):

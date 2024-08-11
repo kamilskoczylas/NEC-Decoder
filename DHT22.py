@@ -24,6 +24,15 @@ class Measure:
 		self.DateTime = dateTime
 
 
+class BasicMeasure:
+	value = 0
+	DateTime = 0
+
+	def __init__(self, value, dateTime):
+		self.value = value
+		self.DateTime = dateTime
+
+
 class DHT22PulseLength(SingleNeuralFactor):
 
 	PULSE_ERROR_MAX_RANGE = 0.000060
@@ -104,48 +113,51 @@ class DHT22Checksum(SingleNeuralFactor):
 		return self.input_value
 
 
-class DHT22Bit(NeuralBoolean):
-
-	def load(self, bitNumber, pulseLength, pulseLengthLeft, averageBitValue):
-		self.bitNumber = bitNumber
-		self.neuralFactors = [
-			DHT22PulseLength(pulseLength, 1),
-			DHT22AverageValue(averageBitValue, 1),
-			DHT22PulseLengthLeft(pulseLengthLeft, 1)
-		]
-
-"""class NeuralTemperature(ABC):
-	neuralBits = []
-	name = "NeuralTemperature"
-	max_bits = 16
-	is_signed = True
-
-	def __init__(self):
-		for i in range(0, self.max_bits):
-			self.neuralBits.append(
-				NeuralBoolean(self.max_bits - i)
-			)
-
-	def __str__(self):
-		print("{0}".format(self.name))
-		for neuralBit in self.neuralBits:
-			print(neuralBit)
+class NeuralReading(NeuralValue):
+	
+	def __init__(self, name, averageValue: BasicMeasure):
+		super().__init__(name, 16, True)
+		self.averageValue = averageValue
 
 	def load(self, pulseLengthArray):
 		for i in range(0, 16):
-			
-			self.neuralBits[i].load(pulseLengthArray[i])
-"""
+			pulseLength = pulseLengthArray[i]
+			averageBitValue = self.averageValue.value & (1 << (16 - i)) > 0
+   
+			neuralFactors = [
+				DHT22PulseLength(pulseLength, 1),
+				DHT22AverageValue(averageBitValue, 1)
+				# DHT22PulseLengthLeft(pulseLengthLeft, 1)
+			]
+			self.neuralBits[i].load(neuralFactors)
+
+	def reward(self, value: BasicMeasure):
+		# super().
+		pass
+
+
+class NeuralTemperature(NeuralReading):
+	
+	def __init__(self, linkedAverageMeasure):
+		super().__init__("Temperature", linkedAverageMeasure)
+		pass
+
+
+class NeuralHumidity(NeuralReading):
+	
+	def __init__(self, linkedAverageMeasure):
+		super().__init__("Humidity", linkedAverageMeasure)
+		pass
 
     
 class NeuralSignalRecognizer(NeuralCalculation):
 	
 	def __init__(self):
-		self.NeuralTemperature = NeuralValue("Temperature", 16, True)
-		self.NeuralHumidity = NeuralValue("Humidity", 16, True)
+		self.averageTemperature = AverageValue()
+		self.averageHumidity = AverageValue()
+		self.NeuralTemperature = NeuralTemperature(self.averageTemperature.measure)
+		self.NeuralHumidity = NeuralHumidity(self.averageHumidity.measure)
 		self.NeuralChecksum = NeuralValue("Checksum", 8, False)
-		self.averageTemperature = AverageMeasure()
-		self.averageHumidity = AverageMeasure()
 		pass
 
 	def __str__(self):
@@ -162,13 +174,53 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.NeuralTemperature.load(inputTimeBuffer[16:32])
 		self.NeuralChecksum.load(inputTimeBuffer[32:40])
 
-	def reward(self, value: Measure):
-		self.NeuralHumidity.reward()
+	def reward(self, value: BasicMeasure):
+		self.NeuralHumidity.reward(value)
 		pass
 
 	def calculate(self):
 		self.NeuralHumidity.calculate()
 		self.NeuralTemperature.calculate()
+		pass
+
+
+class AverageValue:
+
+	sum = 0
+	lastMeasureDateTime = 0
+	measure = BasicMeasure(0, 0)
+	DEBUG = False
+
+	def __init__(self, maximum_length_seconds=120):
+		self.results = deque()
+		self.maximum_length_seconds = maximum_length_seconds
+		pass
+
+	def remove(self):
+		while len(self.results) > 0 and default_timer() - self.results[0].DateTime > self.maximum_length_seconds:
+			first = self.results.popleft()
+			self.sum -= first.value
+		self.update()
+		pass
+
+	def update(self):
+		results_count = len(self.results)
+		if results_count > 0:
+			self.measure.DateTime = self.results[0].DateTime
+			self.measure.value = self.sum / results_count 
+		else:
+			self.measure.DateTime = 0
+			self.measure.value = 0
+		pass
+    
+	def append(self, measure: BasicMeasure):
+    
+		self.results.append(measure)
+		self.sum += measure.value
+		self.update() 
+
+		if self.DEBUG:
+			print("+ {0} = {1} / {2} = {3}".format(measure.value, self.sum, len(self.results), self.measure.value))
 		pass
 
 
