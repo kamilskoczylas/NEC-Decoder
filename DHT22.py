@@ -48,16 +48,16 @@ class DHT22PulseLength(SingleNeuralFactor):
 		pass
 
 	def calculate(self):
-		ValueBasedOnPulseLength = 0
+		self.value = 0
 		pulseLengthDifference = 0
 		if self.pulseLength >= self.PULSE_POSITIVE_LENGTH and self.pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE:
-			ValueBasedOnPulseLength = 1
+			self.value = 1
 			pulseLengthDifference = self.pulseLength - self.PULSE_POSITIVE_LENGTH
 		else:
 			pulseLengthDifference = self.pulseLength - self.PULSE_NEGATIVE_LENGTH
 
 		self.stability = self.factor * (1 - min(abs(pulseLengthDifference), self.PULSE_ERROR_MAX_RANGE) / self.PULSE_ERROR_MAX_RANGE)
-		return ValueBasedOnPulseLength
+		return self.value
 
 
 class DHT22PulseLengthLeft(SingleNeuralFactor):
@@ -74,17 +74,17 @@ class DHT22PulseLengthLeft(SingleNeuralFactor):
 		self.factor = factor
 
 	def calculate(self):
-		ValueBasedOnPulseLength = 0
+		self.value = 0
 		pulseLengthDifference = 0
   
 		if self.pulseLength >= self.PULSE_POSITIVE_LENGTH and self.pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE:
-			self.ValueBasedOnPulseLength = 1
+			self.value = 1
 			pulseLengthDifference = self.pulseLength - self.PULSE_POSITIVE_LENGTH
 		else:
 			pulseLengthDifference = self.pulseLength - self.PULSE_NEGATIVE_LENGTH
 
 		self.stability = self.factor * (1 - min(abs(pulseLengthDifference), self.PULSE_ERROR_MAX_RANGE) / self.PULSE_ERROR_MAX_RANGE)
-		return ValueBasedOnPulseLength
+		return self.value
 
 
 class DHT22AverageValue(SingleNeuralFactor):
@@ -104,13 +104,13 @@ class DHT22Checksum(SingleNeuralFactor):
 
 	def __init__(self, input_value, factor) -> None:
 		self.name = "Checksum"
-		self.input_value = input_value
+		self.value = input_value
 		self.factor = factor
 
 	def calculate(self):
   
 		self.stability = 1
-		return self.input_value
+		return self.value
 
 
 class NeuralReading(NeuralValue):
