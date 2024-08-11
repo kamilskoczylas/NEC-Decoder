@@ -21,8 +21,7 @@ class SingleNeuralFactor(ABC):
 		pass
 
 	def __str__(self):
-		print("Name: {0}, stability: {1}, value {2}, factor {3}".format(self.name, self.stability, self.value, self.factor))
-		pass
+		return "Name: {0}, stability: {1}, value {2}, factor {3}\n".format(self.name, self.stability, self.value, self.factor)
 
 	def calculate(self):
 		return self.value * self.factor
@@ -46,10 +45,12 @@ class NeuralBoolean(ABC):
 		self.bitNumber = bitNumber
 
 	def __str__(self):
-		print("BIT: {0}".format(self.bitNumber))
-		print("value: {0}, stability: {1}".format(self.value, self.stability))
+		result = "BIT: {0}\n".format(self.bitNumber)
+		result += "value: {0}, stability: {1}\n".format(self.value, self.stability)
 		for neuralFactor in self.neuralFactors:
-			print(neuralFactor)
+			result += neuralFactor
+   
+		return result
 
 	def load(self, neuralFactors):
 		print(neuralFactors)
@@ -101,9 +102,10 @@ class NeuralValue(ABC):
 			)
 
 	def __str__(self):
-		print("{0}".format(self.name))
+		result = "{0}\n".format(self.name)
 		for neuralBit in self.neuralBits:
-			print(neuralBit)
+			result += neuralBit
+		return result
 
 	def load(self, neuralFactorsList):
 		for i in range(0, self.max_bits):

@@ -176,9 +176,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		pass
 
 	def __str__(self):
-		print(self.NeuralHumidity)
-		print(self.NeuralTemperature)
-		print(self.NeuralChecksum)
+		return "{0}\n{1}\n{2}".format(self.NeuralHumidity, self.NeuralTemperature, self.NeuralChecksum)
 
 	def load(self, inputTimeBuffer):
 		if len(inputTimeBuffer) != 40:
