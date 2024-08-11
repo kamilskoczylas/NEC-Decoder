@@ -116,7 +116,7 @@ class DHT22Checksum(SingleNeuralFactor):
 class NeuralReading(NeuralValue):
 	
 	def __init__(self, name, averageValue: BasicMeasure):
-		super(NeuralValue, self).__init__(name, 16, True)
+		super(NeuralReading, self).__init__(name, 16, True)
 		self.averageValue = averageValue
 
 	def load(self, pulseLengthArray):
@@ -139,7 +139,7 @@ class NeuralReading(NeuralValue):
 class NeuralChecksum(NeuralValue):
 	
 	def __init__(self):
-		NeuralValue.__init__("Checksum", 8, False)
+		NeuralChecksum.__init__("Checksum", 8, False)
 
 	def load(self, pulseLengthArray):
 		for i in range(0, 8):
@@ -154,14 +154,14 @@ class NeuralChecksum(NeuralValue):
 class NeuralTemperature(NeuralReading):
 	
 	def __init__(self, linkedAverageMeasure):
-		super(NeuralReading, self).__init__("Temperature", linkedAverageMeasure)
+		super(NeuralTemperature, self).__init__("Temperature", linkedAverageMeasure)
 		pass
 
 
 class NeuralHumidity(NeuralReading):
 	
 	def __init__(self, linkedAverageMeasure):
-		super(NeuralReading, self).__init__("Humidity", linkedAverageMeasure)
+		super(NeuralHumidity, self).__init__("Humidity", linkedAverageMeasure)
 		pass
 
     
