@@ -6,7 +6,6 @@
 #   MIT Licence
 #
 
-from abc import ABC, abstractmethod
 from timeit import default_timer
 from queue import Queue
 from queue import Empty
@@ -14,7 +13,7 @@ from queue import Full
 import RPi.GPIO as GPIO
 import sys 
 
-class EdgeDetected(ABC):
+class EdgeDetected():
     
     def __init__(self, GPIO_Mode = None, GPIO_PIN = None):
         
