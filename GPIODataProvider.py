@@ -16,7 +16,7 @@ import sys
 
 
 class EdgeDetected(SignalDataProvider):
-    
+ 
     def __init__(self, GPIO_Mode=None, GPIO_PIN=None):
         
         if not GPIO_Mode is None:
