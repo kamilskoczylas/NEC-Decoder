@@ -2,7 +2,6 @@
 
 from time import sleep 
 from timeit import default_timer
-from abc import ABC
 import unittest
 import SignalDecoder
 import datetime
@@ -11,7 +10,7 @@ import DHT22
 from NeuralNetwork import SingleNeuralFactor, NeuralValue, NeuralCalculation
 
 
-class TestDataProvider(ABC):
+class TestDataProvider(SignalDataProvider):
 
     expectedResult = []
     
