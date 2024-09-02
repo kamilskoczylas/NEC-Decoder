@@ -10,7 +10,7 @@ import DHT22
 from NeuralNetwork import SingleNeuralFactor, NeuralValue, NeuralCalculation
 
 
-class TestDataProvider(SignalDataProvider):
+class TestDataProvider(SignalDecoder.SignalDataProvider):
 
     expectedResult = []
     
