@@ -17,30 +17,32 @@ import sys
 
 class EdgeDetected(SignalDataProvider):
  
-    def __init__(self, GPIO_Mode=None, GPIO_PIN=None):
-        
-        if not GPIO_Mode is None:
-            self.GPIO_Mode = GPIO_Mode
+	def __init__(self, GPIO_Mode=None, GPIO_PIN=None):
 
-        if not GPIO_PIN is None: 
-            self.GPIO_PIN = GPIO_PIN
-            
-        GPIO.setmode(self.GPIO_Mode)
-        GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
-        pass
+		if not GPIO_Mode is None:
+			self.GPIO_Mode = GPIO_Mode
+
+		if not GPIO_PIN is None: 
+			self.GPIO_PIN = GPIO_PIN
+			
+		GPIO.setmode(self.GPIO_Mode)
+		GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+		pass
     
-    def SignalEdgeDetected(self, PinNumber):
-        try:
-            self.Queue.put_nowait(default_timer())
+	def SignalEdgeDetected(self, PinNumber):
+		try:
+			self.Queue.put_nowait(default_timer())
           
-        except Full:
-            print("Full")
-        pass
+		except Full:
+			print("Full")
+			with self.Queue.mutex:
+				self.Queue.clear()
+		pass
         
-    def InitDataQueue(self, queue):
-        self.Queue = queue
-        GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback=self.SignalEdgeDetected)
-        pass
+	def InitDataQueue(self, queue):
+		self.Queue = queue
+		GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback=self.SignalEdgeDetected)
+		pass
 
-    def __del__(self):
-        GPIO.cleanup(self.GPIO_PIN)
+	def __del__(self):
+		GPIO.cleanup(self.GPIO_PIN)
