@@ -36,6 +36,7 @@ class SignalDecoder:
     startIRTimeQueue = 0
     MAX_QUEUE_SIZE = 1024
     MAX_COMMANDS = 20
+    isStopped = False
     
     def __init__(self, dataProvider: SignalDataProvider, decoder: SignalAdapter, DEBUG=False):
         
@@ -46,11 +47,20 @@ class SignalDecoder:
         self.decoder = decoder
 
         dataProvider.InitDataQueue(self.timeQueue)
+        self.Start()
+        
+        pass
+
+    def Stop(self):
+        self.isStopped = True
+
+    def Start(self):
+        self.isStopped = False
 
         worker = Thread(target=self.QueueConsumer)
-        worker.daemon = True
+        #worker.daemon = True
         worker.start()
-        pass
+        
     
     def QueueConsumer(self):
         self.decoder.initialize(self.timeQueue, self.DEBUG)
