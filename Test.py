@@ -69,6 +69,8 @@ class NECTesting(unittest.TestCase):
             print("Expected:" + result)
             self.assertTrue(type(cmd) is dict and "hex" in cmd and cmd['hex'] in result)
             sleep(0.1)
+
+        self.IReader.Stop()
         pass
         
 
@@ -86,6 +88,8 @@ class DHT22Testing(unittest.TestCase):
             print("Expected:" + result)
             self.assertTrue(result == "Result = {0}, Temperature = {1}°C, Humidity = {2}%. Avg. Temperature = {3}°C, Avg. Humidity = {4}%".format(cmd['result'], cmd['temperature'], cmd['humidity'], cmd['avg_temperature'], cmd['avg_humidity']))
             sleep(0.1)
+
+        self.DHT22Reader.Stop()
         pass
 
         
