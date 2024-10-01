@@ -65,7 +65,7 @@ class SignalDecoder:
     def QueueConsumer(self):
         self.decoder.initialize(self.timeQueue, self.DEBUG)
         
-        while True:
+        while not self.isStopped:
             
             currentCommand = self.decoder.getCommand()
             self.Commands.put_nowait(currentCommand)
