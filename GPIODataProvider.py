@@ -37,7 +37,10 @@ class EdgeDetected(SignalDataProvider):
 		pass
 
 	def Start(self):
-		GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback=self.SignalEdgeDetected)
+		try:
+			GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback=self.SignalEdgeDetected)
+		except:
+			print("This pin {0} has been already used. Ignoring".format(self.GPIO_PIN))
 		pass
     
 	def SignalEdgeDetected(self, PinNumber):
