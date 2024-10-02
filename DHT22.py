@@ -53,7 +53,7 @@ class AverageMeasure:
       i = 0
       for result in self.results:
           i += 1
-          print("{0}. = {1}".format(i, result))
+          print("{0}. = {1}".format(i, result.Temperature))
 
       
       self.sum.Temperature += measure.Temperature
@@ -108,12 +108,17 @@ class DHT22Decoder:
   humidity = 0
   checksum = 0
   calculated_checksum = 0
-  averageMeasure = AverageMeasure()
+  
 
   lastAverageTemperature = 0
   lastAverageHumidity = 0
 
   DEBUG = False
+
+  def __init__(self) -> None:
+      self.averageMeasure = AverageMeasure()
+      print("Avg Measure address {0}".format(self.averageMeasure))
+      pass
   
   def initialize(self, timeQueue, DebugMode = False):
       self.signalEdgeDetectedTimeQueue = timeQueue
