@@ -46,8 +46,16 @@ class AverageMeasure:
           self.sum.Humidity -= first.Humidity
     
   def append(self, measure: Measure):
+
     
       self.results.append(measure)
+      print(self.results)
+      i = 0
+      for result in self.results:
+          i += 1
+          print("{0}. = {1}".format(i, result))
+
+      
       self.sum.Temperature += measure.Temperature
       self.sum.Humidity += measure.Humidity
       self.sum.DateTime = measure.DateTime
