@@ -17,6 +17,7 @@ class TemperatureSensor:
 	AvgHumidity = 0
 	MeasureFrequencyInSeconds = 8
 	isStopped = False
+	
   
 	def __init__(self, GPIO_BCM_PIN, MeasureFrequencyInSeconds = 8):
 		assert MeasureFrequencyInSeconds>=2, "DHT22 requires that measures must be 2 seconds at minimum"

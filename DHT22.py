@@ -29,7 +29,7 @@ class AverageMeasure:
   ALLOW_TEMPERATURE_DIFFERENCE = 2
   ALLOW_HUMIDITY_DIFFERENCE = 10
 
-  def __init__(self, maximum_length_seconds = 120):
+  def __init__(self, maximum_length_seconds = 180):
       self.sum = Measure(0, 0, 0)
       self.results = deque()
       self.maximum_length_seconds = maximum_length_seconds
@@ -103,7 +103,6 @@ class DHT22Decoder:
 
   def __init__(self) -> None:
       self.averageMeasure = AverageMeasure()
-      print("Avg Measure address {0}".format(self.averageMeasure))
       self.currentSignalStartTime = 0
   
       self.temperature = 0
