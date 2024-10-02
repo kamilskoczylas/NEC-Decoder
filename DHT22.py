@@ -26,16 +26,14 @@ class Measure:
 
 class AverageMeasure:
 
-  sum = Measure(0, 0, 0)
-  lastMeasureDateTime = 0
-  counter = 0
-
   ALLOW_TEMPERATURE_DIFFERENCE = 2
   ALLOW_HUMIDITY_DIFFERENCE = 10
 
   def __init__(self, maximum_length_seconds = 120):
+      self.sum = Measure(0, 0, 0)
       self.results = deque()
       self.maximum_length_seconds = maximum_length_seconds
+      self.lastMeasureDateTime = 0
 
 
   def remove(self):
@@ -60,7 +58,6 @@ class AverageMeasure:
       self.sum.Humidity += measure.Humidity
       self.sum.DateTime = measure.DateTime
       self.lastMeasureDateTime = measure.DateTime
-      self.counter += 1
       divider = len(self.results)
     
       result = 0
@@ -102,22 +99,19 @@ class DHT22Decoder:
   REMOVE_READING_WHEN_TEMPERATURE_DIFFERENT_FROM_AVG = 20
   REMOVE_READING_WHEN_HUMIDITY_DIFFERENT_FROM_AVG = 20
 
-  currentSignalStartTime = 0
-  
-  temperature = 0
-  humidity = 0
-  checksum = 0
-  calculated_checksum = 0
-  
-
-  lastAverageTemperature = 0
-  lastAverageHumidity = 0
-
   DEBUG = False
 
   def __init__(self) -> None:
       self.averageMeasure = AverageMeasure()
       print("Avg Measure address {0}".format(self.averageMeasure))
+      self.currentSignalStartTime = 0
+  
+      self.temperature = 0
+      self.humidity = 0
+      self.checksum = 0
+      self.calculated_checksum = 0
+      self.lastAverageTemperature = 0
+      self.lastAverageHumidity = 0
       pass
   
   def initialize(self, timeQueue, DebugMode = False):
