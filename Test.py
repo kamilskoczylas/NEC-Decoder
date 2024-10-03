@@ -12,7 +12,10 @@ from NeuralNetwork import SingleNeuralFactor, NeuralValue, NeuralCalculation
 
 class TestDataProvider(SignalDecoder.SignalDataProvider):
 
-    expectedResult = []
+    def __init__(self) -> None:
+        super().__init__()
+        self.expectedResult = []
+        pass
     
     def InitDataQueue(self, queue):
         self.Queue = queue

@@ -50,7 +50,7 @@ class TemperatureSensor:
 		self.isStopped = False
 
 		self.worker = Thread(target=self.QueueConsumer)
-		#self.worker.daemon = True
+		self.worker.daemon = True
 		self.worker.start()
 
 

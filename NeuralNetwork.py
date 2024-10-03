@@ -41,10 +41,9 @@ class NeuralBoolean(ABC):
 	previousPulseLengthLeft = 0
 	bitNumber = 0
 
-	neuralFactors = []
-
 	def __init__(self, bitNumber):
 		self.bitNumber = bitNumber
+		self.neuralFactors = []
 
 	def __str__(self):
 		print("BIT: {0}".format(self.bitNumber))
@@ -83,7 +82,6 @@ class NeuralBoolean(ABC):
 
 
 class NeuralValue(ABC):
-	neuralBits = []
 	name = "NeuralValue"
 	max_bits = 0
 	is_signed = False
@@ -93,6 +91,7 @@ class NeuralValue(ABC):
 		self.name = name
 		self.max_bits = max_bits
 		self.is_signed = is_signed
+		self.neuralBits = []
   
 		for i in range(0, max_bits):
 			self.neuralBits.append(

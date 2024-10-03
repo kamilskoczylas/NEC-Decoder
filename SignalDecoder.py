@@ -58,7 +58,7 @@ class SignalDecoder:
         self.isStopped = False
 
         worker = Thread(target=self.QueueConsumer)
-        #worker.daemon = True
+        worker.daemon = True
         worker.start()
         
     
