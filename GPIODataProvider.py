@@ -45,7 +45,7 @@ class EdgeDetected(SignalDataProvider):
     
 	def SignalEdgeDetected(self, PinNumber):
 		try:
-			self.Queue.put_nowait(default_timer())
+			self.Queue.put(default_timer())
 
 		except Full:
 			print("Full")

@@ -68,7 +68,7 @@ class SignalDecoder:
         while not self.isStopped:
             
             currentCommand = self.decoder.getCommand()
-            self.Commands.put_nowait(currentCommand)
+            self.Commands.put(currentCommand)
             
             # Minimum time for next IR command
             sleep(0.01)
