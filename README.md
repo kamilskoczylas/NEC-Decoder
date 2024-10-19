@@ -73,6 +73,8 @@ Python 3 required
 Recorded DHT22 signal (using sound card line-in)
 ![Recorded DHT22 Signal](https://github.com/kamilskoczylas/NEC-Decoder/blob/main/Tests/DHT22-Recorded-signal.png?raw=true)
 
+![Chart created from the data collected by the class](https://github.com/kamilskoczylas/NEC-Decoder/blob/main/Tests/TemperatureInsideOutside.png?raw=true)
+
 ---
 Requirements
 -
