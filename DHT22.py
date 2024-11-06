@@ -307,9 +307,13 @@ class DHT22Decoder:
 
           i+= 1
 
-      # Raspberry reads incorrectly beginning of the signal. But it must be 5 times 0
+      # Raspberry reads only 10 bits from the right of the signal. First 5 bits are 0, but length might be random
       correctSignal = "00000" + decodedSignal[5:len(decodedSignal)]
-      self.temperature = sign * temperature / 10
+      if sign == 1:
+          self.temperature = sign * temperature / 10
+      else:
+          self.temperature = sign * (1024-temperature) / 10
+
       self.humidity = humidity / 10
       self.checksum = checksum
           
