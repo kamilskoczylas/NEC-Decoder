@@ -440,80 +440,16 @@ class DHT22Decoder:
 		self.temperature = self.neuralSignalRecognizer.averageTemperature.getValue()
 		self.humidity = self.neuralSignalRecognizer.averageHumidity.getValue()
 
-		# decodedSignal = self.translateSignal(pulseArray)
-
-		# if not self.validateSignal(decodedSignal):
-		#    decodedSignal = self.correctSignal(decodedSignal)
-		
-		# self.averageMeasure.remove()
-
-		# if self.validateSignal(decodedSignal):
-		"""
-		measure = Measure(temperature=self.temperature, humidity=self.humidity, dateTime=self.currentSignalStartTime)
-			
-			if self.averageMeasure.canAddMeasure(measure):
-				self.averageMeasure.append(measure)
-				average = self.averageMeasure.getAvegareMeasure()
-
-				if self.averageMeasure.isStableAverage():
-					self.lastAverageTemperature = average.Temperature
-					self.lastAverageHumidity = average.Humidity
-			
-				return { "binary": self.formatBinary(decodedSignal),
-						"result": "OK",
-						"temperature": self.temperature,
-						"humidity": self.humidity,
-						"avg_temperature": average.Temperature,
-						"avg_humidity": average.Humidity
-						}
-						
-		
-		return { "binary": self.formatBinary(decodedSignal),
-				"result": "ERROR",
-				"checksum": self.checksum,
-				"calculated_checksum": self.calculated_checksum,
-				"temperature": self.temperature,
-				"humidity": self.humidity
-				}
-				"""
-
 		return  { "binary": "TESTING NEURAL",
 				"result": "OK" if result else "ERROR",
 				"checksum": self.checksum,
 				"calculated_checksum": self.calculated_checksum,
 				"temperature": self.temperature,
-				"humidity": self.humidity
+				"humidity": self.humidity,
+    			"avg_temperature": self.averageMeasure.Temperature,
+				"avg_humidity": self.averageMeasure.Humidity
 				}
 
-	def correctSignal(self, decodedSignal):
-		if len(decodedSignal) != 40:
-			return decodedSignal
-		
-		correctedSignal = decodedSignal
-		print("Correcting {0}".format(self.formatBinary(decodedSignal)))
-		print("Checksum read {0} == {1} calculated".format(self.checksum, self.calculated_checksum))
-
-		difference_too_high = (256 - self.checksum) & self.calculated_checksum
-		difference_too_low = (256 - self.calculated_checksum) & self.checksum
-
-		counts_too_high = 0
-		counts_too_low = 0
-		for i in range(0, 8):
-			if difference_too_high & (1 << i) > 0:
-				counts_too_high += 1
-			if difference_too_low & (1 << i) > 0:
-				counts_too_low += 1
-		
-		print("Bitwise difference HI {0}, LOW {1}".format(difference_too_high, difference_too_low))
-		print("Bits different HI {0}, LOW {1}".format(counts_too_high, counts_too_low))
-
-		temperatureDifference = self.lastAverageTemperature - self.temperature
-		humidityDifference = self.lastAverageHumidity - self.humidity
-
-		print("Temperature difference {0} = {1} (avg) - {2} (last)".format(temperatureDifference, self.lastAverageTemperature, self.temperature))
-		print("Humidity difference {0} = {1} (avg) - {2} (last)".format(humidityDifference, self.lastAverageHumidity, self.humidity))
-
-		return correctedSignal
 		
 	def waitForSignal(self):
 		self.breakTime = 0
@@ -550,51 +486,6 @@ class DHT22Decoder:
 			if self.signalEdgeDetectedTimeQueue.empty():
 				sleep(0.01)
 
-	def translateSignal(self, timeArray):
-		correctSignal = ''
-		decodedSignal = ''
-		i = 0
-		humidity = 0
-		temperature = 0
-		checksum = 0
-		sign = 1
-		
-		for pulseLength in timeArray:
-			
-			if pulseLength >= self.PULSE_POSITIVE_LENGTH and pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PulseErrorRange:
-				decodedSignal += '1'
-
-				# it makes no sense if humidity exceed 100%, therefore no need to calculate it
-				if i in range (5, 16):
-					humidity += (1 << (15 - i))
-
-				# i = 17 is only sign digit: +/-
-				if i == 16:
-					sign = -1
-
-				# skipping 17-21 bits, because temperature cannot be as high but it detects errors
-				if i in range (22, 32):
-					temperature += (1 << (31 - i))
-		
-				if i in range (32, 40):
-					checksum += (1 << (39 - i))
-					
-			elif pulseLength > self.PULSE_NEGATIVE_LENGTH - self.PulseErrorRange and pulseLength < self.PULSE_POSITIVE_LENGTH:
-				decodedSignal += '0'
-
-			i += 1
-
-		# Raspberry reads only 10 bits from the right of the signal. First 5 bits are 0, but length might be random
-		correctSignal = "00000" + decodedSignal[5:len(decodedSignal)]
-		if sign == 1:
-			self.temperature = sign * temperature / 10
-		else:
-			self.temperature = sign * (1024-temperature) / 10
-
-		self.humidity = humidity / 10
-		self.checksum = checksum
-			
-		return correctSignal 
       
 	def validateSignal(self, signalString):
 		if type(signalString) != str:

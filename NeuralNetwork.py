@@ -40,9 +40,10 @@ class NeuralBoolean():
 	bitNumber = 0
 
 	def __init__(self, bitNumber):
-		print(self)
 		self.bitNumber = bitNumber
 		self.neuralFactors = []
+
+		print(self)
 
 	def __str__(self):
 		result = "BIT: {0}\n".format(self.bitNumber)
