@@ -141,7 +141,7 @@ class NeuralValue(ABC):
 		for i in range(0, self.max_bits):
 			self.neuralBits[i].calculate()	
 		for i in range(0, self.max_bits):
-			if self.neuralBits[i].bitNumber < self.value_bits:
+			if self.neuralBits[i].bitNumber < self.value_bits or (i == 0 and self.is_signed):
 				if round(self.neuralBits[i].value) == 1:
 					if i == 0 and self.is_signed:
 						multiply_by = -1
