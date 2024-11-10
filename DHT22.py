@@ -446,8 +446,8 @@ class DHT22Decoder:
 				"calculated_checksum": self.calculated_checksum,
 				"temperature": self.temperature,
 				"humidity": self.humidity,
-    			"avg_temperature": self.averageMeasure.Temperature,
-				"avg_humidity": self.averageMeasure.Humidity
+    			"avg_temperature": self.temperature,
+				"avg_humidity": self.humidity
 				}
 
 		
