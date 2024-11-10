@@ -141,11 +141,12 @@ class NeuralValue(ABC):
 		for i in range(0, self.max_bits):
 			self.neuralBits[i].calculate()	
 		for i in range(0, self.max_bits):
-			if round(self.neuralBits[i].value) == 1:
-				if i == 0 and self.is_signed:
-					multiply_by = -1
-				else:
-					self.value += 1 << (self.max_bits - 1 - i)
+			if self.neuralBits[i].bitNumber < self.value_bits:
+				if round(self.neuralBits[i].value) == 1:
+					if i == 0 and self.is_signed:
+						multiply_by = -1
+					else:
+						self.value += 1 << (self.max_bits - 1 - i)
 		if self.minus_negative and multiply_by == -1:
 			self.value = multiply_by * ((1 << self.value_bits) - self.value)
 		else:
