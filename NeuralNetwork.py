@@ -89,12 +89,16 @@ class NeuralValue(ABC):
 	max_bits = 0
 	is_signed = False
 	value = 0
+	value_bits = 0
+	minus_negative = False
 
-	def __init__(self, name, max_bits, is_signed):
+	def __init__(self, name, max_bits, is_signed, value_bits = 0, minus_negative = True):
 		self.name = name
 		self.max_bits = max_bits
+		self.value_bits = value_bits if value_bits > 0 else max_bits
 		self.is_signed = is_signed
 		self.neuralBits = []
+		self.minus_negative = minus_negative
   
 		for i in range(0, max_bits):
 			self.neuralBits.append(
@@ -130,15 +134,18 @@ class NeuralValue(ABC):
 	def calculate(self):
 		self.value = 0
 		multiply_by = 1
-		for i in range(0, self.max_bits):
+		for i in range(0, self.value_bits):
 			self.neuralBits[i].calculate()	
-		for i in range(0, self.max_bits):
+		for i in range(0, self.value_bits):
 			if round(self.neuralBits[i].value) == 1:
 				if i == 0 and self.is_signed:
 					multiply_by = -1
 				else:
 					self.value += 1 << (self.max_bits - 1 - i)
-		self.value = multiply_by * self.value
+		if self.minus_negative:
+			self.value = multiply_by * (~self.value & (1 << (self.value_bits - 1) - 1))
+		else:
+			self.value = multiply_by * self.value
 		return self.value
 
 		

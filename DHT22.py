@@ -131,7 +131,7 @@ class NeuralReading(NeuralValue):
 	value_low = 0
 	
 	def __init__(self, name, averageValue: BasicMeasure):
-		super(NeuralReading, self).__init__(name, 16, True)
+		super(NeuralReading, self).__init__(name, 16, True, 10, True)
 		self.averageValue = averageValue
 
 	def load(self, pulseLengthArray):
