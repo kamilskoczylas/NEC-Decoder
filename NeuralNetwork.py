@@ -142,7 +142,7 @@ class NeuralValue(ABC):
 					multiply_by = -1
 				else:
 					self.value += 1 << (self.max_bits - 1 - i)
-		if self.minus_negative:
+		if self.minus_negative and multiply_by == -1:
 			self.value = multiply_by * ((1 << self.value_bits) - self.value)
 		else:
 			self.value = multiply_by * self.value
