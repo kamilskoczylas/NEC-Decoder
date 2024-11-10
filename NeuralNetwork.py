@@ -119,7 +119,11 @@ class NeuralValue(ABC):
 			# result += str(neuralBit)
 			line1 += "-----"
 			line2 += " {:3}|".format(neuralBit.bitNumber)
-			line3 += "{:4.1f}|".format(neuralBit.value)
+
+			if neuralBit.bitNumber < self.value_bits:
+				line3 += "{:4.1f}|".format(neuralBit.value)
+			else:
+				line3 += "  - |".format(neuralBit.value)
 			line4 += "{:4.1f}|".format(neuralBit.stability * 100)
 		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line4 + "\n" + line1 + "\n"
 
