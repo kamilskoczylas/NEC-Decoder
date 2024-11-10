@@ -210,11 +210,12 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		return "{0}\n{1}\n{2}".format(str(self.NeuralHumidity), str(self.NeuralTemperature), str(self.NeuralChecksum))
 
 	def load(self, inputTimeBuffer, timeStarted):
+		self.firstReadingDateTime = timeStarted
 		if len(inputTimeBuffer) != 40:
 			print("Invalid length")
 			return
 
-		self.firstReadingDateTime = timeStarted
+		
 		self.NeuralHumidity.load(inputTimeBuffer[0:16])
 		self.NeuralTemperature.load(inputTimeBuffer[16:32])
 		self.NeuralChecksum.load(inputTimeBuffer[32:40])
