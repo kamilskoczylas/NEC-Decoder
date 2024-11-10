@@ -13,23 +13,20 @@ from threading import Thread
 from abc import ABC, abstractmethod
 
 
-class SignalDataProvider(ABC):
+class SignalDataProvider():
 
-    @abstractmethod
     def InitDataQueue(self, queue):
         pass
 
 
-class SignalAdapter(ABC):
+class SignalAdapter():
     DEBUG = False
 
-    @abstractmethod
     def initialize(self, timeQueue, debug):
         self.timeQueue = timeQueue
         self.DEBUG = debug
         pass
 
-    @abstractmethod
     def getCommand(self):
         pass
 
@@ -39,6 +36,7 @@ class SignalDecoder:
     startIRTimeQueue = 0
     MAX_QUEUE_SIZE = 1024
     MAX_COMMANDS = 20
+    isStopped = False
     
     def __init__(self, dataProvider: SignalDataProvider, decoder: SignalAdapter, DEBUG=False):
         
@@ -49,6 +47,15 @@ class SignalDecoder:
         self.decoder = decoder
 
         dataProvider.InitDataQueue(self.timeQueue)
+        self.Start()
+        
+        pass
+
+    def Stop(self):
+        self.isStopped = True
+
+    def Start(self):
+        self.isStopped = False
 
         worker = Thread(target=self.QueueConsumer)
         worker.daemon = True
@@ -58,10 +65,10 @@ class SignalDecoder:
     def QueueConsumer(self):
         self.decoder.initialize(self.timeQueue, self.DEBUG)
         
-        while True:
+        while not self.isStopped:
             
             currentCommand = self.decoder.getCommand()
-            self.Commands.put_nowait(currentCommand)
+            self.Commands.put(currentCommand)
             
             # Minimum time for next IR command
             sleep(0.01)

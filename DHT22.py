@@ -289,16 +289,14 @@ class AverageValue:
 
 class AverageMeasure:
 
-	sum = Measure(0, 0, 0)
-	lastMeasureDateTime = 0
-	counter = 0
-
 	ALLOW_TEMPERATURE_DIFFERENCE = 2
 	ALLOW_HUMIDITY_DIFFERENCE = 10
 
-	def __init__(self, maximum_length_seconds=120):
+	def __init__(self, maximum_length_seconds = 180):
+		self.sum = Measure(0, 0, 0)
 		self.results = deque()
 		self.maximum_length_seconds = maximum_length_seconds
+		self.lastMeasureDateTime = 0
 
 	def remove(self):
 		while len(self.results) > 0 and default_timer() - self.results[0].DateTime > self.maximum_length_seconds:
@@ -308,13 +306,20 @@ class AverageMeasure:
 			self.sum.Humidity -= first.Humidity
     
 	def append(self, measure: Measure):
+
     
 		self.results.append(measure)
+		print(self.results)
+		i = 0
+		for result in self.results:
+			i += 1
+			print("{0}. = {1}".format(i, result.Temperature))
+
+      
 		self.sum.Temperature += measure.Temperature
 		self.sum.Humidity += measure.Humidity
 		self.sum.DateTime = measure.DateTime
 		self.lastMeasureDateTime = measure.DateTime
-		self.counter += 1
 		divider = len(self.results)
     
 		result = 0
@@ -579,14 +584,18 @@ class DHT22Decoder:
 
 			i += 1
 
-		# Raspberry reads incorrectly beginning of the signal. But it must be 5 times 0
+		# Raspberry reads only 10 bits from the right of the signal. First 5 bits are 0, but length might be random
 		correctSignal = "00000" + decodedSignal[5:len(decodedSignal)]
-		self.temperature = sign * temperature / 10
+		if sign == 1:
+			self.temperature = sign * temperature / 10
+		else:
+			self.temperature = sign * (1024-temperature) / 10
+
 		self.humidity = humidity / 10
 		self.checksum = checksum
 			
 		return correctSignal 
-		
+      
 	def validateSignal(self, signalString):
 		if type(signalString) != str:
 			return False

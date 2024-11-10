@@ -2,8 +2,7 @@
 
 from time import sleep 
 from timeit import default_timer
-from abc import ABC
-from unittest import TestCase
+import unittest
 import SignalDecoder
 import datetime
 import NEC
@@ -11,10 +10,12 @@ import DHT22
 from NeuralNetwork import SingleNeuralFactor, NeuralValue, NeuralCalculation
 
 
+class TestDataProvider(SignalDecoder.SignalDataProvider):
 
-class TestDataProvider(ABC):
-
-    expectedResult = []
+    def __init__(self) -> None:
+        super().__init__()
+        self.expectedResult = []
+        pass
     
     def InitDataQueue(self, queue):
         self.Queue = queue
@@ -58,7 +59,7 @@ class TestDataProvider(ABC):
         pass
 
 
-class NECTesting(TestCase):
+class NECTesting(unittest.TestCase):
     
     def test_001(self):
         self.testProvider = TestDataProvider()
@@ -71,9 +72,12 @@ class NECTesting(TestCase):
             print("Expected:" + result)
             self.assertTrue(type(cmd) is dict and "hex" in cmd and cmd['hex'] in result)
             sleep(0.1)
+
+        self.IReader.Stop()
+        pass
         
 
-class DHT22Testing(TestCase):
+class DHT22Testing(unittest.TestCase):
     
     def dht_test_001(self):
         self.dhtTestProvider = TestDataProvider()
@@ -88,8 +92,11 @@ class DHT22Testing(TestCase):
             self.assertTrue(result == "Result = {0}, Temperature = {1}°C, Humidity = {2}%. Avg. Temperature = {3}°C, Avg. Humidity = {4}%".format(cmd['result'], cmd['temperature'], cmd['humidity'], cmd['avg_temperature'], cmd['avg_humidity']))
             sleep(0.1)
 
+        self.DHT22Reader.Stop()
+        pass
+
         
-class NeuralNetworkTesting(TestCase):
+class NeuralNetworkTesting(unittest.TestCase):
     
     def basic_concepts(self):
         neuralValue = NeuralValue("value", 2, False)
@@ -111,3 +118,8 @@ class NeuralNetworkTesting(TestCase):
 
         print(neuralValue)
         self.assertTrue(neuralValue.calculate() == 2)
+        pass
+
+
+if __name__ == '__main__':
+    unittest.main()
