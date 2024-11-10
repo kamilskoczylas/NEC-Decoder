@@ -120,7 +120,7 @@ class NeuralValue(ABC):
 			line1 += "-----"
 			line2 += " {:3}|".format(neuralBit.bitNumber)
 
-			if neuralBit.bitNumber < self.value_bits:
+			if neuralBit.bitNumber < self.value_bits or (neuralBit.bitNumber == self.max_bits - 1 and self.is_signed):
 				line3 += "{:4.1f}|".format(neuralBit.value)
 			else:
 				line3 += "  - |".format(neuralBit.value)

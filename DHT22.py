@@ -230,9 +230,10 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.NeuralChecksum.calculate()
 
 		self.averageTemperature.remove()
-		self.averageTemperature.remove()
+		self.averageHumidity.remove()
 
-		calculated_checksum = self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi
+		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
+		print("Expected checksum = {0}".format(calculated_checksum))
 		if calculated_checksum == self.NeuralChecksum.value:
 			self.averageTemperature.append(BasicMeasure(self.NeuralTemperature.temperature, self.firstReadingDateTime))
 			self.averageHumidity.append(BasicMeasure(self.NeuralHumidity.humidity, self.firstReadingDateTime))
@@ -486,27 +487,3 @@ class DHT22Decoder:
 			
 			if self.signalEdgeDetectedTimeQueue.empty():
 				sleep(0.01)
-
-      
-	def validateSignal(self, signalString):
-		if type(signalString) != str:
-			return False
-		
-		if len(signalString) != 40:
-			if self.DEBUG:
-				print("Invalid length")
-			return False
-
-		temperatureDifference = abs(self.lastAverageTemperature - self.temperature)
-		humidityDifference = abs(self.lastAverageHumidity - self.humidity)
-		if self.lastAverageTemperature != 0 and self.lastAverageHumidity != 0 and (temperatureDifference > self.REMOVE_READING_WHEN_TEMPERATURE_DIFFERENT_FROM_AVG or humidityDifference > self.REMOVE_READING_WHEN_HUMIDITY_DIFFERENT_FROM_AVG):
-			return False
-
-		self.calculated_checksum = 0
-		for i in range (0, 32):
-			if signalString[i] == '1':
-				self.calculated_checksum += 1 << (7 - (i % 8))
-
-		self.calculated_checksum = self.calculated_checksum & 255
-		return self.calculated_checksum == self.checksum
-		
