@@ -183,7 +183,7 @@ class NeuralTemperature(NeuralReading):
 		pass
 
 	def calculate(self):
-		self.temperature = float(super().calculate() / 10)
+		self.temperature = float(super().calculate()) / 10
 
 
 class NeuralHumidity(NeuralReading):
@@ -193,7 +193,7 @@ class NeuralHumidity(NeuralReading):
 		pass
 
 	def calculate(self):
-		self.humidity = float(super().calculate() / 10)
+		self.humidity = float(super().calculate()) / 10
 
     
 class NeuralSignalRecognizer(NeuralCalculation):
