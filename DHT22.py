@@ -199,8 +199,8 @@ class NeuralHumidity(NeuralReading):
 class NeuralSignalRecognizer(NeuralCalculation):
 	
 	def __init__(self):
-		self.averageTemperature = AverageValue()
-		self.averageHumidity = AverageValue()
+		self.averageTemperature = AverageValue(180, 1)
+		self.averageHumidity = AverageValue(180, 1)
 		self.NeuralTemperature = NeuralTemperature(self.averageTemperature.measure)
 		self.NeuralHumidity = NeuralHumidity(self.averageHumidity.measure)
 		self.NeuralChecksum = NeuralChecksum()
@@ -248,10 +248,12 @@ class AverageValue:
 	lastMeasureDateTime = 0
 	measure = BasicMeasure(0, 0)
 	DEBUG = False
+	digit_numbers = 2
 
-	def __init__(self, maximum_length_seconds=120):
+	def __init__(self, maximum_length_seconds=120, digit_numbers = 2):
 		self.results = deque()
 		self.maximum_length_seconds = maximum_length_seconds
+		self.digit_numbers = digit_numbers
 		pass
 
 	def remove(self):
@@ -284,7 +286,7 @@ class AverageValue:
 	def getValue(self):
 		divider = len(self.results)
 		if divider > 0:
-			return round(self.sum / divider)
+			return round(self.sum / divider, self.digit_numbers)
 		else:
 			return 0
 
