@@ -286,7 +286,11 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			checksum_factors_humidity = [1 - value for value in bit_stabilities_humidity]
 			checksum_factors_temperature = [1 - value for value in bit_stabilities_temperature]
 			checksum_difference_bit_value = self.get_checksum_bit_differences_value()
-			checksum_bit_masked_values = [self.NeuralChecksum.getBit(i).value if checksum_difference_bit_value & (1 >> i) > 0 else 0 for i in range (0, 8)]
+			checksum_bit_masked_values = [self.NeuralChecksum.getBit(i % 8).value if checksum_difference_bit_value & (1 >> (i % 8)) > 0 else 0 for i in range (0, 16)]
+
+			if self.DEBUG:
+				print("Different bits: {0}".format(bin(checksum_difference_bit_value)))
+				print(checksum_bit_masked_values)
    
 			masked_checksum_factors_humidity = self.mask_values(checksum_factors_humidity, checksum_difference_bit_value)
 			masked_checksum_factors_temperature = self.mask_values(checksum_factors_temperature, checksum_difference_bit_value)
