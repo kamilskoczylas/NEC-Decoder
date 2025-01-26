@@ -301,6 +301,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 					print(masked_checksum_factors_humidity)
 					print("Temperature different values")
 					print(masked_checksum_factors_temperature)
+					print(self)
 	
 				self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, masked_checksum_factors_humidity)
 				self.NeuralTemperature.updateFactorsFactor(DHT22Checksum, masked_checksum_factors_temperature)
