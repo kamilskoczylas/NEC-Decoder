@@ -236,6 +236,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 	def succeed(self):
 		self.averageTemperature.append(BasicMeasure(self.NeuralTemperature.temperature, self.firstReadingDateTime))
 		self.averageHumidity.append(BasicMeasure(self.NeuralHumidity.humidity, self.firstReadingDateTime))
+		if self.DEBUG:
+			print("SECCESS: {0}°C, {1}%".format(self.averageTemperature.getValue(), self.averageHumidity.getValue()))
 		pass
 
 	def validate(self):
