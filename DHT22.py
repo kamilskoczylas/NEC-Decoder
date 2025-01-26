@@ -141,11 +141,14 @@ class NeuralReading(NeuralValue):
 				averageBitValue = 1
 			else:
 				averageBitValue = 0
-   
+
+
+			# Starting settings. Every execution, the values will be initialized
+			# If the result will not pass the checksum, the factor values will be rewarded
 			neuralFactors = [
 				DHT22PulseLength(pulseLength, 1),
-				DHT22AverageValue(averageBitValue, 0)
-				# DHT22PulseLengthLeft(pulseLengthLeft, 1)
+				DHT22AverageValue(averageBitValue, 0),
+				DHT22Checksum(0, 0)
 			]
 			self.neuralBits[i].load(neuralFactors)
 
@@ -198,7 +201,8 @@ class NeuralHumidity(NeuralReading):
     
 class NeuralSignalRecognizer(NeuralCalculation):
 	
-	def __init__(self):
+	def __init__(self, debug = True):
+		self.DEBUG = debug
 		self.averageTemperature = AverageValue(180, 1)
 		self.averageHumidity = AverageValue(180, 1)
 		self.NeuralTemperature = NeuralTemperature(self.averageTemperature.measure)
@@ -224,22 +228,71 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.NeuralHumidity.reward(value)
 		pass
 
-	def calculate(self):
+	def finalize(self):
+		self.averageTemperature.remove()
+		self.averageHumidity.remove()
+		pass
+
+	def succeed(self):
+		self.averageTemperature.append(BasicMeasure(self.NeuralTemperature.temperature, self.firstReadingDateTime))
+		self.averageHumidity.append(BasicMeasure(self.NeuralHumidity.humidity, self.firstReadingDateTime))
+		pass
+
+	def validate(self):
+		if self.DEBUG:
+			print("Expected checksum = {0}".format(calculated_checksum))
+		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
+		return calculated_checksum == self.NeuralChecksum.value
+
+
+	def calculate_all_values(self):
 		self.NeuralHumidity.calculate()
 		self.NeuralTemperature.calculate()
 		self.NeuralChecksum.calculate()
 
-		self.averageTemperature.remove()
-		self.averageHumidity.remove()
-
-		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
-		print("Expected checksum = {0}".format(calculated_checksum))
-		if calculated_checksum == self.NeuralChecksum.value:
-			self.averageTemperature.append(BasicMeasure(self.NeuralTemperature.temperature, self.firstReadingDateTime))
-			self.averageHumidity.append(BasicMeasure(self.NeuralHumidity.humidity, self.firstReadingDateTime))
+		self.finalize()
+		if self.validate():
+			self.succeed()
 			return True
-
 		return False
+
+	def calculate(self):
+		# First level - just calculate the data from DHT22, if it match checksum, fine
+		# TODO: check  and stability > 90%
+  
+		success = self.calculate_all_values()
+  
+		if not success:
+
+			bit_stabilities_humidity = self.NeuralHumidity.getStabilityBitArray()
+			bit_stabilities_temperature = self.NeuralTemperature.getStabilityBitArray()
+			bit_stabilities_checksum = self.NeuralChecksum.getStabilityBitArray()
+
+			# Correcting loop. Insted of typical Neural Network, date will not be pre-trained
+			# We'll check various combination of factors that could impact the reading quality:
+			# Checksum might indicate wrong bytes, average values might help to detect more probable results
+
+
+
+			checksum_factors_humidity = [1 - value for value in bit_stabilities_humidity]
+			checksum_factors_temperature = [1 - value for value in bit_stabilities_temperature]
+   
+			self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, checksum_factors_humidity)
+			self.NeuralTemperature.updateFactorsFactor(DHT22Checksum, checksum_factors_temperature)
+   
+			checksum_values = [0] * 16
+			self.NeuralHumidity.updateFactorsValue(DHT22Checksum, checksum_values)
+			self.NeuralTemperature.updateFactorsValue(DHT22Checksum, checksum_values)
+
+			avg_readings_factors_temperature = [1 - value for value in bit_stabilities_temperature]
+			avg_readings_factors_humidity = [1 - value for value in bit_stabilities_humidity]
+   
+			self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, avg_readings_factors_humidity)
+			self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, avg_readings_factors_temperature)
+
+			success = self.calculate_all_values()
+		
+		return success
 
 
 class AverageValue:

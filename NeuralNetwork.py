@@ -62,6 +62,20 @@ class NeuralBoolean():
 	def getFactor(self, number: int):
 		return self.neuralFactors[number]
 
+	def updateFactorFactor(self, factor_class_type, value: float):
+		property_name = "factor"
+		for obj in self.neuralFactors:
+			if isinstance(obj, factor_class_type) and hasattr(obj, property_name):
+				setattr(obj, property_name, value)
+		pass
+
+	def updateFactorValue(self, factor_class_type, value: float):
+		property_name = "value"
+		for obj in self.neuralFactors:
+			if isinstance(obj, factor_class_type) and hasattr(obj, property_name):
+				setattr(obj, property_name, value)
+		pass
+
 	def calculate(self):
 		valueSum = 0
 		factorSum = 0
@@ -134,6 +148,25 @@ class NeuralValue(ABC):
 
 	def getBit(self, number: int):
 		return self.neuralBits[(self.max_bits - 1) - number]
+
+	def getStabilityBitArray(self):
+		stability = [0] * self.max_bits
+		for i in range(0, self.max_bits):
+			stability[i] = self.neuralBits[i].stability
+		return stability
+
+
+	def updateFactorsFactor(self, factor_class_type, values):
+		assert len(values) == self.max_bits, "You must pass the same number of factors ({0}) as the number of value has bits ({1})".format(len(values), self.max_bits)
+		for i in range(0, self.max_bits):
+			self.neuralBits[i].updateFactorFactor(factor_class_type, values[i])
+		pass
+
+	def updateFactorsValue(self, factor_class_type, values):
+		assert len(values) == self.max_bits, "You must pass the same number of factors ({0}) as the number of value has bits ({1})".format(len(values), self.max_bits)
+		for i in range(0, self.max_bits):
+			self.neuralBits[i].updateFactorValue(factor_class_type, values[i])
+		pass
 
 	def calculate(self):
 		self.value = 0
