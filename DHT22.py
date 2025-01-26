@@ -247,7 +247,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 	def validate(self):
 		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
 		if self.DEBUG:
-			print("Expected checksum = {0}".format(calculated_checksum))
+			print("Calculated checksum = {0}".format(calculated_checksum))
 		return calculated_checksum == self.NeuralChecksum.value
 
 	def mask_values(self, array, bit_mask):
@@ -285,7 +285,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 				proportion_humidity = iteration / 4
 				proportion_temperature = 1 - proportion_humidity
-       
+
+				"""
 				checksum_factors_humidity = [proportion_humidity * (1 - value) for value in bit_stabilities_humidity]
 				checksum_factors_temperature = [proportion_temperature * (1 - value) for value in bit_stabilities_temperature]
 				checksum_difference_bit_value = self.get_checksum_bit_differences_value()
@@ -310,6 +311,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 	
 				self.NeuralHumidity.updateFactorsValue(DHT22Checksum, checksum_bit_masked_values)
 				self.NeuralTemperature.updateFactorsValue(DHT22Checksum, checksum_bit_masked_values)
+				"""
 
 				avg_readings_factors_temperature = [proportion_temperature * (1 - value) for value in bit_stabilities_temperature]
 				avg_readings_factors_humidity = [proportion_humidity * (1 - value) for value in bit_stabilities_humidity]
