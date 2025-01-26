@@ -239,9 +239,9 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		pass
 
 	def validate(self):
+		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
 		if self.DEBUG:
 			print("Expected checksum = {0}".format(calculated_checksum))
-		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
 		return calculated_checksum == self.NeuralChecksum.value
 
 
