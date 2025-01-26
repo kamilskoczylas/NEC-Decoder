@@ -240,6 +240,12 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			print("SECCESS: {0}°C, {1}%".format(self.averageTemperature.getValue(), self.averageHumidity.getValue()))
 		pass
 
+	def get_checksum_factors(self):
+		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
+		if self.DEBUG:
+			print("Expected checksum = {0}".format(calculated_checksum))
+		return calculated_checksum == self.NeuralChecksum.value
+
 	def validate(self):
 		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
 		if self.DEBUG:
@@ -282,7 +288,9 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, checksum_factors_humidity)
 			self.NeuralTemperature.updateFactorsFactor(DHT22Checksum, checksum_factors_temperature)
    
-			checksum_values = [0] * 16
+			checksum_values = [self.NeuralChecksum.getBit(i % 8).value for i in range(0, 16)]
+			print(checksum_values)
+   
 			self.NeuralHumidity.updateFactorsValue(DHT22Checksum, checksum_values)
 			self.NeuralTemperature.updateFactorsValue(DHT22Checksum, checksum_values)
 
