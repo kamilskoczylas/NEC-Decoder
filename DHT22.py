@@ -242,13 +242,13 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 	def get_checksum_bit_differences_value(self):
 		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
+		if self.DEBUG:
+			print("Calculated checksum = {0}".format(calculated_checksum))
+			print("Calculated checksum bin= {0}".format(bin(calculated_checksum)))
 		return calculated_checksum ^ self.NeuralChecksum.value
 
 	def validate(self):
 		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
-		if self.DEBUG:
-			print("Calculated checksum = {0}".format(calculated_checksum))
-			print("Calculated checksum bin= {0}".format(bin(calculated_checksum)))
 		return calculated_checksum == self.NeuralChecksum.value
 
 	def mask_values(self, array, bit_mask):
