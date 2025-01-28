@@ -242,10 +242,16 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 	def get_checksum_bit_differences_value(self):
 		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
+		differences_should_be_lower = calculated_checksum ^ self.NeuralChecksum.value & self.NeuralChecksum.value
+		differences_should_be_higher = calculated_checksum ^ self.NeuralChecksum.value & calculated_checksum
+  
 		if self.DEBUG:
+			print("Checksum read: {0}".format(bin(self.NeuralChecksum.value)))
 			print("Calculated checksum = {0}".format(calculated_checksum))
 			print("Calculated checksum bin= {0}".format(bin(calculated_checksum)))
-		return calculated_checksum ^ self.NeuralChecksum.value
+			print("Differences lower bin= {0}".format(bin(differences_should_be_lower)))
+			print("Differences higher bin= {0}".format(bin(differences_should_be_higher)))
+		return differences_should_be_lower, differences_should_be_higher
 
 	def validate(self):
 		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
@@ -293,33 +299,33 @@ class NeuralSignalRecognizer(NeuralCalculation):
 				checksum_factors_humidity = [proportion_humidity * (1 - value) for value in bit_stabilities_humidity]
 				checksum_factors_temperature = [proportion_temperature * (1 - value) for value in bit_stabilities_temperature]
 
-				checksum_difference_bit_value = self.get_checksum_bit_differences_value()
-				checksum_bit_masked_values = [round(self.NeuralChecksum.getBit(i % 8).value) if checksum_difference_bit_value & (1 >> (i % 8)) > 0 else 0 for i in range (0, 16)]
+				(differences_should_be_lower, differences_should_be_higher) = self.get_checksum_bit_differences_value()
+				#checksum_bit_masked_values = [round(self.NeuralChecksum.getBit(i % 8).value) if checksum_difference_bit_value & (1 >> (i % 8)) > 0 else 0 for i in range (0, 16)]
 
-				masked_checksum_factors_humidity = self.mask_values(checksum_factors_humidity, checksum_difference_bit_value)
-				masked_checksum_factors_temperature = self.mask_values(checksum_factors_temperature, checksum_difference_bit_value)
+				#masked_checksum_factors_humidity = self.mask_values(checksum_factors_humidity, checksum_difference_bit_value)
+				#masked_checksum_factors_temperature = self.mask_values(checksum_factors_temperature, checksum_difference_bit_value)
 
 				avg_readings_factors_temperature = [proportion_temperature * (1 - value) for value in bit_stabilities_temperature]
 				avg_readings_factors_humidity = [proportion_humidity * (1 - value) for value in bit_stabilities_humidity]
 
-				masked_temperature = self.mask_values(avg_readings_factors_temperature, checksum_difference_bit_value)
-				masked_humidity = self.mask_values(avg_readings_factors_humidity, checksum_difference_bit_value)
+				#masked_temperature = self.mask_values(avg_readings_factors_temperature, checksum_difference_bit_value)
+				#masked_humidity = self.mask_values(avg_readings_factors_humidity, checksum_difference_bit_value)
 
     
 				if self.DEBUG:
 					print(self)
-					print("Checksum: {0}".format(bin(self.NeuralChecksum.value)))
-					print("Different bits: {0}".format(bin(checksum_difference_bit_value)))
-					print(checksum_bit_masked_values)
-					print("Humidity different values")
-					print(masked_checksum_factors_humidity)
-					print("Temperature different values")
-					print(masked_checksum_factors_temperature)
+					
+					
+					#print(checksum_bit_masked_values)
+					#print("Humidity different values")
+					#print(masked_checksum_factors_humidity)
+					#print("Temperature different values")
+					#print(masked_checksum_factors_temperature)
 
-					print("Masked temperature")
-					print(masked_temperature)
-					print("Masked humidity")
-					print(masked_humidity)
+					#print("Masked temperature")
+					#print(masked_temperature)
+					#print("Masked humidity")
+					#print(masked_humidity)
 					
 				"""
 				self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, masked_checksum_factors_humidity)
