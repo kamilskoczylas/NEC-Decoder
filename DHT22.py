@@ -284,6 +284,9 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 			for iteration in range (1, 5):
 
+				if self.DEBUG:
+					print("ATTEMPT: {0}".format(iteration))
+
 				proportion_humidity = iteration / 4
 				proportion_temperature = 1 - proportion_humidity
 
@@ -304,7 +307,6 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
     
 				if self.DEBUG:
-					print("ATTEMPT: {0}".format(iteration))
 					print(self)
 					print("Checksum: {0}".format(bin(self.NeuralChecksum.value)))
 					print("Different bits: {0}".format(bin(checksum_difference_bit_value)))
