@@ -261,6 +261,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		# return the same array only if all bits of bit_mask are set to 1
 		return [value if bit_mask & (1 >> index % 8) > 0 else 0 for index, value in enumerate(array)]
 
+	
+
 	def calculate_all_values(self, iteration = 1):
 		self.NeuralHumidity.calculate()
 		self.NeuralTemperature.calculate()
@@ -337,8 +339,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 				
 	
-				self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, masked_humidity)
-				self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, masked_temperature)
+				#self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, masked_humidity)
+				#self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, masked_temperature)
 
 				success = self.calculate_all_values(iteration)
 				if success:
