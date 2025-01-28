@@ -138,7 +138,7 @@ class NeuralValue(ABC):
 				line3 += "{:4.1f}|".format(neuralBit.value)
 			else:
 				line3 += "  - |".format(neuralBit.value)
-			line4 += "{:4.1f}|".format(neuralBit.stability * 100)
+			line4 += "{:4.0f}|".format(neuralBit.stability * 100)
 		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line4 + "\n" + line1 + "\n"
 
 	def load(self, neuralFactorsList):
