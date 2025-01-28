@@ -243,7 +243,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 	def get_checksum_bit_differences_value(self):
 		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
 		differences_should_be_lower = calculated_checksum ^ self.NeuralChecksum.value & self.NeuralChecksum.value
-		differences_should_be_higher = calculated_checksum ^ self.NeuralChecksum.value & (~calculated_checksum)
+		differences_should_be_higher = ~calculated_checksum ^ self.NeuralChecksum.value & calculated_checksum
   
 		if self.DEBUG:
 			print("Checksum read: {0}".format(bin(self.NeuralChecksum.value)))
