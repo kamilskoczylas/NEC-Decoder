@@ -267,8 +267,8 @@ class NeuralValidator():
 
 
 class NeuralChecksumValidator():
-	def calculate(self, checksum_stability):
-		self.value = checksum_stability
+	def calculate(self, checksum_read, checksum_calculated, checksum_stability):
+		self.value = checksum_stability * min((8 - bin(256 - (checksum_calculated - checksum_read)).count('1')), (8 - bin(checksum_calculated - checksum_read).count('1')))
 		return checksum_stability > 0.8
 
 	
@@ -370,7 +370,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
 			self.NeuralTemperatureValidator.calculate(self.averageTemperature.getValue(), self.NeuralTemperature.temperature, calculated_checksum, self.NeuralChecksum.value, self.NeuralTemperature.getStabilityBitArray())
 			self.NeuralHumidityValidator.calculate(self.averageHumidity.getValue(), self.NeuralHumidity.humidity, calculated_checksum, self.NeuralChecksum.value, self.NeuralHumidity.getStabilityBitArray())
-			self.NeuralChecksumValidator.calculate(self.NeuralChecksum.getStability())
+			self.NeuralChecksumValidator.calculate(self.NeuralChecksum.value, calculated_checksum, self.NeuralChecksum.getStability())
 
 		return False
 
