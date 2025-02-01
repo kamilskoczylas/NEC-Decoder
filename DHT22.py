@@ -204,9 +204,10 @@ class NeuralChecksum(NeuralValue):
 
 class NeuralValidator():
 	
-	def __init__(self, DEBUG = False):
+	def __init__(self, name, DEBUG = False):
 		self.correcting_value_mask = [0] * 16
 		self.value = 0
+		self.name = name
 		self.DEBUG = DEBUG
 		pass
 
@@ -258,7 +259,7 @@ class NeuralValidator():
 
 
 		if self.DEBUG:
-			print(type(self).__name__)
+			print(self.name)
 			print("Calculated value: {0}".format(average_measure_covering))
 			print("Average Measure Covering = {0}".format(average_measure_covering))
    
@@ -306,8 +307,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.NeuralHumidity = NeuralHumidity(self.averageHumidity.measure)
 		self.NeuralChecksum = NeuralChecksum()
 
-		self.NeuralTemperatureValidator = NeuralValidator(self.DEBUG)
-		self.NeuralHumidityValidator = NeuralValidator(self.DEBUG)
+		self.NeuralTemperatureValidator = NeuralValidator("Temperature", self.DEBUG)
+		self.NeuralHumidityValidator = NeuralValidator("Humidity", self.DEBUG)
 		self.NeuralChecksumValidator = NeuralChecksumValidator()
 		pass
 
