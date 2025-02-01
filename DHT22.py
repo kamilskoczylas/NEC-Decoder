@@ -209,7 +209,7 @@ class NeuralValidator():
 		self.DEBUG = DEBUG
 		pass
 
-	def calculate(self, average_measure, last_reading, checksum_calculated, checksum_read, stability):
+	def calculate(self, average_measure, last_reading, checksum_calculated, checksum_read, stability_bits_array):
      
 		average_measure_minus_last_reading = average_measure - last_reading
 		checksum_read_minus_checksum_calculated = checksum_read - checksum_calculated
@@ -233,18 +233,23 @@ class NeuralValidator():
 		else:
 			int_last_reading = int(-last_reading * 10) | (1 << 16)
 
+		calculated_value = 0
+
 		# see how many different bits falls into difference in average temperature
 		if (average_measure_minus_last_reading > 0):
 			# some bits read might be  missing
-			self.value = ((int_last_reading & 255) & checksum_read_minus_checksum_calculated) / 255 + (((int_last_reading & 1792) >> 8) & checksum_read_minus_checksum_calculated) / 8
-			self.correcting_value_mask = [1 if (checksum_read_minus_checksum_calculated | (checksum_read_minus_checksum_calculated << 8)) & (1 >> i) != int_last_reading & (1 >> i) else 0 for i in range (0, 16)]
+			for i in range(0, 10):
+				if checksum_read_minus_checksum_calculated & (1 >> (i % 8)) and not (int_last_reading & (1 >> i)):
+					calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
+					self.correcting_value_mask[i] = 1
 		else:
 			# some bits read might be set too high
-			self.value = ((int_last_reading & 255) & checksum_calculated_minus_checksum) / 255 + (((int_last_reading & 1792) >> 8) & checksum_calculated_minus_checksum) / 8
-			self.correcting_value_mask = [1 if (checksum_calculated_minus_checksum | (checksum_calculated_minus_checksum << 8)) & (1 >> (i % 8)) != int_last_reading & (1 >> i) else 0 for i in range (0, 16)]
-
-		min_stability = max(0.001, stability)
-		return self.value / min_stability
+			for i in range(0, 10):
+				if not checksum_calculated_minus_checksum & (1 >> (i % 8)) and (int_last_reading & (1 >> i)):
+					calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
+					self.correcting_value_mask[i] = 1
+     
+		return calculated_value
 
    
 
@@ -351,8 +356,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			return True
 		else:
 			calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
-			self.NeuralTemperatureValidator.calculate(self.averageTemperature.getValue(), self.NeuralTemperature.value, calculated_checksum, self.NeuralChecksum.value, self.NeuralTemperature.getStability())
-			self.NeuralHumidityValidator.calculate(self.averageHumidity.getValue(), self.NeuralHumidity.value, calculated_checksum, self.NeuralChecksum.value, self.NeuralHumidity.getStability())
+			self.NeuralTemperatureValidator.calculate(self.averageTemperature.getValue(), self.NeuralTemperature.value, calculated_checksum, self.NeuralChecksum.value, self.NeuralTemperature.getStabilityBitArray())
+			self.NeuralHumidityValidator.calculate(self.averageHumidity.getValue(), self.NeuralHumidity.value, calculated_checksum, self.NeuralChecksum.value, self.NeuralHumidity.getStabilityBitArray())
 			self.NeuralChecksumValidator.calculate(self.NeuralChecksum.getStability())
 
 		return False
