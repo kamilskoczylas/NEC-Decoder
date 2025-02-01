@@ -369,8 +369,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			return True
 		else:
 			calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
-			self.NeuralTemperatureValidator.calculate(self.averageTemperature.getValue(), self.NeuralTemperature.value, calculated_checksum, self.NeuralChecksum.value, self.NeuralTemperature.getStabilityBitArray())
-			self.NeuralHumidityValidator.calculate(self.averageHumidity.getValue(), self.NeuralHumidity.value, calculated_checksum, self.NeuralChecksum.value, self.NeuralHumidity.getStabilityBitArray())
+			self.NeuralTemperatureValidator.calculate(self.averageTemperature.getValue(), self.NeuralTemperature.temperature, calculated_checksum, self.NeuralChecksum.value, self.NeuralTemperature.getStabilityBitArray())
+			self.NeuralHumidityValidator.calculate(self.averageHumidity.getValue(), self.NeuralHumidity.humidity, calculated_checksum, self.NeuralChecksum.value, self.NeuralHumidity.getStabilityBitArray())
 			self.NeuralChecksumValidator.calculate(self.NeuralChecksum.getStability())
 
 		return False
