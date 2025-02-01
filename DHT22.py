@@ -369,13 +369,17 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			# Checksum might indicate wrong bytes, average values might help to detect more probable results
 
 			for iteration in range (1, 5):
+				if self.NeuralChecksumValidator.value < 0.5:
+					if self.DEBUG:
+						print("Checksum Stability {0} too low to recover.".format(self.NeuralChecksumValidator.value))
+					break
 
 				if self.DEBUG:
 					print("ATTEMPT: {0}".format(iteration))
 					print("Checksum stability: {0}".format(self.NeuralChecksumValidator.value))
 					print(self)
 
-				if self.NeuralTemperatureValidator.value > self.NeuralHumidityValidator.value:
+				if self.NeuralTemperatureValidator.value > self.NeuralHumidityValidator.value and self.NeuralTemperatureValidator.value > 0:
 					self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, self.NeuralTemperatureValidator.correcting_value_mask)
      
 					if self.DEBUG:
