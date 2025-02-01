@@ -204,7 +204,7 @@ class NeuralChecksum(NeuralValue):
 
 class NeuralValidator(NeuralBoolean):
 	
-	def __init__(self, checksum_read_minus_checksum_calculated):
+	def __init__(self):
 		super(NeuralValidator, self).__init__(0)
 		self.addFactor(DHT22DifferenceFromAverageValueValidator(0, 1))
 		self.addFactor(DHT22DifferenceChecksumValidator(0, 1))
@@ -235,11 +235,11 @@ class NeuralValidator(NeuralBoolean):
 		if (average_measure_minus_last_reading > 0):
 			# some bits read might be  missing
 			self.value = ((int_last_reading & 255) & checksum_read_minus_checksum_calculated) / 255 + (((int_last_reading & 1792) >> 8) & checksum_read_minus_checksum_calculated) / 8
-			self.correcting_value_mask = [1 if int_last_reading & (checksum_read_minus_checksum_calculated + (checksum_read_minus_checksum_calculated << 8)) & (1 >> (i % 8)) > 0 else 0 for i in range (0, 10)]
+			self.correcting_value_mask = [1 if int_last_reading & (checksum_read_minus_checksum_calculated | (checksum_read_minus_checksum_calculated << 8)) & (1 >> (i % 8)) > 0 else 0 for i in range (0, 16)]
 		else:
 			# some bits read might be set too high
 			self.value = ((int_last_reading & 255) & checksum_calculated_minus_checksum) / 255 + (((int_last_reading & 1792) >> 8) & checksum_calculated_minus_checksum) / 8
-			self.correcting_value_mask = [1 if int_last_reading & (checksum_calculated_minus_checksum + (checksum_calculated_minus_checksum << 8)) & (1 >> (i % 8)) > 0 else 0 for i in range (0, 10)]
+			self.correcting_value_mask = [1 if int_last_reading & (checksum_calculated_minus_checksum | (checksum_calculated_minus_checksum << 8)) & (1 >> (i % 8)) > 0 else 0 for i in range (0, 16)]
    
 		return self.value
 
