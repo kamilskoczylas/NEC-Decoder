@@ -240,9 +240,7 @@ class NeuralValidator():
 		# see how many different bits falls into difference in average temperature
 		#if (average_measure_minus_last_reading > 0):
 			# some bits read might be  missing
-		average_measure_covering = 0
-		if abs(checksum_read_minus_checksum_calculated) > 0:
-			average_measure_covering = abs(average_measure_minus_last_reading)
+		average_measure_covering = abs(average_measure_minus_last_reading)
   
 		for i in range(0, 10):
 			if abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8)):
@@ -261,7 +259,7 @@ class NeuralValidator():
 		if self.DEBUG:
 			print(self.name)
 			print("Calculated value: {0}".format(calculated_value))
-			print("Average Measure Covering = {0}".format(average_measure_covering))
+			print("Difference from average Measure: = {0}".format(average_measure_covering))
    
 		self.value = calculated_value * average_measure_covering
 		return calculated_value
@@ -426,11 +424,11 @@ class AverageValue:
 
 	sum = 0
 	lastMeasureDateTime = 0
-	measure = BasicMeasure(0, 0)
 	DEBUG = False
 	digit_numbers = 2
 
 	def __init__(self, maximum_length_seconds=120, digit_numbers = 2):
+		self.measure = BasicMeasure(0, 0)
 		self.results = deque()
 		self.maximum_length_seconds = maximum_length_seconds
 		self.digit_numbers = digit_numbers
