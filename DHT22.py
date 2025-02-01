@@ -445,6 +445,7 @@ class DHT22Decoder:
 	currentSignalStartTime = 0
 	temperature = 0
 	humidity = 0
+	checksum = 0
 
 	average_temperature = 0
 	average_humidity = 0
@@ -514,8 +515,9 @@ class DHT22Decoder:
 		result = self.neuralSignalRecognizer.calculate()
 
 		if result:
-			self.humidity = self.neuralSignalRecognizer.NeuralHumidity
-			self.temperature = self.neuralSignalRecognizer.NeuralTemperature
+			self.humidity = self.neuralSignalRecognizer.NeuralHumidity.value
+			self.temperature = self.neuralSignalRecognizer.NeuralTemperature.value
+			self.checksum = self.neuralSignalRecognizer.NeuralChecksum.value
    
 		self.average_temperature = self.neuralSignalRecognizer.averageTemperature.getValue()
 		self.average_humidity = self.neuralSignalRecognizer.averageHumidity.getValue()
