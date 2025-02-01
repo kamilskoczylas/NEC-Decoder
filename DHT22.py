@@ -237,10 +237,9 @@ class NeuralValidator():
 
 		calculated_value = 0
 
-		# see how many different bits falls into difference in average temperature
-		#if (average_measure_minus_last_reading > 0):
-			# some bits read might be  missing
-		average_measure_covering = abs(average_measure_minus_last_reading)
+		
+		# Experimental parameter / 10 might be Machine Learning in the future
+		average_measure_covering = abs(average_measure_minus_last_reading) / 10
   
 		for i in range(0, 16):
 			if (i < 10 or i == 15) and (abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8))):
