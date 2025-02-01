@@ -520,7 +520,7 @@ class DHT22Decoder:
 		self.average_temperature = self.neuralSignalRecognizer.averageTemperature.getValue()
 		self.average_humidity = self.neuralSignalRecognizer.averageHumidity.getValue()
 
-		return  { "binary": "{0} {1} {2}".format(bin(int(self.neuralSignalRecognizer.NeuralHumidity.value * 10)), bin(int(self.neuralSignalRecognizer.NeuralTemperature.value * 10), bin(self.neuralSignalRecognizer.NeuralChecksum.value))),
+		return  { "binary": "{0} {1} {2}".format(bin(int(self.neuralSignalRecognizer.NeuralHumidity.value * 10)), bin(int(self.neuralSignalRecognizer.NeuralTemperature.value * 10)), bin(self.neuralSignalRecognizer.NeuralChecksum.value)),
 				"result": "OK" if result else "ERROR",
 				"checksum": self.checksum,
 				"calculated_checksum": self.calculated_checksum,
