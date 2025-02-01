@@ -204,8 +204,9 @@ class NeuralChecksum(NeuralValue):
 
 class NeuralValidator():
 	
-	def __init__(self):
+	def __init__(self, DEBUG = False):
 		self.correcting_value_mask = [0] * 16
+		self.DEBUG = DEBUG
 		pass
 
 	def calculate(self, average_measure, last_reading, checksum_calculated, checksum_read):
@@ -213,6 +214,13 @@ class NeuralValidator():
 		average_measure_minus_last_reading = average_measure - last_reading
 		checksum_read_minus_checksum_calculated = checksum_read - checksum_calculated
 		checksum_calculated_minus_checksum = checksum_calculated - checksum_read
+
+		if self.DEBUG:
+			print("Checksum read: {0}".format(bin(checksum_read)))
+			print("Calculated checksum = {0}".format(checksum_calculated))
+			print("Calculated checksum bin= {0}".format(bin(checksum_calculated)))
+			print("checksum_read_minus_checksum_calculated bin= {0}".format(bin(checksum_read_minus_checksum_calculated)))
+			print("checksum_calculated_minus_checksum bin= {0}".format(bin(checksum_calculated_minus_checksum)))
 
 		# Calculate probability that the difference in checksum is result of the difference in average reading
 		int_last_reading = 0
@@ -274,8 +282,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.NeuralHumidity = NeuralHumidity(self.averageHumidity.measure)
 		self.NeuralChecksum = NeuralChecksum()
 
-		self.NeuralTemperatureValidator = NeuralValidator()
-		self.NeuralHumidityValidator = NeuralValidator()
+		self.NeuralTemperatureValidator = NeuralValidator(self.DEBUG)
+		self.NeuralHumidityValidator = NeuralValidator(self.DEBUG)
 		self.NeuralChecksumValidator = NeuralChecksumValidator()
 		pass
 
@@ -314,12 +322,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		differences_should_be_lower = calculated_checksum ^ self.NeuralChecksum.value & self.NeuralChecksum.value
 		differences_should_be_higher = ~calculated_checksum ^ self.NeuralChecksum.value & calculated_checksum
   
-		if self.DEBUG:
-			print("Checksum read: {0}".format(bin(self.NeuralChecksum.value)))
-			print("Calculated checksum = {0}".format(calculated_checksum))
-			print("Calculated checksum bin= {0}".format(bin(calculated_checksum)))
-			print("Differences lower bin= {0}".format(bin(differences_should_be_lower)))
-			print("Differences higher bin= {0}".format(bin(differences_should_be_higher)))
+		
 		return differences_should_be_lower, differences_should_be_higher
 
 	def validate(self):
