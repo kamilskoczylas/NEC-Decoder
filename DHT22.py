@@ -256,7 +256,13 @@ class NeuralValidator():
 		#			calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
 		#			self.correcting_value_mask[i] = 1
 
-		self.value = calculated_value * average_measure_covering
+
+		if self.DEBUG:
+			print(type(self).__name__)
+			print("Calculated value: {0}".format(average_measure_covering))
+			print("Average Measure Covering = {0}".format(average_measure_covering))
+   
+		self.value = average_measure_covering * average_measure_covering
 		return calculated_value
 
    
