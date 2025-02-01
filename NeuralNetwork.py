@@ -164,7 +164,8 @@ class NeuralValue(ABC):
 	def getStability(self):
 		stability = 1
 		for i in range(0, self.max_bits):
-			stability = stability * self.neuralBits[i].stability
+			if i < self.value_bits or (i == self.max_bits - 1 and self.is_signed):
+				stability = stability * self.neuralBits[i].stability
 		return stability
 
 
