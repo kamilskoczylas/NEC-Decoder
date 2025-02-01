@@ -62,6 +62,12 @@ class NeuralBoolean():
 	def getFactor(self, number: int):
 		return self.neuralFactors[number]
 
+	def getValueFactorByClass(self, factor_class_type):
+		for obj in self.neuralFactors:
+			if isinstance(obj, factor_class_type) and hasattr(obj, "value") and hasattr(obj, "factor"):
+				return (obj.value, obj.factor)
+		return (0, 0)
+
 	def updateFactorFactor(self, factor_class_type, value: float):
 		property_name = "factor"
 		for obj in self.neuralFactors:
@@ -153,6 +159,12 @@ class NeuralValue(ABC):
 		stability = [0] * self.max_bits
 		for i in range(0, self.max_bits):
 			stability[i] = self.neuralBits[i].stability
+		return stability
+
+	def getStability(self):
+		stability = 1
+		for i in range(0, self.max_bits):
+			stability = stability * self.neuralBits[i].stability
 		return stability
 
 

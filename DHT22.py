@@ -125,6 +125,29 @@ class DHT22Checksum(SingleNeuralFactor):
 			]
 			self.neuralBits[i].load(neuralFactors)
 
+class DHT22DifferenceFromAverageValueValidator(SingleNeuralFactor):
+
+	def __init__(self, input_value, factor) -> None:
+		self.name = "DifferenceFromAverage"
+		self.input_value = input_value
+		self.factor = factor
+
+	def calculate(self):
+		self.stability = 1
+		return self.input_value
+
+
+class DHT22DifferenceChecksumValidator(SingleNeuralFactor):
+
+	def __init__(self, input_value, factor) -> None:
+		self.name = "DifferenceChecksum"
+		self.input_value = input_value
+		self.factor = factor
+
+	def calculate(self):
+		self.stability = 1
+		return self.input_value
+
 
 class NeuralReading(NeuralValue):
 	value_hi = 0
@@ -179,6 +202,58 @@ class NeuralChecksum(NeuralValue):
 			self.neuralBits[i].load(neuralFactors)
 
 
+class NeuralValidator(NeuralBoolean):
+	
+	def __init__(self, checksum_read_minus_checksum_calculated):
+		super(NeuralValidator, self).__init__(0)
+		self.addFactor(DHT22DifferenceFromAverageValueValidator(0, 1))
+		self.addFactor(DHT22DifferenceChecksumValidator(0, 1))
+
+		self.correcting_value_mask = [0] * 16
+		pass
+
+	def calculate(self, average_measure, last_reading, checksum_calculated, checksum_read):
+     
+		average_measure_minus_last_reading = average_measure - last_reading
+		checksum_read_minus_checksum_calculated = checksum_read - checksum_calculated
+		checksum_calculated_minus_checksum = checksum_calculated - checksum_read
+  
+		self.updateFactorValue(DHT22DifferenceFromAverageValueValidator, average_measure_minus_last_reading)
+		self.updateFactorValue(DHT22DifferenceChecksumValidator, checksum_read_minus_checksum_calculated)
+  
+		average_measure_minus_last_reading, avg_factor = self.getValueFactorByClass(DHT22DifferenceFromAverageValueValidator)
+		checksum_read_minus_checksum_calculated, chk_factor = self.getValueFactorByClass(DHT22DifferenceChecksumValidator)
+
+		# Calculate probability that the difference in checksum is result of the difference in average reading
+		int_last_reading = 0
+		if last_reading >= 0:
+			int_last_reading = int(last_reading * 10)
+		else:
+			int_last_reading = int(-last_reading * 10) | (1 << 16)
+
+		# see how many different bits falls into difference in average temperature
+		if (average_measure_minus_last_reading > 0):
+			# some bits read might be  missing
+			self.value = ((int_last_reading & 255) & checksum_read_minus_checksum_calculated) / 255 + (((int_last_reading & 1792) >> 8) & checksum_read_minus_checksum_calculated) / 8
+			self.correcting_value_mask = [1 if int_last_reading & (checksum_read_minus_checksum_calculated + (checksum_read_minus_checksum_calculated << 8)) & (1 >> (i % 8)) > 0 else 0 for i in range (0, 10)]
+		else:
+			# some bits read might be set too high
+			self.value = ((int_last_reading & 255) & checksum_calculated_minus_checksum) / 255 + (((int_last_reading & 1792) >> 8) & checksum_calculated_minus_checksum) / 8
+			self.correcting_value_mask = [1 if int_last_reading & (checksum_calculated_minus_checksum + (checksum_calculated_minus_checksum << 8)) & (1 >> (i % 8)) > 0 else 0 for i in range (0, 10)]
+   
+		return self.value
+
+   
+
+
+class NeuralChecksumValidator():
+	def calculate(self, checksum_stability):
+		self.value = checksum_stability
+		return checksum_stability > 0.8
+
+	
+
+
 class NeuralTemperature(NeuralReading):
 	
 	def __init__(self, linkedAverageMeasure):
@@ -208,6 +283,10 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.NeuralTemperature = NeuralTemperature(self.averageTemperature.measure)
 		self.NeuralHumidity = NeuralHumidity(self.averageHumidity.measure)
 		self.NeuralChecksum = NeuralChecksum()
+
+		self.NeuralTemperatureValidator = NeuralValidator()
+		self.NeuralHumidityValidator = NeuralValidator()
+		self.NeuralChecksumValidator = NeuralChecksumValidator()
 		pass
 
 	def __str__(self):
@@ -272,6 +351,12 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		if self.validate():
 			self.succeed(iteration)
 			return True
+		else:
+			calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
+			self.NeuralTemperatureValidator.calculate(self.averageTemperature.getValue(), self.NeuralTemperature.value, calculated_checksum, self.NeuralChecksum.value)
+			self.NeuralHumidityValidator.calculate(self.averageHumidity.getValue(), self.NeuralHumidity.value, calculated_checksum, self.NeuralChecksum.value)
+			self.NeuralChecksumValidator.calculate(self.NeuralChecksum.getStability())
+
 		return False
 
 	def calculate(self):
@@ -282,10 +367,6 @@ class NeuralSignalRecognizer(NeuralCalculation):
   
 		if not success:
 
-			bit_stabilities_humidity = self.NeuralHumidity.getStabilityBitArray()
-			bit_stabilities_temperature = self.NeuralTemperature.getStabilityBitArray()
-			bit_stabilities_checksum = self.NeuralChecksum.getStabilityBitArray()
-
 			# Correcting loop. Insted of typical Neural Network, date will not be pre-trained
 			# We'll check various combination of factors that could impact the reading quality:
 			# Checksum might indicate wrong bytes, average values might help to detect more probable results
@@ -294,53 +375,22 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 				if self.DEBUG:
 					print("ATTEMPT: {0}".format(iteration))
+					print("Checksum stability: {0}".format(self.NeuralChecksumValidator.value))
 
-				proportion_humidity = iteration / 4
-				proportion_temperature = 1 - proportion_humidity
+				if self.NeuralTemperatureValidator.value > self.NeuralHumidityValidator.value:
+					self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, self.NeuralTemperatureValidator.correcting_value_mask)
+     
+					if self.DEBUG:
+						print("Correcting temperature")
+						print(self.NeuralTemperatureValidator.correcting_value_mask)
+						
 
-				checksum_factors_humidity = [proportion_humidity * (1 - value) for value in bit_stabilities_humidity]
-				checksum_factors_temperature = [proportion_temperature * (1 - value) for value in bit_stabilities_temperature]
+				else:
+					self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, self.NeuralHumidityValidator.correcting_value_mask)
+					if self.DEBUG:
+						print("Correcting humidity")
+						print(self.NeuralHumidityValidator.correcting_value_mask)
 
-				(differences_should_be_lower, differences_should_be_higher) = self.get_checksum_bit_differences_value()
-				#checksum_bit_masked_values = [round(self.NeuralChecksum.getBit(i % 8).value) if checksum_difference_bit_value & (1 >> (i % 8)) > 0 else 0 for i in range (0, 16)]
-
-				#masked_checksum_factors_humidity = self.mask_values(checksum_factors_humidity, checksum_difference_bit_value)
-				#masked_checksum_factors_temperature = self.mask_values(checksum_factors_temperature, checksum_difference_bit_value)
-
-				avg_readings_factors_temperature = [proportion_temperature * (1 - value) for value in bit_stabilities_temperature]
-				avg_readings_factors_humidity = [proportion_humidity * (1 - value) for value in bit_stabilities_humidity]
-
-				#masked_temperature = self.mask_values(avg_readings_factors_temperature, checksum_difference_bit_value)
-				#masked_humidity = self.mask_values(avg_readings_factors_humidity, checksum_difference_bit_value)
-
-    
-				if self.DEBUG:
-					print(self)
-					
-					
-					#print(checksum_bit_masked_values)
-					#print("Humidity different values")
-					#print(masked_checksum_factors_humidity)
-					#print("Temperature different values")
-					#print(masked_checksum_factors_temperature)
-
-					#print("Masked temperature")
-					#print(masked_temperature)
-					#print("Masked humidity")
-					#print(masked_humidity)
-					
-				"""
-				self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, masked_checksum_factors_humidity)
-				self.NeuralTemperature.updateFactorsFactor(DHT22Checksum, masked_checksum_factors_temperature)
-	
-				self.NeuralHumidity.updateFactorsValue(DHT22Checksum, checksum_bit_masked_values)
-				self.NeuralTemperature.updateFactorsValue(DHT22Checksum, checksum_bit_masked_values)
-				"""
-
-				
-	
-				#self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, masked_humidity)
-				#self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, masked_temperature)
 
 				success = self.calculate_all_values(iteration)
 				if success:
@@ -398,90 +448,16 @@ class AverageValue:
 			return 0
 
 
-class AverageMeasure:
-
-	ALLOW_TEMPERATURE_DIFFERENCE = 2
-	ALLOW_HUMIDITY_DIFFERENCE = 10
-
-	def __init__(self, maximum_length_seconds = 180):
-		self.sum = Measure(0, 0, 0)
-		self.results = deque()
-		self.maximum_length_seconds = maximum_length_seconds
-		self.lastMeasureDateTime = 0
-
-	def remove(self):
-		while len(self.results) > 0 and default_timer() - self.results[0].DateTime > self.maximum_length_seconds:
-			first = self.results.popleft()
-			print("removing first measure after {0} seconds: {1}C".format(default_timer() - first.DateTime, first.Temperature))
-			self.sum.Temperature -= first.Temperature
-			self.sum.Humidity -= first.Humidity
-    
-	def append(self, measure: Measure):
-
-    
-		self.results.append(measure)
-		print(self.results)
-		i = 0
-		for result in self.results:
-			i += 1
-			print("{0}. = {1}".format(i, result.Temperature))
-
-      
-		self.sum.Temperature += measure.Temperature
-		self.sum.Humidity += measure.Humidity
-		self.sum.DateTime = measure.DateTime
-		self.lastMeasureDateTime = measure.DateTime
-		divider = len(self.results)
-    
-		result = 0
-		if divider > 0:
-			result = self.sum.Temperature / divider  
-
-		print("+ {0} = {1} / {2} = {3}".format(measure.Temperature, self.sum.Temperature, divider, result))
-		pass
-
-	def canAddMeasure(self, measure: Measure):
-		average = self.getAvegareMeasure()
-		print(abs(measure.Temperature - average.Temperature))
-		print(abs(measure.Humidity - average.Humidity))
-    
-		return len(self.results) < 2 or (abs(measure.Temperature - average.Temperature) <= self.ALLOW_TEMPERATURE_DIFFERENCE and abs(measure.Humidity - average.Humidity) <= self.ALLOW_HUMIDITY_DIFFERENCE)
-
-	def isStableAverage(self):
-		return len(self.results) >= 3
-    
-	def getAvegareMeasure(self):
-		divider = len(self.results)
-		if divider > 0:
-			return Measure(temperature=round(self.sum.Temperature / divider, 1), humidity=round(self.sum.Humidity / divider, 1), dateTime=self.lastMeasureDateTime)
-		else:
-			return Measure(0, 0, 0)
-
-
 class DHT22Decoder:
 
-	# Maximum value is half of the difference between
-	# positive and negative signal length
-	PulseErrorRange = 0.00006
-	
-	PULSE_POSITIVE_LENGTH = 0.000107
-	PULSE_NEGATIVE_LENGTH = 0.000076
-
 	MAX_DHT22_SIGNAL_LENGTH = 0.0048
-
-	REMOVE_READING_WHEN_TEMPERATURE_DIFFERENT_FROM_AVG = 20
-	REMOVE_READING_WHEN_HUMIDITY_DIFFERENT_FROM_AVG = 20
-
+ 
 	currentSignalStartTime = 0
-	
 	temperature = 0
 	humidity = 0
-	checksum = 0
-	calculated_checksum = 0
-	averageMeasure = AverageMeasure()
 
-	lastAverageTemperature = 0
-	lastAverageHumidity = 0
+	average_temperature = 0
+	average_humidity = 0
 
 	DEBUG = False
   
@@ -546,19 +522,22 @@ class DHT22Decoder:
 		pulseArray = self.getBurst(40, self.currentSignalStartTime, self.currentSignalStartTime + signalTime + self.MAX_DHT22_SIGNAL_LENGTH)   
 		self.neuralSignalRecognizer.load(pulseArray, self.currentSignalStartTime)
 		result = self.neuralSignalRecognizer.calculate()
-		print(self.neuralSignalRecognizer)
 
-		self.temperature = self.neuralSignalRecognizer.averageTemperature.getValue()
-		self.humidity = self.neuralSignalRecognizer.averageHumidity.getValue()
+		if result:
+			self.humidity = self.neuralSignalRecognizer.NeuralHumidity
+			self.temperature = self.neuralSignalRecognizer.NeuralTemperature
+   
+		self.average_temperature = self.neuralSignalRecognizer.averageTemperature.getValue()
+		self.average_humidity = self.neuralSignalRecognizer.averageHumidity.getValue()
 
-		return  { "binary": "TESTING NEURAL",
+		return  { "binary": "{0} {1} {2}".format(bin(int(self.neuralSignalRecognizer.NeuralHumidity.value * 10)), bin(int(self.neuralSignalRecognizer.NeuralTemperature.value * 10), bin(self.neuralSignalRecognizer.NeuralChecksum.value))),
 				"result": "OK" if result else "ERROR",
 				"checksum": self.checksum,
 				"calculated_checksum": self.calculated_checksum,
 				"temperature": self.temperature,
 				"humidity": self.humidity,
-    			"avg_temperature": self.temperature,
-				"avg_humidity": self.humidity
+    			"avg_temperature": self.average_temperature,
+				"avg_humidity": self.average_humidity
 				}
 
 		
