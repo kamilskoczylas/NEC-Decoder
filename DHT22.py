@@ -225,11 +225,11 @@ class NeuralValidator():
 		if (average_measure_minus_last_reading > 0):
 			# some bits read might be  missing
 			self.value = ((int_last_reading & 255) & checksum_read_minus_checksum_calculated) / 255 + (((int_last_reading & 1792) >> 8) & checksum_read_minus_checksum_calculated) / 8
-			self.correcting_value_mask = [1 if int_last_reading & (checksum_read_minus_checksum_calculated | (checksum_read_minus_checksum_calculated << 8)) & (1 >> (i % 8)) > 0 else 0 for i in range (0, 16)]
+			self.correcting_value_mask = [1 if (checksum_read_minus_checksum_calculated | (checksum_read_minus_checksum_calculated << 8)) & (1 >> i) != int_last_reading & (1 >> i) else 0 for i in range (0, 16)]
 		else:
 			# some bits read might be set too high
 			self.value = ((int_last_reading & 255) & checksum_calculated_minus_checksum) / 255 + (((int_last_reading & 1792) >> 8) & checksum_calculated_minus_checksum) / 8
-			self.correcting_value_mask = [1 if int_last_reading & (checksum_calculated_minus_checksum | (checksum_calculated_minus_checksum << 8)) & (1 >> (i % 8)) > 0 else 0 for i in range (0, 16)]
+			self.correcting_value_mask = [1 if (checksum_calculated_minus_checksum | (checksum_calculated_minus_checksum << 8)) & (1 >> (i % 8)) != int_last_reading & (1 >> i) else 0 for i in range (0, 16)]
    
 		return self.value
 
@@ -366,6 +366,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 				if self.DEBUG:
 					print("ATTEMPT: {0}".format(iteration))
 					print("Checksum stability: {0}".format(self.NeuralChecksumValidator.value))
+					print(self)
 
 				if self.NeuralTemperatureValidator.value > self.NeuralHumidityValidator.value:
 					self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, self.NeuralTemperatureValidator.correcting_value_mask)
