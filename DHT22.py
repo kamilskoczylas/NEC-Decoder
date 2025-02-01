@@ -206,6 +206,7 @@ class NeuralValidator():
 	
 	def __init__(self, DEBUG = False):
 		self.correcting_value_mask = [0] * 16
+		self.value = 0
 		self.DEBUG = DEBUG
 		pass
 
@@ -248,7 +249,8 @@ class NeuralValidator():
 				if not checksum_calculated_minus_checksum & (1 >> (i % 8)) and (int_last_reading & (1 >> i)):
 					calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
 					self.correcting_value_mask[i] = 1
-     
+
+		self.value = calculated_value
 		return calculated_value
 
    
