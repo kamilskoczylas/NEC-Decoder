@@ -202,13 +202,9 @@ class NeuralChecksum(NeuralValue):
 			self.neuralBits[i].load(neuralFactors)
 
 
-class NeuralValidator(NeuralBoolean):
+class NeuralValidator():
 	
 	def __init__(self):
-		super(NeuralValidator, self).__init__(0)
-		self.addFactor(DHT22DifferenceFromAverageValueValidator(0, 1))
-		self.addFactor(DHT22DifferenceChecksumValidator(0, 1))
-
 		self.correcting_value_mask = [0] * 16
 		pass
 
@@ -217,12 +213,6 @@ class NeuralValidator(NeuralBoolean):
 		average_measure_minus_last_reading = average_measure - last_reading
 		checksum_read_minus_checksum_calculated = checksum_read - checksum_calculated
 		checksum_calculated_minus_checksum = checksum_calculated - checksum_read
-  
-		self.updateFactorValue(DHT22DifferenceFromAverageValueValidator, average_measure_minus_last_reading)
-		self.updateFactorValue(DHT22DifferenceChecksumValidator, checksum_read_minus_checksum_calculated)
-  
-		average_measure_minus_last_reading, avg_factor = self.getValueFactorByClass(DHT22DifferenceFromAverageValueValidator)
-		checksum_read_minus_checksum_calculated, chk_factor = self.getValueFactorByClass(DHT22DifferenceChecksumValidator)
 
 		# Calculate probability that the difference in checksum is result of the difference in average reading
 		int_last_reading = 0
