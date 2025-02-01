@@ -242,8 +242,8 @@ class NeuralValidator():
 			# some bits read might be  missing
 		average_measure_covering = abs(average_measure_minus_last_reading)
   
-		for i in range(0, 10):
-			if abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8)):
+		for i in range(0, 16):
+			if (i < 10 or i == 15) and (abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8))):
 				calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
 				self.correcting_value_mask[i] = ((100 - min(stability_bits_array[i], 100)) / 100)
 			else:
