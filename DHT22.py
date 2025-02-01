@@ -239,10 +239,14 @@ class NeuralValidator():
 		# see how many different bits falls into difference in average temperature
 		#if (average_measure_minus_last_reading > 0):
 			# some bits read might be  missing
+		average_measure_covering = 0
+		if abs(checksum_read_minus_checksum_calculated) > 0:
+			average_measure_covering = abs(average_measure_minus_last_reading * 10) / abs(checksum_read_minus_checksum_calculated)
+  
 		for i in range(0, 10):
 			if checksum_read_minus_checksum_calculated & (1 << (i % 8)) > 0:
 				calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
-				self.correcting_value_mask[i] = 1
+				self.correcting_value_mask[i] = ((100 - min(stability_bits_array[i], 100)) / 100)
 		#else:
 			# some bits read might be set too high
 		#	for i in range(0, 10):
@@ -250,7 +254,7 @@ class NeuralValidator():
 		#			calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
 		#			self.correcting_value_mask[i] = 1
 
-		self.value = calculated_value
+		self.value = calculated_value * average_measure_covering
 		return calculated_value
 
    
