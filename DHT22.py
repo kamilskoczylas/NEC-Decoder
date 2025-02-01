@@ -270,7 +270,7 @@ class NeuralValidator():
 class NeuralChecksumValidator():
 	def calculate(self, checksum_read, checksum_calculated, checksum_stability):
 		self.value = checksum_stability * min((8 - bin(256 - (checksum_calculated - checksum_read)).count('1')), (8 - bin(checksum_calculated - checksum_read).count('1')))
-		return checksum_stability > 0.8
+		return self.value > 0.8
 
 	
 
