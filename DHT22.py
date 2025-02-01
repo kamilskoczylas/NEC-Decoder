@@ -242,7 +242,7 @@ class NeuralValidator():
 			# some bits read might be  missing
 		average_measure_covering = 0
 		if abs(checksum_read_minus_checksum_calculated) > 0:
-			average_measure_covering = abs(average_measure_minus_last_reading * 10) / abs(checksum_read_minus_checksum_calculated)
+			average_measure_covering = abs(average_measure_minus_last_reading)
   
 		for i in range(0, 10):
 			if abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8)):
