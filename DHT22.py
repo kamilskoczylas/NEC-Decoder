@@ -35,7 +35,7 @@ class BasicMeasure:
 
 class DHT22PulseLength(SingleNeuralFactor):
 
-	PULSE_ERROR_MAX_RANGE = 0.000060
+	PULSE_ERROR_MAX_RANGE = 0.000044
 	PULSE_POSITIVE_LENGTH = 0.000120
 	PULSE_NEGATIVE_LENGTH = 0.000076
 
@@ -62,7 +62,7 @@ class DHT22PulseLength(SingleNeuralFactor):
 
 class DHT22PulseLengthLeft(SingleNeuralFactor):
 
-	PULSE_ERROR_MAX_RANGE = 0.000060
+	PULSE_ERROR_MAX_RANGE = 0.000044
 	PULSE_POSITIVE_LENGTH = 0.000120
 	PULSE_NEGATIVE_LENGTH = 0.000076
 
@@ -245,7 +245,7 @@ class NeuralValidator():
 			average_measure_covering = abs(average_measure_minus_last_reading * 10) / abs(checksum_read_minus_checksum_calculated)
   
 		for i in range(0, 10):
-			if checksum_read_minus_checksum_calculated & (1 << (i % 8)) > 0:
+			if abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8)):
 				calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
 				self.correcting_value_mask[i] = ((100 - min(stability_bits_array[i], 100)) / 100)
 			else:
