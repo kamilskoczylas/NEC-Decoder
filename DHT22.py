@@ -247,6 +247,8 @@ class NeuralValidator():
 			if checksum_read_minus_checksum_calculated & (1 << (i % 8)) > 0:
 				calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
 				self.correcting_value_mask[i] = ((100 - min(stability_bits_array[i], 100)) / 100)
+			else:
+				self.correcting_value_mask[i] = 0
 		#else:
 			# some bits read might be set too high
 		#	for i in range(0, 10):
