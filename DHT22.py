@@ -257,11 +257,12 @@ class NeuralValidator():
 
 		if self.DEBUG:
 			print(self.name)
-			print("Calculated value: {0}".format(calculated_value))
+			print("Value: {0}".format(self.value))
+			print("Calculated by stability: {0}".format(calculated_value))
 			print("Difference from average Measure: = {0}".format(average_measure_covering))
    
 		self.value = calculated_value * average_measure_covering
-		return calculated_value
+		return self.value
 
    
 
