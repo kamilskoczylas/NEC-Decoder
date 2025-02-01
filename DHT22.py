@@ -240,7 +240,7 @@ class NeuralValidator():
 		#if (average_measure_minus_last_reading > 0):
 			# some bits read might be  missing
 		for i in range(0, 10):
-			if (checksum_read_minus_checksum_calculated & (1 << (i % 8)) != (int_last_reading & (1 << i))):
+			if checksum_read_minus_checksum_calculated & (1 << (i % 8)) > 0:
 				calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
 				self.correcting_value_mask[i] = 1
 		#else:
