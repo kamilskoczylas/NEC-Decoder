@@ -243,8 +243,8 @@ class NeuralValidator():
   
 		for i in range(0, 16):
 			if (i < 10 or i == 15) and (abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8))):
-				calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
-				self.correcting_value_mask[i] = ((100 - min(stability_bits_array[i], 100)) / 100)
+				calculated_value = calculated_value + pow((100 - min(stability_bits_array[i], 100)) / 50)
+				self.correcting_value_mask[i] = pow((100 - min(stability_bits_array[i], 100)) / 50)
 			else:
 				self.correcting_value_mask[i] = 0
 		#else:
