@@ -216,8 +216,12 @@ class NeuralValidator():
 		checksum_calculated_minus_checksum = checksum_calculated - checksum_read
 
 		if self.DEBUG:
-			print("Checksum read: {0}".format(bin(checksum_read)))
+			print("Checksum read: {0}".format(checksum_read))
 			print("Calculated checksum = {0}".format(checksum_calculated))
+			print("checksum_read_minus_checksum_calculated = {0}".format(checksum_read_minus_checksum_calculated))
+			print("checksum_calculated_minus_checksum = {0}".format(checksum_calculated_minus_checksum))
+			print("")
+			print("Checksum read: {0}".format(bin(checksum_read)))
 			print("Calculated checksum bin= {0}".format(bin(checksum_calculated)))
 			print("checksum_read_minus_checksum_calculated bin= {0}".format(bin(checksum_read_minus_checksum_calculated)))
 			print("checksum_calculated_minus_checksum bin= {0}".format(bin(checksum_calculated_minus_checksum)))
