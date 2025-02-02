@@ -360,7 +360,6 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		if len(inputTimeBuffer) != 40:
 			print("Invalid length")
 			return
-
 		
 		self.NeuralHumidity.load(inputTimeBuffer[0:16])
 		self.NeuralTemperature.load(inputTimeBuffer[16:32])
@@ -457,6 +456,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 						print(self.NeuralTemperatureValidator.getCorrectingChecksumMask())
 						print("using checksum factors")
 						print(self.NeuralTemperatureValidator.getCorrectingChecksumValueMask())
+						print(self)
 
 				else:
 					self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, self.NeuralHumidityValidator.getCorrectingChecksumMask())
@@ -472,6 +472,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 						print(self.NeuralHumidityValidator.getCorrectingChecksumMask())
 						print("using checksum factors")
 						print(self.NeuralHumidityValidator.getCorrectingChecksumValueMask())
+						print(self)
 
 
 				success = self.calculate_all_values(iteration)
