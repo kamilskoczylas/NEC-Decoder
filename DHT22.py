@@ -216,7 +216,9 @@ class NeuralValidator():
      
 		average_measure_minus_last_reading = average_measure - last_reading
 		checksum_read_minus_checksum_calculated = checksum_read - checksum_calculated
-		checksum_calculated_overflow = 256 - checksum_calculated - checksum_read
+		checksum_calculated_overflow = 256 - checksum_read_minus_checksum_calculated
+
+
 
 		if self.DEBUG:
 			print("Checksum read: {0}".format(checksum_read))
@@ -397,7 +399,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 					print(self)
 
 				# Need to wait for the average measures to perform corrections based on these values
-				if self.averageHumidity.results.count > 2 and self.averageTemperature.results.count > 2:
+				if len(self.averageHumidity.results) > 2 and len(self.averageTemperature.results) > 2:
         
 					if self.NeuralTemperatureValidator.value > self.NeuralHumidityValidator.value:
 						self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, self.NeuralTemperatureValidator.correcting_value_mask)
