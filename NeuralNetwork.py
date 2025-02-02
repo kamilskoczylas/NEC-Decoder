@@ -152,12 +152,7 @@ class NeuralValue(ABC):
 			for j, neuralFactor in enumerate(self.neuralBits[i].neuralFactors):
 				lines[j * 2] += "{:4.1f}|".format(neuralFactor.value)
 				lines[j * 2 + 1] += "{:4.1f}|".format(neuralFactor.factor)
-	
-			
-	
-			return line1 + "\n" + line2 + "\n" + line3
 
-			
 		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line4 + "\n" + ("\n".join(lines)) + line1 + "\n"
 
 	def load(self, neuralFactorsList):
