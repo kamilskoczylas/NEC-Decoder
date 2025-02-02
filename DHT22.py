@@ -391,7 +391,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 					print(self)
 
 				# Need to wait for the average measures to perform corrections based on these values
-				if len(self.averageHumidity.results) > 2 and len(self.averageTemperature.results) > 2:
+				if self.averageHumidity.getValue() > 0:
         
 					if self.NeuralTemperatureValidator.value > self.NeuralHumidityValidator.value:
 						self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, self.NeuralTemperatureValidator.correcting_value_mask)
