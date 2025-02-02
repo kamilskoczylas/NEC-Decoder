@@ -219,12 +219,16 @@ class NeuralValidator():
 		checksum_read_minus_checksum_calculated = checksum_read - checksum_calculated
 		checksum_calculated_overflow = 256 - checksum_read_minus_checksum_calculated
 
+		closest_checksum_difference = checksum_calculated_overflow if bin(checksum_read_minus_checksum_calculated).count('1') > bin(checksum_calculated_overflow).count('1') else checksum_read_minus_checksum_calculated
+
 
 
 		if self.DEBUG:
 			print("Checksum read: {0}".format(checksum_read))
 			print("Calculated checksum = {0}".format(checksum_calculated))
 			print("checksum_read_minus_checksum_calculated = {0}".format(checksum_read_minus_checksum_calculated))
+			print("closest_checksum_difference = {0}".format(closest_checksum_difference))
+   
 			#print("")
 			#print("Checksum read: {0}".format(bin(checksum_read)))
 			#print("Calculated checksum bin= {0}".format(bin(checksum_calculated)))
@@ -247,7 +251,7 @@ class NeuralValidator():
 		average_measure_covering = abs(average_measure_minus_last_reading)
   
 		for i in range(0, 16):
-			if (i < 10 or (i == 15 and self.is_signed)) and (abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8))):
+			if (i < 10 or (i == 15 and self.is_signed)) and (abs(closest_checksum_difference) & (1 << (i % 8))):
 				stability_points = pow(((1 - min(stability_bits_array[i], 1)) * 10), 2)
 				calculated_value = calculated_value + stability_points
 				self.correcting_average_value_mask[i] = 1 if int_average_reading & (1 << i) > 0 else 0
@@ -256,7 +260,6 @@ class NeuralValidator():
 				self.correcting_average_value_mask[i] = 0
 				self.correcting_checksum_factors_mask[i] = 0
 
-		# Experimental parameter / 10 might be Machine Learning in the future
 		self.value = calculated_value * average_measure_covering
 		if self.DEBUG:
 			print(self.name)
