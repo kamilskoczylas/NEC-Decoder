@@ -204,11 +204,12 @@ class NeuralChecksum(NeuralValue):
 
 class NeuralValidator():
 	
-	def __init__(self, name, DEBUG = False):
+	def __init__(self, name, is_signed = True, DEBUG = False):
 		self.correcting_value_mask = [0] * 16
 		self.value = 0
 		self.name = name
 		self.DEBUG = DEBUG
+		self.is_signed = is_signed
 		pass
 
 	def calculate(self, average_measure, last_reading, checksum_calculated, checksum_read, stability_bits_array):
@@ -242,7 +243,7 @@ class NeuralValidator():
 		average_measure_covering = abs(average_measure_minus_last_reading) / 10
   
 		for i in range(0, 16):
-			if (i < 10 or i == 15) and (abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8))):
+			if (i < 10 or (i == 15 and self.is_signed)) and (abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8))):
 				calculated_value = calculated_value + pow((1 - min(stability_bits_array[i], 1) * 10) , 2)
 				self.correcting_value_mask[i] = pow((1 - min(stability_bits_array[i], 1) * 10), 2)
 			else:
@@ -304,8 +305,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.NeuralHumidity = NeuralHumidity(self.averageHumidity.measure)
 		self.NeuralChecksum = NeuralChecksum()
 
-		self.NeuralTemperatureValidator = NeuralValidator("Temperature", self.DEBUG)
-		self.NeuralHumidityValidator = NeuralValidator("Humidity", self.DEBUG)
+		self.NeuralTemperatureValidator = NeuralValidator("Temperature", is_signed=True, DEBUG=self.DEBUG)
+		self.NeuralHumidityValidator = NeuralValidator("Humidity", is_signed=False, DEBUG=self.DEBUG)
 		self.NeuralChecksumValidator = NeuralChecksumValidator()
 		pass
 
@@ -339,14 +340,6 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			print("Attempt: {0}: SUCCESS: {1}°C, {2}%".format(iteration, self.averageTemperature.getValue(), self.averageHumidity.getValue()))
 		pass
 
-	def get_checksum_bit_differences_value(self):
-		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
-		differences_should_be_lower = calculated_checksum ^ self.NeuralChecksum.value & self.NeuralChecksum.value
-		differences_should_be_higher = ~calculated_checksum ^ self.NeuralChecksum.value & calculated_checksum
-  
-		
-		return differences_should_be_lower, differences_should_be_higher
-
 	def validate(self):
 		calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
 		return calculated_checksum == self.NeuralChecksum.value
@@ -376,7 +369,6 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 	def calculate(self):
 		# First level - just calculate the data from DHT22, if it match checksum, fine
-		# TODO: check  and stability > 90%
 		self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, [0] * 16)
 		self.NeuralHumidity.updateFactorsFactor(DHT22PulseLength, [1] * 16)
 		self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, [0] * 16)
