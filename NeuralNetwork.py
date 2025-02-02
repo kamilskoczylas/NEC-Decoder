@@ -21,7 +21,10 @@ class SingleNeuralFactor():
 		pass
 
 	def __str__(self):
-		return "Name: {0}, stability: {1}, value {2}, factor {3}\n".format(self.name, self.stability, self.value, self.factor)
+		line1 = "{:4.1f}|".format(self.value)
+		line2 = "{:4.1f}|".format(self.factor)
+		#line3 = "{:4.0f}|".format(self.stability * 100)
+		return  line1 + "\n" + line2
 
 	def calculate(self):
 		return self.value * self.factor
@@ -42,10 +45,16 @@ class NeuralBoolean():
 		self.neuralFactors = []
 
 	def __str__(self):
-		result = "value: {0}, stability: {1}\n".format(self.value, self.stability)
+		line1 = "{:4.1f}|".format(self.value)
+		line2 = ""
+  
 		for neuralFactor in self.neuralFactors:
-			result += str(neuralFactor)
-		return result
+			line2 += str(neuralFactor)
+   
+		line3 = "{:4.0f}|".format(self.stability * 100)
+  
+		return line1 + "\n" + line2 + "\n" + line3
+
 
 	def load(self, neuralFactors):
 		self.neuralFactors = neuralFactors
@@ -131,12 +140,9 @@ class NeuralValue(ABC):
 			neuralBit = self.neuralBits[self.max_bits -1 - i]
 			line1 += "-----"
 			line2 += " {:3}|".format(i)
+			line3 += str(neuralBit)
 
-			if i < self.value_bits or (i == self.max_bits - 1 and self.is_signed):
-				line3 += "{:4.1f}|".format(neuralBit.value)
-			else:
-				line3 += "  - |".format(neuralBit.value)
-			line4 += "{:4.0f}|".format(neuralBit.stability * 100)
+			
 		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line4 + "\n" + line1 + "\n"
 
 	def load(self, neuralFactorsList):
