@@ -139,8 +139,8 @@ class NeuralValue(ABC):
 
 		lines = []
 		for neuralFactor in self.neuralBits[0].neuralFactors:
-			lines.append("|" + neuralFactor.name[:2] + "v|")
-			lines.append("|" + neuralFactor.name[:4] + "f|")
+			lines.append("|" + neuralFactor.name[:3] + "V|")
+			lines.append("|" + neuralFactor.name[:3] + "F|")
   
 		for i in range(self.max_bits - 1, -1, -1):
 			neuralBit = self.neuralBits[self.max_bits -1 - i]
@@ -153,7 +153,7 @@ class NeuralValue(ABC):
 				lines[j * 2] += "{:4.1f}|".format(neuralFactor.value)
 				lines[j * 2 + 1] += "{:4.1f}|".format(neuralFactor.factor)
 
-		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line4 + "\n" + ("\n".join(lines)) + line1 + "\n"
+		return result + line1 + "\n" + line2 + "\n" + line3 + "\n" + line4 + "\n" + ("\n".join(lines)) + "\n" + line1 + "\n"
 
 	def load(self, neuralFactorsList):
 		for i in range(0, self.max_bits):
