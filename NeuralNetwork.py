@@ -150,8 +150,8 @@ class NeuralValue(ABC):
 			line4 += "{:4.0f}|".format(neuralBit.stability * 100)
    
 			for j, neuralFactor in enumerate(self.neuralBits[i].neuralFactors):
-				lines[j * 2] += "{:4.1f}|".format(self.value)
-				lines[j * 2 + 1] += "{:4.1f}|".format(self.factor)
+				lines[j * 2] += "{:4.1f}|".format(neuralFactor.value)
+				lines[j * 2 + 1] += "{:4.1f}|".format(neuralFactor.factor)
 	
 			
 	
