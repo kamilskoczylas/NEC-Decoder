@@ -273,7 +273,7 @@ class NeuralValidator():
 			# When we need to add a missing bit
 			if (i < 10 or (i == 15 and self.is_signed)):
 				if correcting_method == "add_bits":
-					if (abs(average_measure_minus_last_reading) & (1 << (i % 8))):
+					if (abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8))):
 						stability_points = pow(((1 - min(stability_bits_array[i], 1)) * 10), 2)
 						calculated_value = calculated_value + stability_points
 						self.correcting_average_value_mask[i] = 1 if int_average_reading & (1 << i) > 0 else 0
