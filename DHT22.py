@@ -205,7 +205,8 @@ class NeuralChecksum(NeuralValue):
 class NeuralValidator():
 	
 	def __init__(self, name, is_signed = True, DEBUG = False):
-		self.correcting_value_mask = [0] * 16
+		self.correcting_average_value_mask = [0] * 16
+		self.correcting_checksum_factors_mask = [0] * 16
 		self.value = 0
 		self.name = name
 		self.DEBUG = DEBUG
@@ -224,10 +225,10 @@ class NeuralValidator():
 			print("Checksum read: {0}".format(checksum_read))
 			print("Calculated checksum = {0}".format(checksum_calculated))
 			print("checksum_read_minus_checksum_calculated = {0}".format(checksum_read_minus_checksum_calculated))
-			print("")
-			print("Checksum read: {0}".format(bin(checksum_read)))
-			print("Calculated checksum bin= {0}".format(bin(checksum_calculated)))
-			print("checksum_read_minus_checksum_calculated bin= {0}".format(bin(checksum_read_minus_checksum_calculated)))
+			#print("")
+			#print("Checksum read: {0}".format(bin(checksum_read)))
+			#print("Calculated checksum bin= {0}".format(bin(checksum_calculated)))
+			#print("checksum_read_minus_checksum_calculated bin= {0}".format(bin(checksum_read_minus_checksum_calculated)))
 
 		# Calculate probability that the difference in checksum is result of the difference in average reading
 		int_last_reading = 0
@@ -236,6 +237,12 @@ class NeuralValidator():
 		else:
 			int_last_reading = int(-last_reading * 10) | (1 << 16)
 
+		int_average_reading = 0
+		if average_measure >= 0:
+			int_average_reading = int(average_measure * 10)
+		else:
+			int_average_reading = int(-average_measure * 10) | (1 << 16)
+
 		calculated_value = 0
 		average_measure_covering = abs(average_measure_minus_last_reading)
   
@@ -243,9 +250,11 @@ class NeuralValidator():
 			if (i < 10 or (i == 15 and self.is_signed)) and (abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8))):
 				stability_points = pow(((1 - min(stability_bits_array[i], 1)) * 10), 2)
 				calculated_value = calculated_value + stability_points
-				self.correcting_value_mask[i] = stability_points
+				self.correcting_average_value_mask[i] = 1 if int_average_reading & (1 << i) > 0 else 0
+				self.correcting_checksum_factors_mask[i] = stability_points
 			else:
-				self.correcting_value_mask[i] = 0
+				self.correcting_average_value_mask[i] = 0
+				self.correcting_checksum_factors_mask[i] = 0
 
 		# Experimental parameter / 10 might be Machine Learning in the future
 		self.value = calculated_value * average_measure_covering
@@ -253,7 +262,7 @@ class NeuralValidator():
 			print(self.name)
 			print("Value: {0}".format(self.value))
 			print("Calculated by stability: {0}".format(calculated_value))
-			print(stability_bits_array)
+			#print(stability_bits_array)
 			print("Difference from average Measure: = {0}".format(average_measure_covering))
    
 		return self.value
@@ -389,23 +398,34 @@ class NeuralSignalRecognizer(NeuralCalculation):
 					print("ATTEMPT: {0}".format(iteration))
 					print("Checksum stability: {0}".format(self.NeuralChecksumValidator.value))
 					print(self)
-
-				# Need to wait for the average measures to perform corrections based on these values
-				if self.averageHumidity.getValue() > 0:
         
 					if self.NeuralTemperatureValidator.value > self.NeuralHumidityValidator.value:
-						self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, self.NeuralTemperatureValidator.correcting_value_mask)
+						self.NeuralTemperature.updateFactorsFactor(DHT22Checksum, self.NeuralTemperatureValidator.correcting_checksum_factors_mask)
+      
+						# Need to wait for the average measures to perform corrections based on these values
+						if self.averageHumidity.getValue() > 0:
+							self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, self.NeuralTemperatureValidator.correcting_average_value_mask)
 		
 						if self.DEBUG:
 							print("Correcting temperature")
-							print(self.NeuralTemperatureValidator.correcting_value_mask)
-							
+							print("Correcting using average factors")
+							print(self.NeuralTemperatureValidator.correcting_average_value_mask)
+							print("Correcting using checksum factors")
+							print(self.NeuralTemperatureValidator.correcting_checksum_factors_mask)
 
 					else:
-						self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, self.NeuralHumidityValidator.correcting_value_mask)
+						self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, self.NeuralHumidityValidator.correcting_checksum_factors_mask)
+      
+						# Need to wait for the average measures to perform corrections based on these values
+						if self.averageHumidity.getValue() > 0:
+							self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, self.NeuralHumidityValidator.correcting_average_value_mask)
+       
 						if self.DEBUG:
 							print("Correcting humidity")
-							print(self.NeuralHumidityValidator.correcting_value_mask)
+							print("Correcting using average factors")
+							print(self.NeuralHumidityValidator.correcting_average_value_mask)
+							print("Correcting using checksum factors")
+							print(self.NeuralHumidityValidator.correcting_checksum_factors_mask)
 
 
 				success = self.calculate_all_values(iteration)
