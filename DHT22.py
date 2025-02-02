@@ -153,8 +153,8 @@ class NeuralReading(NeuralValue):
 	value_hi = 0
 	value_low = 0
 	
-	def __init__(self, name, averageValue: BasicMeasure):
-		super(NeuralReading, self).__init__(name, 16, True, 10, True)
+	def __init__(self, name, averageValue: BasicMeasure, isSigned = True):
+		super(NeuralReading, self).__init__(name, 16, isSigned, 10, True)
 		self.averageValue = averageValue
 
 	def load(self, pulseLengthArray):
@@ -253,15 +253,14 @@ class NeuralValidator():
 		#		if not checksum_calculated_minus_checksum & (1 << (i % 8)) and (int_last_reading & (1 << i)):
 		#			calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
 		#			self.correcting_value_mask[i] = 1
-
-
+   
+		self.value = calculated_value * average_measure_covering
 		if self.DEBUG:
 			print(self.name)
 			print("Value: {0}".format(self.value))
 			print("Calculated by stability: {0}".format(calculated_value))
 			print("Difference from average Measure: = {0}".format(average_measure_covering))
    
-		self.value = calculated_value * average_measure_covering
 		return self.value
 
    
@@ -288,7 +287,7 @@ class NeuralTemperature(NeuralReading):
 class NeuralHumidity(NeuralReading):
 	
 	def __init__(self, linkedAverageMeasure):
-		super(NeuralHumidity, self).__init__("Humidity", linkedAverageMeasure)
+		super(NeuralHumidity, self).__init__("Humidity", linkedAverageMeasure, False)
 		pass
 
 	def calculate(self):
@@ -378,6 +377,13 @@ class NeuralSignalRecognizer(NeuralCalculation):
 	def calculate(self):
 		# First level - just calculate the data from DHT22, if it match checksum, fine
 		# TODO: check  and stability > 90%
+		self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, [0] * 16)
+		self.NeuralHumidity.updateFactorsFactor(DHT22PulseLength, [1] * 16)
+		self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, [0] * 16)
+
+		self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, [0] * 16)
+		self.NeuralTemperature.updateFactorsFactor(DHT22PulseLength, [1] * 16)
+		self.NeuralTemperature.updateFactorsFactor(DHT22Checksum, [0] * 16)
   
 		success = self.calculate_all_values()
   
