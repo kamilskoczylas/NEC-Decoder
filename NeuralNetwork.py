@@ -132,19 +132,19 @@ class NeuralValue(ABC):
 	def __str__(self):
 		result = "{0}\n".format(self.name)
 		result += "{0}, HI: {1}, LOW: {2}\n".format(self.value, self.value >> 8, self.value & 255)	
-		line1 = "------"
-		line2 = "| bit |"
-		line3 = "| val |"
-		line4 = "| ..% |"
+		line1 = "---------"
+		line2 = "| bit   |"
+		line3 = "| value |"
+		line4 = "| OK..% |"
 
 		lines = []
 		for neuralFactor in self.neuralBits[0].neuralFactors:
-			lines.append("|" + neuralFactor.name[:3] + "V|")
-			lines.append("|" + neuralFactor.name[:3] + "F|")
+			lines.append("|" + neuralFactor.name[:6] + "V|")
+			lines.append("|" + neuralFactor.name[:6] + "F|")
   
 		for i in range(self.max_bits - 1, -1, -1):
 			neuralBit = self.neuralBits[self.max_bits -1 - i]
-			line1 += "-----"
+			line1 += "-------"
 			line2 += " {:3}|".format(i)
 			line3 += "{:4.1f}|".format(neuralBit.value)
 			line4 += "{:4.0f}|".format(neuralBit.stability * 100)
