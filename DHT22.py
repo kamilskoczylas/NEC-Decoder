@@ -422,7 +422,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.NeuralHumidity.updateFactorsFactor(DHT22PulseLength, [1] * 16)
 		self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, [0] * 16)
 
-		self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, [0] * 16)
+		self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, [0.2] * 16)
 		self.NeuralTemperature.updateFactorsFactor(DHT22PulseLength, [1] * 16)
 		self.NeuralTemperature.updateFactorsFactor(DHT22Checksum, [0] * 16)
   
