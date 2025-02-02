@@ -132,7 +132,7 @@ class NeuralValue(ABC):
 		for i in range(self.max_bits - 1, -1, -1):
 			neuralBit = self.neuralBits[self.max_bits -1 - i]
 			line1 += "-----"
-			line2 += " {:3}|".format(self.max_bits - i)
+			line2 += " {:3}|".format(i)
 
 			if i < self.value_bits or (i == self.max_bits - 1 and self.is_signed):
 				line3 += "{:4.1f}|".format(neuralBit.value)
