@@ -418,10 +418,14 @@ class NeuralSignalRecognizer(NeuralCalculation):
 	def calculate(self):
 		# First level - just calculate the data from DHT22, if it match checksum, fine
 		self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, [0] * 16)
+		self.NeuralHumidity.updateFactorsValue(DHT22AverageValue, self.averageHumidity.getRawValue())
+  
 		self.NeuralHumidity.updateFactorsFactor(DHT22PulseLength, [1] * 16)
 		self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, [0] * 16)
 
 		self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, [0.2] * 16)
+		self.NeuralTemperature.updateFactorsValue(DHT22AverageValue, self.averageTemperature.getRawValue())
+  
 		self.NeuralTemperature.updateFactorsFactor(DHT22PulseLength, [1] * 16)
 		self.NeuralTemperature.updateFactorsFactor(DHT22Checksum, [0] * 16)
   
@@ -522,6 +526,15 @@ class AverageValue:
 		if self.DEBUG:
 			print("+ {0} = {1} / {2} = {3}".format(measure.value, self.sum, len(self.results), self.measure.value))
 		pass
+
+	def getRawValue(self):
+		raw_value = self.getValue()
+		if raw_value > 0:
+			raw_value = int(raw_value * 10)
+		else:
+			raw_value = 1024 - int(raw_value * 10) | 1 << 16
+   
+		return raw_value
 
 	def getValue(self):
 		divider = len(self.results)
