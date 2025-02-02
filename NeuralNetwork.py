@@ -37,16 +37,13 @@ class NeuralBoolean():
 	value = 0
 	pulseLength = 0
 	previousPulseLengthLeft = 0
-	bitNumber = 0
 
-	def __init__(self, bitNumber):
-		self.bitNumber = bitNumber
+	def __init__(self):
 		self.neuralFactors = []
 
 		print(self)
 
 	def __str__(self):
-		result = "BIT: {0}\n".format(self.bitNumber)
 		result += "value: {0}, stability: {1}\n".format(self.value, self.stability)
 		for neuralFactor in self.neuralFactors:
 			result += str(neuralFactor)
@@ -122,11 +119,8 @@ class NeuralValue(ABC):
   
 		for i in range(0, max_bits):
 			self.neuralBits.append(
-				NeuralBoolean(max_bits - i - 1)
+				NeuralBoolean()
 			)
-   
-		print("{0}: {1}".format(name, max_bits))
-		print(self.neuralBits)
 
 	def __str__(self):
 		result = "{0}\n".format(self.name)
@@ -135,12 +129,12 @@ class NeuralValue(ABC):
 		line2 = "| bit |"
 		line3 = "| val |"
 		line4 = "| ..% |"
-		for neuralBit in self.neuralBits:
+		for i, neuralBit in enumerate(self.neuralBits):
 			# result += str(neuralBit)
 			line1 += "-----"
-			line2 += " {:3}|".format(neuralBit.bitNumber)
+			line2 += " {:3}|".format(i)
 
-			if neuralBit.bitNumber < self.value_bits or (neuralBit.bitNumber == self.max_bits - 1 and self.is_signed):
+			if i < self.value_bits or (i == self.max_bits - 1 and self.is_signed):
 				line3 += "{:4.1f}|".format(neuralBit.value)
 			else:
 				line3 += "  - |".format(neuralBit.value)
@@ -153,7 +147,7 @@ class NeuralValue(ABC):
 		pass
 
 	def getBit(self, number: int):
-		return self.neuralBits[(self.max_bits - 1) - number]
+		return self.neuralBits[number]
 
 	def getStabilityBitArray(self):
 		stability = [0] * self.max_bits
@@ -187,12 +181,12 @@ class NeuralValue(ABC):
 		for i in range(0, self.max_bits):
 			self.neuralBits[i].calculate()	
 		for i in range(0, self.max_bits):
-			if self.neuralBits[i].bitNumber < self.value_bits or (i == 0 and self.is_signed):
+			if i < self.value_bits or (i == self.max_bits - 1 and self.is_signed):
 				if round(self.neuralBits[i].value) == 1:
-					if i == 0 and self.is_signed:
+					if i == i == self.max_bits - 1 and self.is_signed:
 						multiply_by = -1
 					else:
-						self.value += 1 << (self.max_bits - 1 - i)
+						self.value += 1 << i
 		if self.minus_negative and multiply_by == -1:
 			self.value = multiply_by * ((1 << self.value_bits) - self.value)
 		else:
