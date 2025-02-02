@@ -144,7 +144,7 @@ class NeuralValue(ABC):
   
 		for i in range(self.max_bits - 1, -1, -1):
 			neuralBit = self.neuralBits[self.max_bits -1 - i]
-			line1 += "-------"
+			line1 += "-----"
 			line2 += " {:3}|".format(i)
 			line3 += "{:4.1f}|".format(neuralBit.value)
 			line4 += "{:4.0f}|".format(neuralBit.stability * 100)
