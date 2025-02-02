@@ -237,10 +237,7 @@ class NeuralValidator():
 			int_last_reading = int(-last_reading * 10) | (1 << 16)
 
 		calculated_value = 0
-
-		
-		# Experimental parameter / 10 might be Machine Learning in the future
-		average_measure_covering = abs(average_measure_minus_last_reading) / 10
+		average_measure_covering = abs(average_measure_minus_last_reading)
   
 		for i in range(0, 16):
 			if (i < 10 or (i == 15 and self.is_signed)) and (abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8))):
@@ -249,13 +246,8 @@ class NeuralValidator():
 				self.correcting_value_mask[i] = stability_points
 			else:
 				self.correcting_value_mask[i] = 0
-		#else:
-			# some bits read might be set too high
-		#	for i in range(0, 10):
-		#		if not checksum_calculated_minus_checksum & (1 << (i % 8)) and (int_last_reading & (1 << i)):
-		#			calculated_value = calculated_value + ((100 - min(stability_bits_array[i], 100)) / 100)
-		#			self.correcting_value_mask[i] = 1
-   
+
+		# Experimental parameter / 10 might be Machine Learning in the future
 		self.value = calculated_value * average_measure_covering
 		if self.DEBUG:
 			print(self.name)
