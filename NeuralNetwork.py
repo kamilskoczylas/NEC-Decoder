@@ -44,7 +44,7 @@ class NeuralBoolean():
 		print(self)
 
 	def __str__(self):
-		result += "value: {0}, stability: {1}\n".format(self.value, self.stability)
+		result = "value: {0}, stability: {1}\n".format(self.value, self.stability)
 		for neuralFactor in self.neuralFactors:
 			result += str(neuralFactor)
 		return result
