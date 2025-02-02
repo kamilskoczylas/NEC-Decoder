@@ -159,8 +159,8 @@ class NeuralReading(NeuralValue):
 
 	def load(self, pulseLengthArray):
 		for i in range(0, 16):
-			pulseLength = pulseLengthArray[i]
-			if int(self.averageValue.value * 10) & (1 << (16 - i)) > 0:
+			pulseLength = pulseLengthArray[16 - i]
+			if int(self.averageValue.value * 10) & (1 << i) > 0:
 				averageBitValue = 1
 			else:
 				averageBitValue = 0
@@ -194,7 +194,7 @@ class NeuralChecksum(NeuralValue):
 
 	def load(self, pulseLengthArray):
 		for i in range(0, 8):
-			pulseLength = pulseLengthArray[i]
+			pulseLength = pulseLengthArray[8 - i]
 			neuralFactors = [
 				DHT22PulseLength(pulseLength, 1),
 				# DHT22PulseLengthLeft(pulseLengthLeft, 1)
