@@ -244,8 +244,9 @@ class NeuralValidator():
   
 		for i in range(0, 16):
 			if (i < 10 or (i == 15 and self.is_signed)) and (abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8))):
-				calculated_value = calculated_value + pow((1 - min(stability_bits_array[i], 1) * 10) , 2)
-				self.correcting_value_mask[i] = pow((1 - min(stability_bits_array[i], 1) * 10), 2)
+				stability_points = pow(((1 - min(stability_bits_array[i], 1)) * 10), 2)
+				calculated_value = calculated_value + stability_points
+				self.correcting_value_mask[i] = stability_points
 			else:
 				self.correcting_value_mask[i] = 0
 		#else:
@@ -260,6 +261,7 @@ class NeuralValidator():
 			print(self.name)
 			print("Value: {0}".format(self.value))
 			print("Calculated by stability: {0}".format(calculated_value))
+			print(stability_bits_array)
 			print("Difference from average Measure: = {0}".format(average_measure_covering))
    
 		return self.value
@@ -385,7 +387,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			# We'll check various combination of factors that could impact the reading quality:
 			# Checksum might indicate wrong bytes, average values might help to detect more probable results
 
-			for iteration in range (1, 2):
+			for iteration in range (2, 4):
 				if self.NeuralChecksumValidator.value < 0.2:
 					if self.DEBUG:
 						print("Checksum Stability {0} too low to recover.".format(self.NeuralChecksumValidator.value))
@@ -396,7 +398,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 					print("Checksum stability: {0}".format(self.NeuralChecksumValidator.value))
 					print(self)
 
-				if self.NeuralTemperatureValidator.value > self.NeuralHumidityValidator.value and self.NeuralTemperatureValidator.value > 0:
+				if self.NeuralTemperatureValidator.value > self.NeuralHumidityValidator.value:
 					self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, self.NeuralTemperatureValidator.correcting_value_mask)
      
 					if self.DEBUG:
