@@ -88,18 +88,15 @@ class NeuralBoolean():
 
 	def calculate(self):
 		valueSum = 0
-		factorSum = 0
 		stabilitySum = 0
   
 		for neuralFactor in self.neuralFactors:
 			if neuralFactor.factor > 0:
-				factorSum += neuralFactor.factor
 				valueSum += neuralFactor.calculate()
 				stabilitySum += neuralFactor.stability
 
-		if factorSum > 0:
-			self.value = valueSum / factorSum
-			self.stability = stabilitySum / factorSum
+		self.value = valueSum
+		self.stability = stabilitySum / len(self.neuralFactors)
 		pass
 
 	def reward(self, value):
