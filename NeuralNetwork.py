@@ -154,7 +154,7 @@ class NeuralValue(ABC):
 			lines.append("|" + neuralFactor.name[:6] + "F|")
   
 		for i in range(self.max_bits - 1, -1, -1):
-			neuralBit = self.neuralBits[self.max_bits -1 - i]
+			neuralBit = self.neuralBits[i]
 			line1 += "-----"
 			line2 += " {:3}|".format(i)
 			line3 += "{:4.1f}|".format(neuralBit.value)
