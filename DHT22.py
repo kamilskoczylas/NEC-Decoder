@@ -52,7 +52,7 @@ class DHT22PulseLength(SingleNeuralFactor):
 		pass
 
 	def calculate(self):
-		self.value = math.sin((self.pulseLength - self.PULSE_UNDEFINED_BETWEEN) * self.MULTIPLY_BY) * 8 # for sigmoid to be more accurate
+		self.value = math.sin((self.pulseLength - self.PULSE_UNDEFINED_BETWEEN) * self.MULTIPLY_BY) * 8 # multiplied by 8 for sigmoid to be more accurate
 		pulseLengthDifference = 0
   
 		if self.pulseLength >= self.PULSE_POSITIVE_LENGTH and self.pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE:
@@ -181,7 +181,7 @@ class NeuralReading(NeuralValue):
 			# If the result will not pass the checksum, the factor values will be rewarded
 			neuralFactors = [
 				DHT22PulseLength(pulseLength, 1),
-				#avgFactor, # From the previous calculations
+				avgFactor, # From the previous calculations
 				DHT22Checksum(0, 0)
 			]
 			self.neuralBits[i].load(neuralFactors)
