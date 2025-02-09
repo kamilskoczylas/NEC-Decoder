@@ -448,7 +448,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			# We'll check various combination of factors that could impact the reading quality:
 			# Checksum might indicate wrong bytes, average values might help to detect more probable results
 
-			for iteration in range (2, 4):
+			for iteration in range (2, 5):
 				if self.NeuralChecksumValidator.value < 0.2:
 					if self.DEBUG:
 						print("Checksum Stability {0} too low to recover.".format(self.NeuralChecksumValidator.value))
