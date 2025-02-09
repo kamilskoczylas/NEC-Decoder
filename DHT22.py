@@ -468,9 +468,9 @@ class NeuralSignalRecognizer(NeuralCalculation):
 					if self.DEBUG:
 						print("Correcting temperature")
 						print("using checksum values")
-						print(self.NeuralTemperatureValidator.getCorrectingChecksumMask())
-						print("using checksum factors")
 						print(self.NeuralTemperatureValidator.getCorrectingChecksumValueMask())
+						print("using checksum factors")
+						print(self.NeuralTemperatureValidator.getCorrectingChecksumMask())
 						print(self)
 
 				else:
@@ -484,9 +484,9 @@ class NeuralSignalRecognizer(NeuralCalculation):
 					if self.DEBUG:
 						print("Correcting humidity")
 						print("using checksum values")
-						print(self.NeuralHumidityValidator.getCorrectingChecksumMask())
-						print("using checksum factors")
 						print(self.NeuralHumidityValidator.getCorrectingChecksumValueMask())
+						print("using checksum factors")
+						print(self.NeuralHumidityValidator.getCorrectingChecksumMask())
 						print(self)
 
 
