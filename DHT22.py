@@ -101,11 +101,11 @@ class DHT22AverageValue(DHT22PulseLength):
 		self.input_value = input_value
 		self.factor = factor
 		self.averagePulse = AverageValue(120, 6)
-		self.averagePulse.append(input_value)
 
 	def calculate(self):
 		self.averagePulse.remove()
-		self.averagePulse.append(self.value)
+		measure = BasicMeasure(self.value, default_timer())
+		self.averagePulse.append(measure)
   
 		self.pulseLength = self.averagePulse.getValue()
 		return super.calculate()
