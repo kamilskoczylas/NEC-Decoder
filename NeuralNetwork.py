@@ -7,7 +7,7 @@
 
 from typing import List
 from abc import ABC, abstractmethod
-
+import math
 
 class SingleNeuralFactor():
 
@@ -66,6 +66,12 @@ class NeuralBoolean():
 	def getFactor(self, number: int):
 		return self.neuralFactors[number]
 
+	def getFactorByClass(self, factor_class_type):
+		for obj in self.neuralFactors:
+			if isinstance(obj, factor_class_type) and hasattr(obj, "value") and hasattr(obj, "factor"):
+				return obj
+		return
+
 	def getValueFactorByClass(self, factor_class_type):
 		for obj in self.neuralFactors:
 			if isinstance(obj, factor_class_type) and hasattr(obj, "value") and hasattr(obj, "factor"):
@@ -86,17 +92,21 @@ class NeuralBoolean():
 				setattr(obj, property_name, value)
 		pass
 
+	def sigmoid(x):
+		return 1 / (1 + math.exp(-x))
+
 	def calculate(self):
 		valueSum = 0
-		stabilitySum = 0
+		max_stability = 0
   
 		for neuralFactor in self.neuralFactors:
 			if neuralFactor.factor > 0:
 				valueSum += neuralFactor.calculate()
-				stabilitySum += neuralFactor.stability
+				max_stability = max(max_stability, neuralFactor.stability * neuralFactor.factor)
 
-		self.value = valueSum
-		self.stability = stabilitySum / len(self.neuralFactors)
+		sigmoid_value = self.sigmoid(valueSum)
+		self.value = 1 if sigmoid_value > 0 else 0
+		self.stability = max(abs(sigmoid_value), max_stability)
 		pass
 
 	def reward(self, value):

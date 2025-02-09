@@ -39,19 +39,22 @@ class DHT22PulseLength(SingleNeuralFactor):
 	PULSE_POSITIVE_LENGTH = 0.000120
 	PULSE_NEGATIVE_LENGTH = 0.000076
 
+	MULTIPLY_BY = 1000000
+
 	pulseLength = 0
 
 	def __init__(self, input_value, factor) -> None:
 		self.name = "Pulse Length"
 		self.pulseLength = input_value
 		self.factor = factor
+		self.PULSE_UNDEFINED_BETWEEN = self.PULSE_NEGATIVE_LENGTH + (self.PULSE_POSITIVE_LENGTH - self.PULSE_NEGATIVE_LENGTH) / 2
 		pass
 
 	def calculate(self):
-		self.value = 0
+		self.value = (self.pulseLength - self.PULSE_UNDEFINED_BETWEEN) * self.MULTIPLY_BY * self.factor
 		pulseLengthDifference = 0
+  
 		if self.pulseLength >= self.PULSE_POSITIVE_LENGTH and self.pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE:
-			self.value = 1
 			pulseLengthDifference = self.pulseLength - self.PULSE_POSITIVE_LENGTH
 		else:
 			pulseLengthDifference = self.pulseLength - self.PULSE_NEGATIVE_LENGTH
@@ -59,7 +62,7 @@ class DHT22PulseLength(SingleNeuralFactor):
 		self.stability = self.factor * (1 - min(abs(pulseLengthDifference), self.PULSE_ERROR_MAX_RANGE) / self.PULSE_ERROR_MAX_RANGE)
 		return self.value
 
-
+"""
 class DHT22PulseLengthLeft(SingleNeuralFactor):
 
 	PULSE_ERROR_MAX_RANGE = 0.000044
@@ -89,19 +92,23 @@ class DHT22PulseLengthLeft(SingleNeuralFactor):
 
 		self.stability = self.factor * (1 - min(abs(pulseLengthDifference), self.PULSE_ERROR_MAX_RANGE) / self.PULSE_ERROR_MAX_RANGE)
 		return self.value
+"""
 
-
-class DHT22AverageValue(SingleNeuralFactor):
+class DHT22AverageValue(DHT22PulseLength):
 
 	def __init__(self, input_value, factor) -> None:
 		self.name = "Average"
 		self.input_value = input_value
 		self.factor = factor
+		self.averagePulse = AverageValue(120, 6)
+		self.averagePulse.append(input_value)
 
 	def calculate(self):
+		self.averagePulse.remove()
+		self.averagePulse.append(self.value)
   
-		self.stability = 1
-		return self.input_value
+		self.pulseLength = self.averagePulse.getValue()
+		return super.calculate()
 
 
 class DHT22Checksum(SingleNeuralFactor):
@@ -165,12 +172,15 @@ class NeuralReading(NeuralValue):
 			else:
 				averageBitValue = 0
 
+			avgFactor = self.neuralBits[i].getFactorByClass(DHT22AverageValue)
+
 
 			# Starting settings. Every execution, the values will be initialized
 			# If the result will not pass the checksum, the factor values will be rewarded
 			neuralFactors = [
 				DHT22PulseLength(pulseLength, 1),
-				DHT22AverageValue(averageBitValue, 0),
+				avgFactor, # From the previous calculations
+				#DHT22AverageValue(averageBitValue, 0),
 				DHT22Checksum(0, 0)
 			]
 			self.neuralBits[i].load(neuralFactors)
