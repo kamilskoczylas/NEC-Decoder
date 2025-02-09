@@ -180,9 +180,9 @@ class NeuralReading(NeuralValue):
 			# Starting settings. Every execution, the values will be initialized
 			# If the result will not pass the checksum, the factor values will be rewarded
 			neuralFactors = [
-				DHT22PulseLength(pulseLength, 1)
+				DHT22PulseLength(pulseLength, 1),
 				#avgFactor, # From the previous calculations
-				#DHT22Checksum(0, 0)
+				DHT22Checksum(0, 0)
 			]
 			self.neuralBits[i].load(neuralFactors)
 
@@ -301,7 +301,7 @@ class NeuralValidator():
 						calculated_value = calculated_value + stability_points * stability_points if int_average_reading & (1 << i) > 0 else 1
 						#self.correcting_average_value_mask[i] = (1 << i) / 10 if int_average_reading & (1 << i) == 0 else 0
 						self.correcting_checksum_factors_mask[i] = stability_points
-						self.correcting_checksum_value_mask[i] = 0
+						self.correcting_checksum_value_mask[i] = -1
 					else:
 						#self.correcting_average_value_mask[i] = 0
 						self.correcting_checksum_factors_mask[i] = 0
