@@ -105,7 +105,7 @@ class NeuralBoolean():
 				max_stability = max(max_stability, neuralFactor.stability * neuralFactor.factor)
 
 		sigmoid_value = self.sigmoid(valueSum)
-		self.value = 1 if sigmoid_value > 0 else 0
+		self.value = sigmoid_value #1 if sigmoid_value > 0 else 0
 		self.stability = max(abs(sigmoid_value), max_stability)
 		pass
 
