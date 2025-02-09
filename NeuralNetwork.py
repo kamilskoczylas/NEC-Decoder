@@ -93,6 +93,10 @@ class NeuralBoolean():
 		pass
 
 	def sigmoid(self, x):
+		if x > 6:
+			return 1
+		if x < -6:
+			return 0
 		return 1 / (1 + math.exp(-x))
 
 	def calculate(self):
