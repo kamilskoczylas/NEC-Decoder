@@ -92,7 +92,7 @@ class NeuralBoolean():
 				setattr(obj, property_name, value)
 		pass
 
-	def sigmoid(x):
+	def sigmoid(self, x):
 		return 1 / (1 + math.exp(-x))
 
 	def calculate(self):
