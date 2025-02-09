@@ -173,14 +173,14 @@ class NeuralReading(NeuralValue):
 				averageBitValue = 0
 
 			avgFactor = self.neuralBits[i].getFactorByClass(DHT22AverageValue)
-
+			if avgFactor is None:
+				avgFactor = DHT22AverageValue(averageBitValue, 0)
 
 			# Starting settings. Every execution, the values will be initialized
 			# If the result will not pass the checksum, the factor values will be rewarded
 			neuralFactors = [
 				DHT22PulseLength(pulseLength, 1),
 				avgFactor, # From the previous calculations
-				#DHT22AverageValue(averageBitValue, 0),
 				DHT22Checksum(0, 0)
 			]
 			self.neuralBits[i].load(neuralFactors)
