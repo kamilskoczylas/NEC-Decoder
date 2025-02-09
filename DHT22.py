@@ -289,7 +289,7 @@ class NeuralValidator():
 						calculated_value = calculated_value + stability_points * stability_points if int_average_reading & (1 << i) > 0 else 1
 						#self.correcting_average_value_mask[i] = (1 << i) / 10 if int_average_reading & (1 << i) > 0 else 0
 						self.correcting_checksum_factors_mask[i] = stability_points
-						self.correcting_checksum_value_mask[i] = 1
+						self.correcting_checksum_value_mask[i] = 10
 					else:
 						#self.correcting_average_value_mask[i] = 0
 						self.correcting_checksum_factors_mask[i] = 0
@@ -301,7 +301,7 @@ class NeuralValidator():
 						calculated_value = calculated_value + stability_points * stability_points if int_average_reading & (1 << i) > 0 else 1
 						#self.correcting_average_value_mask[i] = (1 << i) / 10 if int_average_reading & (1 << i) == 0 else 0
 						self.correcting_checksum_factors_mask[i] = stability_points
-						self.correcting_checksum_value_mask[i] = -1
+						self.correcting_checksum_value_mask[i] = -10
 					else:
 						#self.correcting_average_value_mask[i] = 0
 						self.correcting_checksum_factors_mask[i] = 0
