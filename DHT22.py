@@ -180,7 +180,7 @@ class NeuralReading(NeuralValue):
 			# If the result will not pass the checksum, the factor values will be rewarded
 			neuralFactors = [
 				DHT22PulseLength(pulseLength, 1),
-				avgFactor, # From the previous calculations
+				#avgFactor, # From the previous calculations
 				DHT22Checksum(0, 0)
 			]
 			self.neuralBits[i].load(neuralFactors)
