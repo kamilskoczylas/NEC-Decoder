@@ -108,7 +108,7 @@ class DHT22AverageValue(DHT22PulseLength):
 		self.averagePulse.append(measure)
   
 		self.pulseLength = self.averagePulse.getValue()
-		return super.calculate()
+		return self.super().calculate()
 
 
 class DHT22Checksum(SingleNeuralFactor):
