@@ -52,7 +52,7 @@ class DHT22PulseLength(SingleNeuralFactor):
 		pass
 
 	def calculate(self):
-		self.value = math.sin((self.pulseLength - self.PULSE_UNDEFINED_BETWEEN) * self.MULTIPLY_BY) * 10
+		self.value = math.sin((self.pulseLength - self.PULSE_UNDEFINED_BETWEEN) * self.MULTIPLY_BY) * 8 # for sigmoid to be more accurate
 		pulseLengthDifference = 0
   
 		if self.pulseLength >= self.PULSE_POSITIVE_LENGTH and self.pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE:
