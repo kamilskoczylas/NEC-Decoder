@@ -11,7 +11,7 @@ from queue import Empty
 from timeit import default_timer
 from collections import deque
 from NeuralNetwork import SingleNeuralFactor, NeuralBoolean, NeuralValue, NeuralCalculation
-
+import math
 
 class Measure:
 	Temperature = 0
@@ -39,8 +39,6 @@ class DHT22PulseLength(SingleNeuralFactor):
 	PULSE_POSITIVE_LENGTH = 0.000120
 	PULSE_NEGATIVE_LENGTH = 0.000076
 
-	MULTIPLY_BY = 1000000
-
 	pulseLength = 0
 
 	def __init__(self, input_value, factor) -> None:
@@ -48,10 +46,13 @@ class DHT22PulseLength(SingleNeuralFactor):
 		self.pulseLength = input_value
 		self.factor = factor
 		self.PULSE_UNDEFINED_BETWEEN = self.PULSE_NEGATIVE_LENGTH + (self.PULSE_POSITIVE_LENGTH - self.PULSE_NEGATIVE_LENGTH) / 2
+
+		# prepare for sinus function
+		self.MULTIPLY_BY = math.pi / self.PULSE_ERROR_MAX_RANGE
 		pass
 
 	def calculate(self):
-		self.value = (self.pulseLength - self.PULSE_UNDEFINED_BETWEEN) * self.MULTIPLY_BY * self.factor
+		self.value = math.sin((self.pulseLength - self.PULSE_UNDEFINED_BETWEEN) * self.MULTIPLY_BY)
 		pulseLengthDifference = 0
   
 		if self.pulseLength >= self.PULSE_POSITIVE_LENGTH and self.pulseLength <= self.PULSE_POSITIVE_LENGTH + self.PULSE_ERROR_MAX_RANGE:
