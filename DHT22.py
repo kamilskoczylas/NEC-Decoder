@@ -97,10 +97,10 @@ class DHT22PulseLengthLeft(SingleNeuralFactor):
 class DHT22AverageValue(DHT22PulseLength):
 
 	def __init__(self, input_value, factor) -> None:
+		super().__init__(input_value, factor)
 		self.name = "Average"
-		self.input_value = input_value
-		self.factor = factor
 		self.averagePulse = AverageValue(120, 6)
+		
 
 	def calculate(self):
 		self.averagePulse.remove()
