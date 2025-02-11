@@ -70,7 +70,7 @@ class NeuralBoolean():
 		for obj in self.neuralFactors:
 			if isinstance(obj, factor_class_type) and hasattr(obj, "value") and hasattr(obj, "factor"):
 				return obj
-		return
+		return None
 
 	def getValueFactorByClass(self, factor_class_type):
 		for obj in self.neuralFactors:
