@@ -103,7 +103,6 @@ class DHT22AverageValue(DHT22PulseLength):
 
 	def calculate(self):
 		self.averagePulse.remove()
-		print("adding {0}".format(self.value))
 		measure = BasicMeasure(self.value, default_timer())
 		self.averagePulse.append(measure)
   
@@ -172,7 +171,6 @@ class NeuralReading(NeuralValue):
 				avgFactor = DHT22AverageValue(pulseLength, 0)
 			else:
 				avgFactor.value = pulseLength
-				print(avgFactor)
 
 			# Starting settings. Every execution, the values will be initialized
 			# If the result will not pass the checksum, the factor values will be rewarded
@@ -429,13 +427,13 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 	def calculate(self):
 		# First level - just calculate the data from DHT22, if it match checksum, fine
-		self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, [0] * 16) #min(0.2, len(self.averageHumidity.results) / 50)] 
+		#self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, [0] * 16) #min(0.2, len(self.averageHumidity.results) / 50)] 
 		#self.NeuralHumidity.updateFactorsValue(DHT22AverageValue, [1 if self.averageHumidity.getRawValue() & (1 << i) > 0 else 0 for i in range(0, 16)])
   
 		self.NeuralHumidity.updateFactorsFactor(DHT22PulseLength, [1] * 16)
 		self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, [0] * 16)
 
-		self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, [0] * 16) #min(0.2, len(self.averageTemperature.results) / 50)
+		#self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, [0] * 16) #min(0.2, len(self.averageTemperature.results) / 50)
 		#self.NeuralTemperature.updateFactorsValue(DHT22AverageValue, [1 if self.averageTemperature.getRawValue() & (1 << i) > 0 else 0 for i in range(0, 16)])
   
 		self.NeuralTemperature.updateFactorsFactor(DHT22PulseLength, [1] * 16)
