@@ -412,7 +412,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 					
 		if self.prevHumidity != None and self.holdHumidity != None:
 			if abs(self.prevHumidity.value - newHumidity.value + 2) > abs(self.holdHumidity.value - self.prevHumidity.value):
-				self.averageTemperature.append(self.holdHumidity)
+				self.averageHumidity.append(self.holdHumidity)
 				self.prevHumidity = self.holdHumidity
 				self.holdHumidity = newHumidity
 				self.refuseCount = 0
