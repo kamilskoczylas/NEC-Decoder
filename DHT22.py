@@ -173,6 +173,7 @@ class NeuralReading(NeuralValue):
 				avgFactor = DHT22AverageValue(pulseLength, 0)
 			else:
 				avgFactor.value = pulseLength
+				avgFactor.factor = 0.1
 
 			# Starting settings. Every execution, the values will be initialized
 			# If the result will not pass the checksum, the factor values will be rewarded
