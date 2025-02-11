@@ -356,6 +356,14 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		self.NeuralTemperatureValidator = NeuralValidator("Temperature", is_signed=True, DEBUG=self.DEBUG)
 		self.NeuralHumidityValidator = NeuralValidator("Humidity", is_signed=False, DEBUG=self.DEBUG)
 		self.NeuralChecksumValidator = NeuralChecksumValidator()
+
+		self.holdTemperature = None
+		self.holdHumidity = None
+		self.prevTemperature = None
+		self.prevHumidity = None
+
+		self.refuseCount = 0
+  
 		pass
 
 	def __str__(self):
@@ -381,11 +389,44 @@ class NeuralSignalRecognizer(NeuralCalculation):
 		pass
 
 	def succeed(self, iteration = 1):
-		if iteration == 1 or abs(self.NeuralTemperature.temperature - self.averageTemperature.getValue()) < 0.5:
-			self.averageTemperature.append(BasicMeasure(self.NeuralTemperature.temperature, self.firstReadingDateTime))
 
-		if iteration == 1 or abs(self.NeuralHumidity.humidity - self.averageHumidity.getValue()) < 2:
-			self.averageHumidity.append(BasicMeasure(self.NeuralHumidity.humidity, self.firstReadingDateTime))
+		newTemperature = BasicMeasure(self.NeuralTemperature.temperature, self.firstReadingDateTime)
+		newHumidity = BasicMeasure(self.NeuralHumidity.humidity, self.firstReadingDateTime)
+  
+		if self.prevTemperature != None and self.holdTemperature != None:
+			if abs(self.prevTemperature.value - newTemperature.value + 0.5) > abs(self.holdTemperature.value - self.prevTemperature.value):
+				self.averageTemperature.append(self.holdTemperature)
+				self.prevTemperature = self.holdTemperature
+				self.holdTemperature = newTemperature
+				self.refuseCount = 0
+			else:
+				self.refuseCount += 1
+				if self.refuseCount > 3:
+					self.holdTemperature = None
+					self.prevTemperature = None
+		else:
+			if self.prevTemperature == None:
+				self.prevTemperature = self.holdTemperature
+			if self.holdTemperature == None:
+				self.holdTemperature = newTemperature
+					
+		if self.prevHumidity != None and self.holdHumidity != None:
+			if abs(self.prevHumidity.value - newHumidity.value + 2) > abs(self.holdHumidity.value - self.prevHumidity.value):
+				self.averageTemperature.append(self.holdHumidity)
+				self.prevHumidity = self.holdHumidity
+				self.holdHumidity = newHumidity
+				self.refuseCount = 0
+			else:
+				self.refuseCount += 1
+				if self.refuseCount > 3:
+					self.holdHumidity = None
+					self.prevHumidity = None
+		else:
+			if self.prevHumidity == None:
+				self.prevHumidity = self.holdHumidity
+			if self.holdHumidity == None:
+				self.holdHumidity = newHumidity
+		
 
 		if self.DEBUG:
 			print("Attempt: {0}: SUCCESS: {1}°C, {2}%".format(iteration, self.NeuralTemperature.temperature, self.NeuralHumidity.humidity))
