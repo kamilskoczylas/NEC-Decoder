@@ -168,14 +168,10 @@ class NeuralReading(NeuralValue):
 	def load(self, pulseLengthArray):
 		for i in range(0, 16):
 			pulseLength = pulseLengthArray[15 - i]
-			if int(self.averageValue.value * 10) & (1 << i) > 0:
-				averageBitValue = 1
-			else:
-				averageBitValue = 0
-
 			avgFactor = self.neuralBits[i].getFactorByClass(DHT22AverageValue)
 			if avgFactor is None:
-				avgFactor = DHT22AverageValue(averageBitValue, 0)
+				avgFactor = DHT22AverageValue(pulseLength, 0)
+			else:
 				avgFactor.value = pulseLength
 
 			# Starting settings. Every execution, the values will be initialized
