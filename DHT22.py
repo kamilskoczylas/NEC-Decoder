@@ -39,8 +39,6 @@ class DHT22PulseLength(SingleNeuralFactor):
 	PULSE_POSITIVE_LENGTH = 0.000120
 	PULSE_NEGATIVE_LENGTH = 0.000076
 
-	pulseLength = 0
-
 	def __init__(self, input_value, factor) -> None:
 		self.name = "Pulse Length"
 		self.pulseLength = input_value
@@ -105,6 +103,7 @@ class DHT22AverageValue(DHT22PulseLength):
 
 	def calculate(self):
 		self.averagePulse.remove()
+		print("adding {0}".format(self.value))
 		measure = BasicMeasure(self.value, default_timer())
 		self.averagePulse.append(measure)
   
