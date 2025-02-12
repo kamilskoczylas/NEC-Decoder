@@ -252,11 +252,6 @@ class NeuralValidator():
 			print("checksum_read_minus_checksum_calculated = {0}".format(checksum_read_minus_checksum_calculated))
 			print("correcting_method = {0}".format(correcting_method))
 			print("correcting bits = {0}".format(bin(checksum_read_minus_checksum_calculated if correcting_method == "add_bits" else checksum_calculated_minus_checksum_read)))
-   
-			#print("")
-			#print("Checksum read: {0}".format(bin(checksum_read)))
-			#print("Calculated checksum bin= {0}".format(bin(checksum_calculated)))
-			#print("checksum_read_minus_checksum_calculated bin= {0}".format(bin(checksum_read_minus_checksum_calculated)))
 
 		# Calculate probability that the difference in checksum is result of the difference in average reading
 		int_last_reading = 0
@@ -276,38 +271,33 @@ class NeuralValidator():
 
 		
 		for i in range(0, 16):
-			# When we need to add a missing bit
 			if (i < 10 or (i == 15 and self.is_signed)):
+       
 				if correcting_method == "add_bits":
 					if (abs(checksum_read_minus_checksum_calculated) & (1 << (i % 8))):
 						stability_points = ((1 - min(stability_bits_array[i], 1)) * 10)
 						calculated_value = calculated_value + stability_points * stability_points if int_average_reading & (1 << i) > 0 else 1
-						#self.correcting_average_value_mask[i] = (1 << i) / 10 if int_average_reading & (1 << i) > 0 else 0
 						self.correcting_checksum_factors_mask[i] = stability_points
 						self.correcting_checksum_value_mask[i] = 10
 					else:
-						#self.correcting_average_value_mask[i] = 0
 						self.correcting_checksum_factors_mask[i] = 0
 						self.correcting_checksum_value_mask[i] = 0
 		
 				if correcting_method == "remove_bits":
 					if (abs(checksum_calculated_minus_checksum_read) & (1 << (i % 8))):
 						stability_points = ((1 - min(stability_bits_array[i], 1)) * 10)
-						calculated_value = calculated_value + stability_points * stability_points if int_average_reading & (1 << i) > 0 else 1
-						#self.correcting_average_value_mask[i] = (1 << i) / 10 if int_average_reading & (1 << i) == 0 else 0
+						calculated_value = calculated_value + stability_points * stability_points if int_average_reading & (1 << i) == 0 else 1
 						self.correcting_checksum_factors_mask[i] = stability_points
 						self.correcting_checksum_value_mask[i] = -10
 					else:
-						#self.correcting_average_value_mask[i] = 0
 						self.correcting_checksum_factors_mask[i] = 0
 						self.correcting_checksum_value_mask[i] = 0
 
-		self.value = calculated_value #* average_measure_covering
+		self.value = calculated_value
 		if self.DEBUG:
 			print(self.name)
 			print("Value: {0}".format(self.value))
 			print("Calculated by stability: {0}".format(calculated_value))
-			#print(stability_bits_array)
 			print("Difference from average Measure: = {0}".format(average_measure_covering))
    
 		return self.value
@@ -392,6 +382,10 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 		newTemperature = BasicMeasure(self.NeuralTemperature.temperature, self.firstReadingDateTime)
 		newHumidity = BasicMeasure(self.NeuralHumidity.humidity, self.firstReadingDateTime)
+
+
+		# The purpose of the code below is to hold a measure until we have the next measurement	
+		# Only if all the 3 are consistent: previous, current and next, adding to the average
   
 		if self.prevTemperature != None and self.holdTemperature != None:
 			if abs(self.prevTemperature.value - newTemperature.value + 0.5) > abs(self.holdTemperature.value - self.prevTemperature.value):
@@ -483,7 +477,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 			# Correcting loop. Insted of typical Neural Network, date will not be pre-trained
 			# We'll check various combination of factors that could impact the reading quality:
-			# Checksum might indicate wrong bytes, average values might help to detect more probable results
+			# Checksum might indicate wrong bits, average values might help to detect more probable results
 
 			for iteration in range (2, 5):
 				if self.NeuralChecksumValidator.value < 0.2:
@@ -655,12 +649,6 @@ class DHT22Decoder:
 			print ("{:0>2} {:.6f}".format(i, self.timeFromNextPhase))
 		
 		return resultArray
-
-	def formatBinary(self, signal):
-		ending = ""
-		if len(signal) > 40:
-			ending = " " + signal[40:len(signal)]
-		return signal[0:8] + " " + signal[8:16] + " " + signal[16:24] + " " + signal[24:32] + " " + signal[32:40] + ending
 		
 	def getCommand(self):
 		signalTime = self.waitForSignal()
@@ -705,7 +693,7 @@ class DHT22Decoder:
 				if signalTime > 0.002 and signalTime < 0.008:
 					# Need to wait for the rest of the signal
 					if self.signalEdgeDetectedTimeQueue.qsize() < 40:
-						# sleep(0.005) - for quarantee that signal has been read increased
+						# sleep(0.005) - increased to guarantee that the signal has been read 
 						sleep(0.01)
 					else:
 						if self.DEBUG:
