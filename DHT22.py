@@ -203,7 +203,7 @@ class NeuralChecksum(NeuralValue):
 			pulseLength = pulseLengthArray[7 - i]
 			neuralFactors = [
 				DHT22PulseLength(pulseLength, 1),
-				# DHT22PulseLengthLeft(pulseLengthLeft, 1)
+				DHT22Checksum(0, 0)
 			]
 			self.neuralBits[i].load(neuralFactors)
 
@@ -234,6 +234,7 @@ class NeuralValidator():
 		return self.correcting_checksum_value_mask
 
 	def calculate(self, average_measure, last_reading, checksum_calculated, checksum_read, stability_bits_array):
+		self.stability_bits_array = stability_bits_array
      
 		average_measure_minus_last_reading = average_measure - last_reading
 		checksum_read_minus_checksum_calculated = checksum_read - checksum_calculated
@@ -306,8 +307,9 @@ class NeuralValidator():
 
 
 class NeuralChecksumValidator():
-	def calculate(self, checksum_read, checksum_calculated, checksum_stability):
+	def calculate(self, checksum_read, checksum_calculated, checksum_stability, stability_bits_array):
 		self.value = checksum_stability * min((8 - bin(256 - (checksum_calculated - checksum_read)).count('1')), (8 - bin(checksum_calculated - checksum_read).count('1')))
+		self.stability_bits_array = stability_bits_array
 		return self.value > 0.8
 
 	
@@ -456,7 +458,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			calculated_checksum = (self.NeuralHumidity.value_low + self.NeuralHumidity.value_hi + self.NeuralTemperature.value_low + self.NeuralTemperature.value_hi) & 255
 			self.NeuralTemperatureValidator.calculate(self.averageTemperature.getValue(), self.NeuralTemperature.temperature, calculated_checksum, self.NeuralChecksum.value, self.NeuralTemperature.getStabilityBitArray())
 			self.NeuralHumidityValidator.calculate(self.averageHumidity.getValue(), self.NeuralHumidity.humidity, calculated_checksum, self.NeuralChecksum.value, self.NeuralHumidity.getStabilityBitArray())
-			self.NeuralChecksumValidator.calculate(self.NeuralChecksum.value, calculated_checksum, self.NeuralChecksum.getStability())
+			self.NeuralChecksumValidator.calculate(self.NeuralChecksum.value, calculated_checksum, self.NeuralChecksum.getStability(), self.NeuralChecksum.getStabilityBitArray())
 
 		return False
 
@@ -470,6 +472,8 @@ class NeuralSignalRecognizer(NeuralCalculation):
 
 		self.NeuralTemperature.updateFactorsFactor(DHT22AverageValue, [min(0.6, len(self.averageTemperature.results) / 20)] * 16)
 		self.NeuralHumidity.updateFactorsFactor(DHT22AverageValue, [min(0.6, len(self.averageHumidity.results) / 20)] * 16)
+
+		self.NeuralChecksum.updateFactorsFactor(DHT22Checksum, [0] * 8)
   
 		success = self.calculate_all_values()
   
@@ -479,7 +483,7 @@ class NeuralSignalRecognizer(NeuralCalculation):
 			# We'll check various combination of factors that could impact the reading quality:
 			# Checksum might indicate wrong bits, average values might help to detect more probable results
 
-			for iteration in range (2, 5):
+			for iteration in range (2, 3):
 				if self.NeuralChecksumValidator.value < 0.2:
 					if self.DEBUG:
 						print("Checksum Stability {0} too low to recover.".format(self.NeuralChecksumValidator.value))
@@ -489,8 +493,22 @@ class NeuralSignalRecognizer(NeuralCalculation):
 					print("Checksum stability: {0}".format(self.NeuralChecksumValidator.value))
         
 				if self.NeuralTemperatureValidator.value > self.NeuralHumidityValidator.value:
-					self.NeuralTemperature.updateFactorsFactor(DHT22Checksum, self.NeuralTemperatureValidator.getCorrectingChecksumMask())
+        
+					weakest_bit_modifier_array = self.NeuralTemperatureValidator.getCorrectingChecksumMask()
+					max_value = max(weakest_bit_modifier_array)
+					max_index = weakest_bit_modifier_array.index(max_value)
+     
+					# need to make sure that stability of the checksum is better than the temperature stability
+					if self.NeuralChecksumValidator.stability_bits_array[max_index % 8] < self.NeuralTemperatureValidator.stability_bits_array[max_index]:
+						if self.DEBUG:
+							print("Checksum stability worse than temperature")
+						break
+
+     
+					self.NeuralTemperature.updateFactorsFactor(DHT22Checksum, weakest_bit_modifier_array)
 					self.NeuralTemperature.updateFactorsValue(DHT22Checksum, self.NeuralTemperatureValidator.getCorrectingChecksumValueMask())
+
+					
 	
 					# Need to wait for the average measures to perform corrections based on these values
 					#if self.averageHumidity.getValue() > 0:
@@ -505,7 +523,17 @@ class NeuralSignalRecognizer(NeuralCalculation):
 						print(self)
 
 				else:
-					self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, self.NeuralHumidityValidator.getCorrectingChecksumMask())
+					weakest_bit_modifier_array = self.NeuralHumidityValidator.getCorrectingChecksumMask()
+					max_value = max(weakest_bit_modifier_array)
+					max_index = weakest_bit_modifier_array.index(max_value)
+     
+					# need to make sure that stability of the checksum is better than the humidity stability
+					if self.NeuralChecksumValidator.stability_bits_array[max_index % 8] < self.NeuralHumidityValidator.stability_bits_array[max_index]:
+						if self.DEBUG:
+							print("Checksum stability worse than humidity")
+						break
+  
+					self.NeuralHumidity.updateFactorsFactor(DHT22Checksum, weakest_bit_modifier_array)
 					self.NeuralHumidity.updateFactorsValue(DHT22Checksum, self.NeuralHumidityValidator.getCorrectingChecksumValueMask())
 	
 					# Need to wait for the average measures to perform corrections based on these values
