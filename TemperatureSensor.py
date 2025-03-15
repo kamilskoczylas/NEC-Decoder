@@ -25,8 +25,7 @@ class TemperatureSensor:
 
 		self.edgeDetectionMethod = GPIODataProvider.EdgeDetected(
 				self.GPIO_Mode,
-				self.GPIO_PIN,
-				90 # 90 milliseconds should be enough to read whole signal
+				self.GPIO_PIN
 			)
 
 		self.DHT22Reader = SignalDecoder.SignalDecoder(
@@ -57,7 +56,7 @@ class TemperatureSensor:
 
 	def QueueConsumer(self):
 		while not self.isStopped:
-			self.edgeDetectionMethod.Stop()
+			#self.edgeDetectionMethod.Stop()
    
 			# Keep positive signal for a while
 			GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
@@ -69,7 +68,7 @@ class TemperatureSensor:
 			sleep(0.002)
 			
 			GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP) 
-			self.edgeDetectionMethod.Start()
+			#self.edgeDetectionMethod.Start()
 			sleep(0.05)
    
 
