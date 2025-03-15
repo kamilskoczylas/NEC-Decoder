@@ -94,7 +94,7 @@ class EdgeDetected(SignalDataProvider):
         
 	def InitDataQueue(self, queue):
 		self.Queue = queue
-		GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback=self.SignalEdgeDetected)
+		self.Start()
 		pass
 
 	def __del__(self):
