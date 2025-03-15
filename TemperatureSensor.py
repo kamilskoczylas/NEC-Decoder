@@ -25,7 +25,8 @@ class TemperatureSensor:
 
 		self.edgeDetectionMethod = GPIODataProvider.EdgeDetected(
 				self.GPIO_Mode,
-				self.GPIO_PIN
+				self.GPIO_PIN,
+				200
 			)
 
 		self.DHT22Reader = SignalDecoder.SignalDecoder(
