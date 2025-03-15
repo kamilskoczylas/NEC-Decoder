@@ -61,7 +61,7 @@ class EdgeDetected(SignalDataProvider):
 			i = 0
    
 			# Reading the signal until its end, or end of time it should end
-			while (reading_time - detected_beginning_of_signal_time) * 1000 < self.Maximum_milliseconds_signal_length:
+			while reading_time - detected_beginning_of_signal_time < self.Maximum_milliseconds_signal_length / 1000:
 				i += 1
 				# To speed up reading from GPIO, not check time every time when checking the GPIO
 				if i == 100:
@@ -70,7 +70,7 @@ class EdgeDetected(SignalDataProvider):
      
 				signal_state = GPIO.input(self.GPIO_PIN)
 				if last_signal_state != signal_state and signal_state == GPIO.LOW:
-					if i != 100:
+					if i != 0:
 						reading_time = default_timer()
 					self.Queue.put(reading_time)
      
