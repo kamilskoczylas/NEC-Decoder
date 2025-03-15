@@ -18,11 +18,10 @@ import sys
 class EdgeDetected(SignalDataProvider):
 
 	number_of_elements_to_leave = 0
-	Maximum_milliseconds_to_signal_begin = 100
 	Maximum_milliseconds_signal_length = 100
  
  
-	def __init__(self, GPIO_Mode=None, GPIO_PIN=None, Maximum_milliseconds_to_signal_begin = 100, Maximum_milliseconds_signal_length = 100):
+	def __init__(self, GPIO_Mode=None, GPIO_PIN=None, Maximum_milliseconds_signal_length = 100):
 
 		if not GPIO_Mode is None:
 			self.GPIO_Mode = GPIO_Mode
@@ -31,7 +30,6 @@ class EdgeDetected(SignalDataProvider):
 			self.GPIO_PIN = GPIO_PIN
 
 		self.Maximum_milliseconds_signal_length = Maximum_milliseconds_signal_length
-		self.Maximum_milliseconds_to_signal_begin = Maximum_milliseconds_to_signal_begin
 			
 		GPIO.setmode(self.GPIO_Mode)
 		GPIO.setup(self.GPIO_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
@@ -57,29 +55,23 @@ class EdgeDetected(SignalDataProvider):
 			self.Queue.put(detected_beginning_of_signal_time)
 
 			signal_state = GPIO.LOW
-   
-			# Reading the signal until no changes are detected
-			#while signal_state == GPIO.LOW and default_timer() - detected_falling_signal_time < self.Maximum_milliseconds_to_signal_begin / 1000:
-			#	signal_state = GPIO.input(self.GPIO_PIN)
-
-
-			#if signal_state == GPIO.LOW:
-				# Timeout: Expected signal did not start in expected time
-			#	self.Start()
-			#	pass
-
-   			# Adding the signal change state to the queue       
-			#detected_beginning_of_signal_time = default_timer()
-			#self.Queue.put(detected_beginning_of_signal_time)
 
 			last_signal_state = signal_state
 			reading_time = detected_beginning_of_signal_time
+			i = 0
    
 			# Reading the signal until its end, or end of time it should end
-			while reading_time - detected_beginning_of_signal_time < self.Maximum_milliseconds_signal_length / 1000:
-				reading_time = default_timer()
+			while (reading_time - detected_beginning_of_signal_time) * 1000 < self.Maximum_milliseconds_signal_length:
+				i += 1
+				# To speed up reading from GPIO, not check time every time when checking the GPIO
+				if i == 100:
+					reading_time = default_timer()
+					i = 0
+     
 				signal_state = GPIO.input(self.GPIO_PIN)
 				if last_signal_state != signal_state and signal_state == GPIO.LOW:
+					if i != 100:
+						reading_time = default_timer()
 					self.Queue.put(reading_time)
      
 				last_signal_state = signal_state
