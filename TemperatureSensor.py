@@ -26,7 +26,7 @@ class TemperatureSensor:
 		self.edgeDetectionMethod = GPIODataProvider.EdgeDetected(
 				self.GPIO_Mode,
 				self.GPIO_PIN,
-				70 # 70 milliseconds should be enough to read whole signal
+				90 # 90 milliseconds should be enough to read whole signal
 			)
 
 		self.DHT22Reader = SignalDecoder.SignalDecoder(
