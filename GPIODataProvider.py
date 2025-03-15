@@ -69,13 +69,13 @@ class EdgeDetected(SignalDataProvider):
 				pass
 
    			# Adding the signal change state to the queue       
-			detected_falling_signal_time = default_timer()
-			self.Queue.put(detected_falling_signal_time)
+			detected_beginning_of_signal_time = default_timer()
+			self.Queue.put(detected_beginning_of_signal_time)
 
 			last_signal_state = signal_state
    
 			# Reading the signal until its end, or end of time it should end
-			while default_timer() - detected_falling_signal_time < self.Maximum_milliseconds_signal_length / 1000:
+			while default_timer() - detected_beginning_of_signal_time < self.Maximum_milliseconds_signal_length / 1000:
 				signal_state = GPIO.input(self.GPIO_PIN)
 				if last_signal_state != signal_state and signal_state == GPIO.LOW:
 					detected_falling_signal_time = default_timer()
