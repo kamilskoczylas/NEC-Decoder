@@ -51,35 +51,36 @@ class EdgeDetected(SignalDataProvider):
     
 	def SignalEdgeDetected(self, PinNumber):
 		try:
-			detected_falling_signal_time = default_timer()
+			detected_beginning_of_signal_time = default_timer()
 			self.Stop()
 
-			self.Queue.put(detected_falling_signal_time)
+			self.Queue.put(detected_beginning_of_signal_time)
 
 			signal_state = GPIO.LOW
    
 			# Reading the signal until no changes are detected
-			while signal_state == GPIO.LOW and default_timer() - detected_falling_signal_time < self.Maximum_milliseconds_to_signal_begin / 1000:
-				signal_state = GPIO.input(self.GPIO_PIN)
+			#while signal_state == GPIO.LOW and default_timer() - detected_falling_signal_time < self.Maximum_milliseconds_to_signal_begin / 1000:
+			#	signal_state = GPIO.input(self.GPIO_PIN)
 
 
-			if signal_state == GPIO.LOW:
+			#if signal_state == GPIO.LOW:
 				# Timeout: Expected signal did not start in expected time
-				self.Start()
-				pass
+			#	self.Start()
+			#	pass
 
    			# Adding the signal change state to the queue       
-			detected_beginning_of_signal_time = default_timer()
-			self.Queue.put(detected_beginning_of_signal_time)
+			#detected_beginning_of_signal_time = default_timer()
+			#self.Queue.put(detected_beginning_of_signal_time)
 
 			last_signal_state = signal_state
+			reading_time = detected_beginning_of_signal_time
    
 			# Reading the signal until its end, or end of time it should end
-			while default_timer() - detected_beginning_of_signal_time < self.Maximum_milliseconds_signal_length / 1000:
+			while reading_time - detected_beginning_of_signal_time < self.Maximum_milliseconds_signal_length / 1000:
+				reading_time = default_timer()
 				signal_state = GPIO.input(self.GPIO_PIN)
 				if last_signal_state != signal_state and signal_state == GPIO.LOW:
-					detected_falling_signal_time = default_timer()
-					self.Queue.put(detected_falling_signal_time)
+					self.Queue.put(reading_time)
      
 				last_signal_state = signal_state
     
