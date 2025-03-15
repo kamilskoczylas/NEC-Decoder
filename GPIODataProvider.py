@@ -72,7 +72,8 @@ class EdgeDetected(SignalDataProvider):
 				if last_signal_state != signal_state and signal_state == GPIO.LOW:
 					if i != 0:
 						reading_time = default_timer()
-					self.Queue.put(reading_time)
+					print(reading_time - detected_beginning_of_signal_time)
+					self.Queue.put("{:.5f}".format(reading_time))
      
 				last_signal_state = signal_state
     
