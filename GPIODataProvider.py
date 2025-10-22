@@ -37,10 +37,14 @@ class EdgeDetected(SignalDataProvider):
 
 
 	def Stop(self):
-		GPIO.remove_event_detect(self.GPIO_PIN)
+		try:
+			GPIO.remove_event_detect(self.GPIO_PIN)
+		except:
+			print("Can't remove the event detection from PIN {0}".format(self.GPIO_PIN))
 		pass
 
 	def Start(self):
+		self.Stop()
 		try:
 			GPIO.add_event_detect(self.GPIO_PIN, GPIO.FALLING, callback=self.SignalEdgeDetected)
 		except:
