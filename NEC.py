@@ -29,17 +29,6 @@ class NECDecoder:
   ir_pulseStart = 0
   timeFromNextPhase = 0
   
-  REMOTE_CONTROLLER_COMMANDS = {
-      "00001100": "ON",
-      "00011010": "OK",
-      "01011010": "RIGHT"
-      }
-  
-  REMOTE_CONTROLLERS = {
-      "10110100": "DVD",
-      "00000000": "Custom"
-      }
-  
   DEBUG = False
   
   def initialize(self, timeQueue, DebugMode = False):
@@ -126,10 +115,12 @@ class NECDecoder:
       pulseArray = self.getBurst(32, self.ir_pulseStart, self.ir_pulseStart + self.AddressLengthSeconds + self.CommandLengthSeconds)    
       
       addressArray = self.getFirst16bitsOr27ms(pulseArray)
-      address = self.fillInKnownValues(addressArray)
+      binarySignalReversed = self.fillInKnownValues(addressArray)
+      address = binarySignalReversed[::-1]
       
       commandArray = pulseArray
-      command = self.fillInKnownValues(commandArray)
+      binarySignalReversed = self.fillInKnownValues(commandArray)
+      command = binarySignalReversed[::-1]
       
       if self.DEBUG:
           print("Address: {0}".format(address))
@@ -178,12 +169,7 @@ class NECDecoder:
           "score": bestScore,
           "value": bestValue
           }
-  
-  def bestAddress(self, command):
-      return self.bestMatch(command, self.REMOTE_CONTROLLERS)
-  
-  def bestCommand(self, command):
-      return self.bestMatch(command, self.REMOTE_CONTROLLER_COMMANDS)
+
   
   def ConvertString16ToHex(self, binaryStringValue):
       result = 0
@@ -455,5 +441,4 @@ class NECDecoder:
       
           
   def fillInKnownValues(self, timeArray):
-      commandDecoded = ''
       return self.enhanceArray(timeArray)
