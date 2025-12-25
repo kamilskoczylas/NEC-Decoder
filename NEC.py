@@ -132,7 +132,7 @@ class NECDecoder:
       if type(address) != str or type(command) != str:
           return False
       
-      return { "hex": self.ConvertString16ToHex(address[:8] + command[:8]),
+      return { "hex": self.ConvertString16ToHex(address[:8] + command[-8:]),
                "address": address,
                "command": command
                }
