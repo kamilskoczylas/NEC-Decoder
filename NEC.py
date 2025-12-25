@@ -94,7 +94,7 @@ class NECDecoder:
       
       return first16or27ms
 
-  def reverse_if_string(value): 
+  def reverse_if_string(self, value): 
       return value[::-1] if isinstance(value, str) else value
       
   def getCommand(self):
