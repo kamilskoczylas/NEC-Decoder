@@ -93,6 +93,9 @@ class NECDecoder:
           totalTime += signalTime
       
       return first16or27ms
+
+  def reverse_if_string(value): 
+      return value[::-1] if isinstance(value, str) else value
       
   def getCommand(self):
       
@@ -116,11 +119,11 @@ class NECDecoder:
       
       addressArray = self.getFirst16bitsOr27ms(pulseArray)
       binarySignalReversed = self.fillInKnownValues(addressArray)
-      address = binarySignalReversed[::-1]
+      address = self.reverse_if_string(binarySignalReversed)
       
       commandArray = pulseArray
       binarySignalReversed = self.fillInKnownValues(commandArray)
-      command = binarySignalReversed[::-1]
+      command = self.reverse_if_string(binarySignalReversed)
       
       if self.DEBUG:
           print("Address: {0}".format(address))
