@@ -14,8 +14,8 @@ IR Signal recorded by a sound card using Line-in looks like this one:
 - 27 miliseconds 8-bit Command and 8-bit inversed command
 
 Example from the recording:
-- Address: 00000000 11111111
-- Command: 10100010 01011101
+- Address: 00000000 11111111, however byte's value is reversed 00000000 11111111
+- Command: 10100010 01011101, however byte's value is reversed 01000101 10111010
 
 ---
 Requirements
